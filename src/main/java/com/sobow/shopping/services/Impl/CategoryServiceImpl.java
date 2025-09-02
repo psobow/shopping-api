@@ -3,6 +3,7 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Category save(Category category) {
+        assertCategoryUnique(category.getName(), null);
         return categoryRepository.save(category);
     }
     
@@ -48,11 +50,31 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
+    public boolean existsByName(String name) {
+        return categoryRepository.existsByName(name);
+    }
+    
+    @Override
     public Category partialUpdateById(Category category, Long id) {
         Category existingCategory = categoryRepository.findById(id)
                                                       .orElseThrow(() -> new EntityNotFoundException(
                                                           "Category with " + id + " not found"));
-        if (category.getName() != null) existingCategory.setName(category.getName());
+        
+        if (category.getName() != null) {
+            assertCategoryUnique(category.getName(), id);
+            existingCategory.setName(category.getName());
+        }
         return categoryRepository.save(existingCategory);
+    }
+    
+    private void assertCategoryUnique(String name, @Nullable Long excludeId) {
+        if (name == null) return;
+        boolean taken = (excludeId == null)
+                        ? categoryRepository.existsByName(name)
+                        : categoryRepository.existsByNameAndIdNot(name, excludeId); // Check if there is any category with the given name and with an id that is different from the one we are updating.
+        
+        if (taken) {
+            throw new IllegalStateException("Category with name \"%s\" already exists".formatted(name));
+        }
     }
 }

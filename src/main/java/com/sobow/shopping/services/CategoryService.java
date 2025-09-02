@@ -18,5 +18,7 @@ public interface CategoryService {
     
     boolean existsById(Long id);
     
+    boolean existsByName(String name);
+    
     Category partialUpdateById(Category category, Long id);
 }
