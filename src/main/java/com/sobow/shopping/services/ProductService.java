@@ -1,4 +1,4 @@
-package com.sobow.shopping.service;
+package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.ProductRequest;

@@ -1,4 +1,4 @@
-package com.sobow.shopping.repository;
+package com.sobow.shopping.repositories;
 
 import com.sobow.shopping.domain.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,11 +1,12 @@
-package com.sobow.shopping.service.Impl;
+package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.ProductRequest;
-import com.sobow.shopping.repository.CategoryRepository;
-import com.sobow.shopping.repository.ProductRepository;
-import com.sobow.shopping.service.ProductService;
+import com.sobow.shopping.mappers.ProductMapper;
+import com.sobow.shopping.repositories.CategoryRepository;
+import com.sobow.shopping.repositories.ProductRepository;
+import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
@@ -16,27 +17,17 @@ public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
     
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
     }
     
     @Override
     public Product save(ProductRequest productRequest) {
-        Category category =
-            categoryRepository.findById(productRequest.categoryId()).orElseThrow(() -> new EntityNotFoundException(
-                "Category with id " + productRequest.categoryId() + " not found"));
-        
-        Product product = new Product().builder()
-                                       .name(productRequest.name())
-                                       .brandName(productRequest.brandName())
-                                       .price(productRequest.price())
-                                       .availableQuantity(productRequest.availableQuantity())
-                                       .description(productRequest.description())
-                                       .category(category)
-                                       .build();
-        
+        Product product = productMapper.mapToEntity(productRequest);
         return productRepository.save(product);
     }
     
