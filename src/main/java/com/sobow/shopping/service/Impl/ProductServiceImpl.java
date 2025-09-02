@@ -1,6 +1,9 @@
 package com.sobow.shopping.service.Impl;
 
+import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.dto.ProductRequest;
+import com.sobow.shopping.repository.CategoryRepository;
 import com.sobow.shopping.repository.ProductRepository;
 import com.sobow.shopping.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,13 +15,28 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
     
     @Override
-    public Product save(Product product) {
+    public Product save(ProductRequest productRequest) {
+        Category category =
+            categoryRepository.findById(productRequest.categoryId()).orElseThrow(() -> new EntityNotFoundException(
+                "Category with id " + productRequest.categoryId() + " not found"));
+        
+        Product product = new Product().builder()
+                                       .name(productRequest.name())
+                                       .brandName(productRequest.brandName())
+                                       .price(productRequest.price())
+                                       .availableQuantity(productRequest.availableQuantity())
+                                       .description(productRequest.description())
+                                       .category(category)
+                                       .build();
+        
         return productRepository.save(product);
     }
     
@@ -38,17 +56,29 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Product partialUpdateById(Product product, Long id) {
+    public Product partialUpdateById(ProductRequest productRequest, Long id) {
+        
         Product existingProduct = productRepository.findById(id)
                                                    .orElseThrow(() -> new EntityNotFoundException(
                                                        "Product with id " + id + " not found"));
         
-        if (product.getName() != null) existingProduct.setName(product.getName());
-        if (product.getBrandName() != null) existingProduct.setBrandName(product.getBrandName());
-        if (product.getPrice() != null) existingProduct.setPrice(product.getPrice());
-        if (product.getQuantity() != null) existingProduct.setQuantity(product.getQuantity());
-        if (product.getDescription() != null) existingProduct.setDescription(product.getDescription());
-        if (product.getCategory() != null) existingProduct.setCategory(product.getCategory());
+        // simple null checks for other fields
+        if (productRequest.name() != null) existingProduct.setName(productRequest.name());
+        if (productRequest.brandName() != null) existingProduct.setBrandName(productRequest.brandName());
+        if (productRequest.price() != null) existingProduct.setPrice(productRequest.price());
+        if (productRequest.availableQuantity() != null) {
+            existingProduct.setAvailableQuantity(productRequest.availableQuantity());
+        }
+        if (productRequest.description() != null) existingProduct.setDescription(productRequest.description());
+        
+        // handle category update safely
+        if (productRequest.categoryId() != null) {
+            Category category = categoryRepository.findById(productRequest.categoryId())
+                                                  .orElseThrow(() -> new EntityNotFoundException(
+                                                      "Category with id " + productRequest.categoryId()
+                                                          + " not found"));
+            existingProduct.setCategory(category);
+        }
         
         return productRepository.save(existingProduct);
     }

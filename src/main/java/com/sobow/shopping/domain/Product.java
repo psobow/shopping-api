@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 public class Product {
     @Id
@@ -27,7 +29,7 @@ public class Product {
     private String name;
     private String brandName;
     private BigDecimal price;
-    private Integer quantity;
+    private Integer availableQuantity;
     private String description;
     
     @ManyToOne
