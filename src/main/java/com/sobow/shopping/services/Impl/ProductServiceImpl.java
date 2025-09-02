@@ -3,6 +3,7 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.ProductRequest;
+import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.mappers.ProductMapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -17,7 +18,7 @@ public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductMapper productMapper;
+    private final Mapper<Product, ProductRequest> productMapper;
     
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;

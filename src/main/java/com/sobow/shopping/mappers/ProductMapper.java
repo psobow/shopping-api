@@ -8,7 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductMapper {
+public class ProductMapper implements Mapper<Product, ProductRequest> {
     
     private final CategoryRepository categoryRepository;
     
@@ -16,10 +16,12 @@ public class ProductMapper {
         this.categoryRepository = categoryRepository;
     }
     
+    @Override
     public Product mapToEntity(ProductRequest productRequest) {
         Category category =
-            categoryRepository.findById(productRequest.categoryId()).orElseThrow(() -> new EntityNotFoundException(
-                "Category with id " + productRequest.categoryId() + " not found"));
+            categoryRepository.findById(productRequest.categoryId())
+                              .orElseThrow(() -> new EntityNotFoundException(
+                                  "Category with id " + productRequest.categoryId() + " not found"));
         
         return new Product().builder()
                             .name(productRequest.name())
@@ -30,5 +32,4 @@ public class ProductMapper {
                             .category(category)
                             .build();
     }
-    
 }
