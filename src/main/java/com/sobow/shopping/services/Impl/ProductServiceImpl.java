@@ -3,6 +3,7 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.dto.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.mappers.ProductMapper;
 import com.sobow.shopping.repositories.CategoryRepository;
@@ -48,28 +49,28 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Product partialUpdateById(ProductCreateRequest productCreateRequest, Long id) {
+    public Product partialUpdateById(ProductUpdateRequest productUpdateRequest, Long id) {
         
         Product existingProduct = productRepository.findById(id)
                                                    .orElseThrow(() -> new EntityNotFoundException(
                                                        "Product with id " + id + " not found"));
         
         // simple null checks for other fields
-        if (productCreateRequest.name() != null) existingProduct.setName(productCreateRequest.name());
-        if (productCreateRequest.brandName() != null) existingProduct.setBrandName(productCreateRequest.brandName());
-        if (productCreateRequest.price() != null) existingProduct.setPrice(productCreateRequest.price());
-        if (productCreateRequest.availableQuantity() != null) {
-            existingProduct.setAvailableQuantity(productCreateRequest.availableQuantity());
+        if (productUpdateRequest.name() != null) existingProduct.setName(productUpdateRequest.name());
+        if (productUpdateRequest.brandName() != null) existingProduct.setBrandName(productUpdateRequest.brandName());
+        if (productUpdateRequest.price() != null) existingProduct.setPrice(productUpdateRequest.price());
+        if (productUpdateRequest.availableQuantity() != null) {
+            existingProduct.setAvailableQuantity(productUpdateRequest.availableQuantity());
         }
-        if (productCreateRequest.description() != null) {
-            existingProduct.setDescription(productCreateRequest.description());
+        if (productUpdateRequest.description() != null) {
+            existingProduct.setDescription(productUpdateRequest.description());
         }
         
         // handle category update safely
-        if (productCreateRequest.categoryId() != null) {
-            Category category = categoryRepository.findById(productCreateRequest.categoryId())
+        if (productUpdateRequest.categoryId() != null) {
+            Category category = categoryRepository.findById(productUpdateRequest.categoryId())
                                                   .orElseThrow(() -> new EntityNotFoundException(
-                                                      "Category with id " + productCreateRequest.categoryId()
+                                                      "Category with id " + productUpdateRequest.categoryId()
                                                           + " not found"));
             existingProduct.setCategory(category);
         }
