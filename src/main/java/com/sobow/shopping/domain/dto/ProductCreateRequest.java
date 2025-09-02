@@ -13,7 +13,7 @@ public record ProductCreateRequest(
     @NotBlank @Size(max = 120) String brandName,
     @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal price,
     @NotNull @PositiveOrZero Integer availableQuantity,
-    @Size(max = 2000) String description,
+    @NotBlank @Size(max = 2000) String description,
     @NotNull @Positive Long categoryId
 ) {
 
