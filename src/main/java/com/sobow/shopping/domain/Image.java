@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostPersist;
 import java.sql.Blob;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,4 +32,9 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+    
+    @PostPersist
+    private void generateDownloadUrl() {
+        this.downloadUrl = "/api/images/image/download/" + this.id;
+    }
 }
