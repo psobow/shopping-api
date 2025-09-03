@@ -2,7 +2,7 @@ package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.repositories.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;

@@ -25,7 +25,7 @@ public class CategoryServiceTests {
         
         Category saved = categoryService.save(category);
         
-        Category laptops = categoryService.findByName("Laptops").get();
+        Category laptops = categoryService.findByName("Laptops");
         
         assertEquals("Laptops", laptops.getName());
     }

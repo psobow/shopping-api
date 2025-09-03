@@ -6,7 +6,6 @@ import com.sobow.shopping.services.CategoryService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,13 +24,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public Optional<Category> findById(Long id) {
-        return categoryRepository.findById(id);
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+            "Category with " + id + " not found"));
     }
     
     @Override
-    public Optional<Category> findByName(String name) {
-        return categoryRepository.findByName(name);
+    public Category findByName(String name) {
+        return categoryRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException(
+            "Category with " + name + " not found"));
     }
     
     @Override
@@ -56,9 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Category partialUpdateById(Category category, Long id) {
-        Category existingCategory = categoryRepository.findById(id)
-                                                      .orElseThrow(() -> new EntityNotFoundException(
-                                                          "Category with " + id + " not found"));
+        Category existingCategory = findById(id);
         
         if (category.getName() != null) {
             assertCategoryUnique(category.getName(), id);
