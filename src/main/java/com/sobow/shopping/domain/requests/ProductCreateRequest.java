@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.dto;
+package com.sobow.shopping.domain.requests;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
