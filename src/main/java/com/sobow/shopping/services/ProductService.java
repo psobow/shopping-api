@@ -13,7 +13,7 @@ public interface ProductService {
     
     boolean existsById(Long id);
     
-    Product partialUpdateById(Product product, Long id);
+    Product partialUpdateById(Product patch, Long existingId);
     
     List<Product> findAll();
     

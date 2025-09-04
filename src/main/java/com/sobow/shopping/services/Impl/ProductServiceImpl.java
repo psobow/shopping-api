@@ -1,14 +1,13 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.mappers.ProductMapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +15,10 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
-    private final CategoryService categoryService;
-    private final Mapper<com.sobow.shopping.domain.Product, ProductCreateRequest> productMapper;
+
     
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CategoryService categoryService, ProductMapper productMapper) {
         this.productRepository = productRepository;
-        this.categoryService = categoryService;
-        this.productMapper = productMapper;
     }
     
     @Override
@@ -46,17 +42,18 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.existsById(id);
     }
     
+    @Transactional
     @Override
-    public Product partialUpdateById(Product product, Long id) {
+    public Product partialUpdateById(Product patch, Long existingId) {
         
-        Product existingProduct = findById(id);
+        Product existingProduct = findById(existingId);
         
-        if (product.getName() != null) existingProduct.setName(product.getName());
-        if (product.getBrandName() != null) existingProduct.setBrandName(product.getBrandName());
-        if (product.getPrice() != null) existingProduct.setPrice(product.getPrice());
-        if (product.getAvailableQuantity() != null) existingProduct.setAvailableQuantity(product.getAvailableQuantity());
-        if (product.getDescription() != null) existingProduct.setDescription(product.getDescription());
-        if (product.getCategory() != null) existingProduct.setCategory(product.getCategory());
+        if (patch.getName() != null) existingProduct.setName(patch.getName());
+        if (patch.getBrandName() != null) existingProduct.setBrandName(patch.getBrandName());
+        if (patch.getPrice() != null) existingProduct.setPrice(patch.getPrice());
+        if (patch.getAvailableQuantity() != null) existingProduct.setAvailableQuantity(patch.getAvailableQuantity());
+        if (patch.getDescription() != null) existingProduct.setDescription(patch.getDescription());
+        if (patch.getCategory() != null) existingProduct.setCategory(patch.getCategory());
         
         return productRepository.save(existingProduct);
     }
