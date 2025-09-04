@@ -1,4 +1,4 @@
-package com.sobow.shopping;
+package com.sobow.shopping.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;

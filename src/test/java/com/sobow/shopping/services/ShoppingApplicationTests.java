@@ -1,4 +1,4 @@
-package com.sobow.shopping;
+package com.sobow.shopping.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
