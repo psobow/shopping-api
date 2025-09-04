@@ -5,6 +5,7 @@ import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -55,13 +56,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.existsByName(name);
     }
     
+    @Transactional
     @Override
-    public Category partialUpdateById(Category category, Long id) {
-        Category existingCategory = findById(id);
+    public Category partialUpdateById(Category patch, Long existingId) {
+        Category existingCategory = findById(existingId);
         
-        if (category.getName() != null) {
-            assertCategoryUnique(category.getName(), id);
-            existingCategory.setName(category.getName());
+        if (patch.getName() != null) {
+            assertCategoryUnique(patch.getName(), existingId);
+            existingCategory.setName(patch.getName());
         }
         return categoryRepository.save(existingCategory);
     }
