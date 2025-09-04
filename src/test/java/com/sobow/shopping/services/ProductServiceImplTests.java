@@ -55,7 +55,7 @@ public class ProductServiceImplTests {
         Product result = underTest.partialUpdateById(patch, id);
         
         // Then
-        // Changed fields
+        // Updated fields
         assertEquals("newProductName", result.getName());
         assertEquals("newCategoryName", result.getCategory().getName());
         

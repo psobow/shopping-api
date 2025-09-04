@@ -25,8 +25,10 @@ public class CategoryRepositoryIntegrationTests {
         books = categoryRepository.save(books);
         electronics = categoryRepository.save(electronics);
         
-        // Test query
-        assertTrue(categoryRepository.existsByNameAndIdNot("Books", electronics.getId())); // another row named "Books" -> true
-        assertFalse(categoryRepository.existsByNameAndIdNot("Books", books.getId())); // exclude self -> false
+        // another row named "Books" -> return true
+        assertTrue(categoryRepository.existsByNameAndIdNot("Books", electronics.getId()));
+        
+        // only same row named "Books" -> return false
+        assertFalse(categoryRepository.existsByNameAndIdNot("Books", books.getId()));
     }
 }

@@ -48,6 +48,20 @@ public class ImageServiceImpl implements ImageService {
         return images;
     }
     
+    @Transactional
+    @Override
+    public Image updateById(MultipartFile patch, Long existingId) {
+        Image image = findById(existingId);
+        image.setFileName(patch.getOriginalFilename());
+        image.setFileType(patch.getContentType());
+        try {
+            image.setImage(new SerialBlob(patch.getBytes()));
+        } catch (Exception e) {
+            throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
+        }
+        return imageRepository.save(image);
+    }
+    
     @Override
     public Image findById(Long id) {
         return imageRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
@@ -57,18 +71,5 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void deleteById(Long id) {
         imageRepository.deleteById(id);
-    }
-    
-    @Override
-    public void updateById(MultipartFile file, Long id) {
-        Image image = findById(id);
-        image.setFileName(file.getOriginalFilename());
-        image.setFileType(file.getContentType());
-        try {
-            image.setImage(new SerialBlob(file.getBytes()));
-        } catch (Exception e) {
-            throw new ImageProcessingException("Failed to process image file: " + file.getOriginalFilename(), e);
-        }
-        imageRepository.save(image);
     }
 }

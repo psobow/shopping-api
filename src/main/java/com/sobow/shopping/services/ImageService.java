@@ -8,9 +8,9 @@ public interface ImageService {
     
     List<Image> saveImages(List<MultipartFile> files, Long productId);
     
+    Image updateById(MultipartFile patch, Long existingId);
+    
     Image findById(Long id);
     
     void deleteById(Long id);
-    
-    void updateById(MultipartFile file, Long id);
 }
