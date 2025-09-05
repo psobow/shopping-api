@@ -1,10 +1,12 @@
 package com.sobow.shopping.services.Impl;
 
+import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.mappers.ProductMapper;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
-import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -15,14 +17,22 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
-
+    private final CategoryRepository categoryRepository;
+    private final Mapper<Product, ProductCreateRequest> productMapper;
     
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, CategoryService categoryService, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              Mapper<Product, ProductCreateRequest> productMapper) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
     }
     
     @Override
-    public Product save(Product product) {
+    public Product save(ProductCreateRequest productCreateRequest) {
+        Category category = findCategoryById(productCreateRequest.categoryId());
+        Product product = productMapper.mapToEntity(productCreateRequest);
+        product.setCategory(category);
         return productRepository.save(product);
     }
     
@@ -44,18 +54,27 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product partialUpdateById(Product patch, Long existingId) {
+    public Product partialUpdateById(ProductUpdateRequest patch, Long existingId) {
         
         Product existingProduct = findById(existingId);
         
-        if (patch.getName() != null) existingProduct.setName(patch.getName());
-        if (patch.getBrandName() != null) existingProduct.setBrandName(patch.getBrandName());
-        if (patch.getPrice() != null) existingProduct.setPrice(patch.getPrice());
-        if (patch.getAvailableQuantity() != null) existingProduct.setAvailableQuantity(patch.getAvailableQuantity());
-        if (patch.getDescription() != null) existingProduct.setDescription(patch.getDescription());
-        if (patch.getCategory() != null) existingProduct.setCategory(patch.getCategory());
+        if (patch.name() != null) existingProduct.setName(patch.name());
+        if (patch.brandName() != null) existingProduct.setBrandName(patch.brandName());
+        if (patch.price() != null) existingProduct.setPrice(patch.price());
+        if (patch.availableQuantity() != null) existingProduct.setAvailableQuantity(patch.availableQuantity());
+        if (patch.description() != null) existingProduct.setDescription(patch.description());
+        if (patch.categoryId() != null) {
+            Category category = findCategoryById(patch.categoryId());
+            existingProduct.setCategory(category);
+        }
         
         return productRepository.save(existingProduct);
+    }
+    
+    private Category findCategoryById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                                 .orElseThrow(() -> new EntityNotFoundException(
+                                     "Category with id " + categoryId + " not found"));
     }
     
     @Override

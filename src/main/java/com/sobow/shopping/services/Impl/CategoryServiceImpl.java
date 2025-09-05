@@ -3,7 +3,6 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -20,7 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Category save(Category category) {
-        assertCategoryUnique(category.getName(), null);
+        assertCategoryUnique(category.getName());
         return categoryRepository.save(category);
     }
     
@@ -61,20 +60,15 @@ public class CategoryServiceImpl implements CategoryService {
     public Category partialUpdateById(Category patch, Long existingId) {
         Category existingCategory = findById(existingId);
         
-        if (patch.getName() != null) {
-            assertCategoryUnique(patch.getName(), existingId);
+        if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
+            assertCategoryUnique(patch.getName());
             existingCategory.setName(patch.getName());
         }
         return categoryRepository.save(existingCategory);
     }
     
-    private void assertCategoryUnique(String name, @Nullable Long excludeId) {
-        if (name == null) return;
-        boolean taken = (excludeId == null)
-                        ? categoryRepository.existsByName(name)
-                        : categoryRepository.existsByNameAndIdNot(name, excludeId); // Check if there is any category with the given name and with an id that is different from the one we are updating.
-        
-        if (taken) {
+    private void assertCategoryUnique(String name) {
+        if (categoryRepository.existsByName(name)) {
             throw new IllegalStateException("Category with name \"%s\" already exists".formatted(name));
         }
     }

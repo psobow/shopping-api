@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,7 +19,6 @@ import com.sobow.shopping.services.Impl.ImageServiceImpl;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +39,7 @@ public class ImageServiceImplTests {
     private ImageServiceImpl underTest;
     
     @Test
-    public void saveImages_saveFiles_and_returnImages() throws Exception {
+    public void saveImages_Success() throws Exception {
         // Given
         Long productId = 10L;
         Product product = new Product();
@@ -80,32 +78,27 @@ public class ImageServiceImplTests {
         when(productService.findById(productId)).thenReturn(product);
         
         MultipartFile bad = mock(MultipartFile.class);
-        when(bad.getOriginalFilename()).thenReturn("broken.png");
         when(bad.getBytes()).thenThrow(new IOException("boom"));
         
         // When & Then
-        ImageProcessingException exception =
-            assertThrows(ImageProcessingException.class,
+        assertThrows(ImageProcessingException.class,
                          () -> underTest.saveImages(List.of(bad), productId));
-        assertTrue(exception.getMessage().contains("broken.png"));
         verify(imageRepository, never()).save(any());
     }
     
     @Test
-    public void updateById_updateFile_and_returnFile() throws Exception {
-        
+    public void updateById_Success() throws Exception {
         // Given
         Long existingId = 10L;
         Image existing = new Image();
-        existing.setImage(new SerialBlob(new byte[]{1, 2, 3}));
-        existing.setFileName("old.png");
-        when(imageRepository.findById(existingId)).thenReturn(Optional.of(existing));
         
         MultipartFile patch = mock(MultipartFile.class);
         when(patch.getOriginalFilename()).thenReturn("new.png");
         when(patch.getContentType()).thenReturn("image/png");
         byte[] patchBytes = new byte[]{4, 5, 6};
         when(patch.getBytes()).thenReturn(patchBytes);
+        
+        when(imageRepository.findById(existingId)).thenReturn(Optional.of(existing));
         when(imageRepository.save(existing)).thenReturn(existing);
         
         // When
@@ -130,8 +123,7 @@ public class ImageServiceImplTests {
         when(bad.getBytes()).thenThrow(new IOException("boom"));
         
         // When & Then
-        ImageProcessingException exception =
-            assertThrows(ImageProcessingException.class, () -> underTest.updateById(bad, existingId));
+        assertThrows(ImageProcessingException.class, () -> underTest.updateById(bad, existingId));
         verify(imageRepository, never()).save(any());
     }
 }

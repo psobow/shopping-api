@@ -67,12 +67,13 @@ public class CategoryServiceImplTests {
         String newName = "new";
         Long existingId = 99L;
         existing.setName(oldName);
-        when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
-        when(categoryRepository.existsByNameAndIdNot(newName, existingId)).thenReturn(false);
-        when(categoryRepository.save(existing)).thenReturn(existing);
         
         Category patch = new Category();
         patch.setName(newName);
+        
+        when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
+        when(categoryRepository.existsByName(newName)).thenReturn(false);
+        when(categoryRepository.save(existing)).thenReturn(existing);
         
         // When
         Category result = underTest.partialUpdateById(patch, existingId);
@@ -80,7 +81,7 @@ public class CategoryServiceImplTests {
         // Then
         assertEquals(newName, existing.getName());
         assertSame(existing, result);
-        verify(categoryRepository).existsByNameAndIdNot(newName, existingId);
+        verify(categoryRepository).existsByName(newName);
         verify(categoryRepository).save(existing);
     }
     
@@ -88,16 +89,15 @@ public class CategoryServiceImplTests {
     public void partialUpdateById_Duplicate_Throws() {
         // Given
         Category existing = new Category();
-        String oldName = "old";
+        existing.setName("old");
         Long existingId = 99L;
-        existing.setName(oldName);
         
         Category patch = new Category();
-        String newName = oldName;
+        String newName = "new";
         patch.setName(newName);
         
         when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
-        when(categoryRepository.existsByNameAndIdNot(newName, existingId)).thenReturn(true);
+        when(categoryRepository.existsByName(newName)).thenReturn(true);
         
         // When & Then
         assertThrows(IllegalStateException.class, () -> underTest.partialUpdateById(patch, existingId));
