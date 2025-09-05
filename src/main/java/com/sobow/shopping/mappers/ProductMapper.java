@@ -16,4 +16,9 @@ public class ProductMapper implements Mapper<Product, ProductCreateRequest> {
                             .description(productCreateRequest.description())
                             .build();
     }
+    
+    @Override
+    public ProductCreateRequest mapToDto(Product product) {
+        return null;
+    }
 }

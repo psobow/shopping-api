@@ -2,16 +2,18 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.dto.FileContent;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.services.ImageService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -42,7 +44,6 @@ public class ImageServiceImpl implements ImageService {
             image.setFileType(file.getContentType());
             image.setProduct(product);
             imageRepository.save(image);
-            
             images.add(image);
         }
         return images;
@@ -71,5 +72,22 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void deleteById(Long id) {
         imageRepository.deleteById(id);
+    }
+    
+    @Transactional(readOnly = true)
+    @Override
+    public FileContent getImageContent(Long id) {
+        Image img = findById(id);
+        try {
+            return new FileContent(
+                img.getFileName(),
+                img.getFileType(),
+                img.getImage().length(),
+                img.getImage().getBytes(1, (int) img.getImage().length())
+            );
+        } catch (SQLException e) {
+            throw new ImageProcessingException(
+                "Failed to process image file: " + img.getFileName(), e);
+        }
     }
 }

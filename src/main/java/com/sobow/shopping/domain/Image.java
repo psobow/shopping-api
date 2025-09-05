@@ -35,6 +35,6 @@ public class Image {
     
     @PostPersist
     private void generateDownloadUrl() {
-        this.downloadUrl = "/api/images/image/download/" + this.id;
+        this.downloadUrl = "/api/images/download/" + this.id;
     }
 }

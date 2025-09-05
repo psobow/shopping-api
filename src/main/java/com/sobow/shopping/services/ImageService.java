@@ -1,6 +1,7 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.Image;
+import com.sobow.shopping.domain.dto.FileContent;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,4 +14,6 @@ public interface ImageService {
     Image findById(Long id);
     
     void deleteById(Long id);
+    
+    FileContent getImageContent(Long id);
 }
