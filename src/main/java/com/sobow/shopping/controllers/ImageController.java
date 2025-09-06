@@ -50,9 +50,9 @@ public class ImageController {
         FileContent fileContent = imageService.getImageContent(id);
         ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
         return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(fileContent.contentType()))
+                             .contentType(MediaType.parseMediaType(fileContent.fileType()))
                              .contentLength(fileContent.length())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileContent.filename() + "\"")
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + fileContent.fileName() + "\"")
                              .body(byteArrayResource);
     }
 }

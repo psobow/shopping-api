@@ -13,12 +13,16 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.dto.FileContent;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.services.Impl.ImageServiceImpl;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -82,7 +86,7 @@ public class ImageServiceImplTests {
         
         // When & Then
         assertThrows(ImageProcessingException.class,
-                         () -> underTest.saveImages(List.of(bad), productId));
+                     () -> underTest.saveImages(List.of(bad), productId));
         verify(imageRepository, never()).save(any());
     }
     
@@ -125,5 +129,41 @@ public class ImageServiceImplTests {
         // When & Then
         assertThrows(ImageProcessingException.class, () -> underTest.updateById(bad, existingId));
         verify(imageRepository, never()).save(any());
+    }
+    
+    @Test
+    void getImageContent_Success() throws SQLException {
+        Long existingId = 1L;
+        Image image = new Image();
+        image.setFileName("photo.png");
+        image.setFileType("image/png");
+        byte[] bytes = new byte[]{1, 2, 3};
+        image.setImage(new SerialBlob(bytes));
+        
+        when(imageRepository.findById(existingId)).thenReturn(Optional.of(image));
+        
+        FileContent result = underTest.getImageContent(existingId);
+        
+        byte[] resultBytes = result.bytes();
+        assertArrayEquals(bytes, resultBytes);
+        assertEquals("photo.png", result.fileName());
+        assertEquals("image/png", result.fileType());
+    }
+    
+    @Test
+    void getImageContent_wrapsBytesError() throws Exception {
+        Long existingId = 1L;
+        
+        Blob bad = mock(Blob.class);
+        long length = 1L;
+        when(bad.length()).thenReturn(length);
+        when(bad.getBytes(1, (int) length)).thenThrow(new SQLException());
+        
+        Image image = new Image();
+        image.setImage(bad);
+        
+        when(imageRepository.findById(existingId)).thenReturn(Optional.of(image));
+        
+        assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(existingId));
     }
 }
