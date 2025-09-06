@@ -111,12 +111,12 @@ public class ProductServiceImplTests {
         Long productId = 2L;
         Product product = new Product();
         
-        Long missingId = 9999L;
+        Long nonExistingCategoryId = 9999L;
         ProductUpdateRequest patch =
-            new ProductUpdateRequest("newProductName", null, null, null, null, missingId);
+            new ProductUpdateRequest(null, null, null, null, null, nonExistingCategoryId);
         
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(categoryRepository.findById(missingId)).thenReturn(Optional.empty());
+        when(categoryRepository.findById(nonExistingCategoryId)).thenReturn(Optional.empty());
         
         // When + Then
         assertThrows(EntityNotFoundException.class,

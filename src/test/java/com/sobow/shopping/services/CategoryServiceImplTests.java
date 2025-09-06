@@ -63,12 +63,11 @@ public class CategoryServiceImplTests {
     public void partialUpdateById_Success() {
         // Given
         Category existing = new Category();
-        String oldName = "old";
-        String newName = "new";
-        Long existingId = 99L;
-        existing.setName(oldName);
+        existing.setName("old");
+        Long existingId = 10L;
         
         Category patch = new Category();
+        String newName = "new";
         patch.setName(newName);
         
         when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
@@ -90,10 +89,10 @@ public class CategoryServiceImplTests {
         // Given
         Category existing = new Category();
         existing.setName("old");
-        Long existingId = 99L;
+        Long existingId = 10L;
         
         Category patch = new Category();
-        String newName = "new";
+        String newName = "nameAlreadyTakenByOtherCategory";
         patch.setName(newName);
         
         when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
