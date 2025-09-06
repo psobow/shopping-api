@@ -106,7 +106,7 @@ public class ProductServiceImplTests {
     }
     
     @Test
-    public void partialUpdateById_missingCategory_Throws() {
+    public void partialUpdateById_NonExistingId_Throws() {
         // Given
         Long productId = 2L;
         Product product = new Product();

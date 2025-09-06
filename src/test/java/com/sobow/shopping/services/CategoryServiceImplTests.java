@@ -29,7 +29,7 @@ public class CategoryServiceImplTests {
     private CategoryServiceImpl underTest;
     
     @Test
-    public void save_Unique_Success() {
+    public void save_Success() {
         // Given
         Category category = new Category();
         String uniqueName = "Unique";
@@ -60,7 +60,7 @@ public class CategoryServiceImplTests {
     }
     
     @Test
-    public void partialUpdateById_Unique_Success() {
+    public void partialUpdateById_Success() {
         // Given
         Category existing = new Category();
         String oldName = "old";
@@ -105,7 +105,7 @@ public class CategoryServiceImplTests {
     }
     
     @Test
-    void findById_Missing_Throws() {
+    void findById_NonExistingId_Throws() {
         when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> underTest.findById(99L));
     }

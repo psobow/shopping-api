@@ -1,5 +1,5 @@
 package com.sobow.shopping.domain.dto;
 
-public record ImageDto(Long imageId, String fileName, String downloadUrl) {
+public record ImageDto(Long id, String fileName, String downloadUrl) {
 
 }

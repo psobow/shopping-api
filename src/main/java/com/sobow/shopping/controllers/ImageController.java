@@ -40,7 +40,7 @@ public class ImageController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
-        @RequestPart @NotEmpty List<@NotNull MultipartFile> files,
+        @RequestPart("file") @NotEmpty List<@NotNull MultipartFile> files,
         @PathVariable @Min(1) Long productId) {
         
         List<ImageDto> imageDtoList = imageService.saveImages(files, productId)
@@ -61,7 +61,7 @@ public class ImageController {
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(fileContent.fileType()))
                              .contentLength(fileContent.length())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + fileContent.fileName() + "\"")
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileContent.fileName() + "\"")
                              .body(byteArrayResource);
     }
     
@@ -71,7 +71,7 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
         @PathVariable @Min(1) Long id,
-        @RequestPart @NotNull MultipartFile file) {
+        @RequestPart("file") @NotNull MultipartFile file) {
         Image updatedImage = imageService.updateById(file, id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", imageMapper.mapToDto(updatedImage))

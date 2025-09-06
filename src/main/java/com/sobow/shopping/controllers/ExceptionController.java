@@ -18,7 +18,7 @@ public class ExceptionController {
         ImageProcessingException exception, HttpServletRequest request) {
         
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
-        problemDetail.setTitle("Unable to process image");
+        problemDetail.setTitle("Unable to process image.");
         problemDetail.setDetail(exception.getMessage());
         problemDetail.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
@@ -27,7 +27,7 @@ public class ExceptionController {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleNotFound(EntityNotFoundException exception, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        pd.setTitle("Resource not found");
+        pd.setTitle("Resource not found.");
         pd.setDetail(exception.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
