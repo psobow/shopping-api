@@ -8,6 +8,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class ExceptionController {
@@ -28,6 +29,15 @@ public class ExceptionController {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         pd.setTitle("Resource not found");
         pd.setDetail(exception.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxSize(MaxUploadSizeExceededException e, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.PAYLOAD_TOO_LARGE);
+        pd.setTitle("File too large.");
+        pd.setDetail(e.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
