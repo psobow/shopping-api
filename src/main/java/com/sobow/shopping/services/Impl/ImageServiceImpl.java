@@ -51,8 +51,8 @@ public class ImageServiceImpl implements ImageService {
     
     @Transactional
     @Override
-    public Image updateById(MultipartFile patch, Long existingId) {
-        Image image = findById(existingId);
+    public Image updateById(MultipartFile patch, Long id) {
+        Image image = findById(id);
         image.setFileName(patch.getOriginalFilename());
         image.setFileType(patch.getContentType());
         try {

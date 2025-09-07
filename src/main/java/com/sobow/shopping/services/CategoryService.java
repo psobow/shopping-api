@@ -19,5 +19,5 @@ public interface CategoryService {
     
     boolean existsByName(String name);
     
-    Category partialUpdateById(Category patch, Long existingId);
+    Category partialUpdateById(Category patch, Long id);
 }

@@ -59,8 +59,8 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Transactional
     @Override
-    public Category partialUpdateById(Category patch, Long existingId) {
-        Category existingCategory = findById(existingId);
+    public Category partialUpdateById(Category patch, Long id) {
+        Category existingCategory = findById(id);
         
         if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
             assertCategoryUnique(patch.getName());

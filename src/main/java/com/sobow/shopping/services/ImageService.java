@@ -9,7 +9,7 @@ public interface ImageService {
     
     List<Image> saveImages(List<MultipartFile> files, Long productId);
     
-    Image updateById(MultipartFile patch, Long existingId);
+    Image updateById(MultipartFile patch, Long id);
     
     Image findById(Long id);
     

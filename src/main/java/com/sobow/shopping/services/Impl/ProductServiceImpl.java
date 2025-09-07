@@ -54,9 +54,9 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product partialUpdateById(ProductUpdateRequest patch, Long existingId) {
+    public Product partialUpdateById(ProductUpdateRequest patch, Long id) {
         
-        Product existingProduct = findById(existingId);
+        Product existingProduct = findById(id);
         
         if (patch.name() != null) existingProduct.setName(patch.name());
         if (patch.brandName() != null) existingProduct.setBrandName(patch.brandName());
