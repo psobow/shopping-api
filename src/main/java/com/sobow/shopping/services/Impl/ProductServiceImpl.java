@@ -9,9 +9,9 @@ import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductServiceImpl implements ProductService {

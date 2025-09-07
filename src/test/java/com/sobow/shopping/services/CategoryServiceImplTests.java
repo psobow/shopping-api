@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.exceptions.AlreadyExistsException;
+import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,13 +29,21 @@ public class CategoryServiceImplTests {
     @InjectMocks
     private CategoryServiceImpl underTest;
     
+    private final static long existingId = 1L;
+    private final static long nonExistingId = 999L;
+    
+    private Category getCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+        return category;
+    }
+    
     @Test
     public void save_Success() {
         // Given
-        Category category = new Category();
-        String uniqueName = "Unique";
-        category.setName(uniqueName);
-        when(categoryRepository.existsByName(uniqueName)).thenReturn(false);
+        Category category = getCategory("Unique");
+        
+        when(categoryRepository.existsByName(category.getName())).thenReturn(false);
         when(categoryRepository.save(category)).thenReturn(category);
         
         // When
@@ -43,70 +51,76 @@ public class CategoryServiceImplTests {
         
         // Then
         assertSame(category, saved);
-        verify(categoryRepository).existsByName(uniqueName);
+        verify(categoryRepository).existsByName(category.getName());
         verify(categoryRepository).save(category);
     }
     
     @Test
     public void save_Duplicate_Throws() {
         // Given
-        Category category = new Category();
-        String duplicate = "Duplicate";
-        category.setName(duplicate);
-        when(categoryRepository.existsByName(duplicate)).thenReturn(true);
+        Category category = getCategory("Duplicate");
+        
+        when(categoryRepository.existsByName(category.getName())).thenReturn(true);
         
         // When & Then
-        assertThrows(AlreadyExistsException.class, () -> underTest.save(category));
+        assertThrows(ResourceAlreadyExistsException.class, () -> underTest.save(category));
         verify(categoryRepository, never()).save(any());
     }
     
     @Test
     public void partialUpdateById_Success() {
         // Given
-        Category existing = new Category();
-        existing.setName("old");
-        Long existingId = 10L;
-        
-        Category patch = new Category();
-        String newName = "new";
-        patch.setName(newName);
+        Category existing = getCategory("old");
+        Category patch = getCategory("new");
         
         when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
-        when(categoryRepository.existsByName(newName)).thenReturn(false);
+        when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
         when(categoryRepository.save(existing)).thenReturn(existing);
         
         // When
         Category result = underTest.partialUpdateById(patch, existingId);
         
         // Then
-        assertEquals(newName, existing.getName());
+        assertEquals(patch.getName(), existing.getName());
         assertSame(existing, result);
-        verify(categoryRepository).existsByName(newName);
+        verify(categoryRepository).existsByName(patch.getName());
         verify(categoryRepository).save(existing);
     }
     
     @Test
     public void partialUpdateById_Duplicate_Throws() {
         // Given
-        Category existing = new Category();
-        existing.setName("old");
-        Long existingId = 10L;
-        
-        Category patch = new Category();
-        String newName = "nameAlreadyTakenByOtherCategory";
-        patch.setName(newName);
+        Category existing = getCategory("old");
+        Category patch = getCategory("nameAlreadyTakenByOtherCategory");
         
         when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
-        when(categoryRepository.existsByName(newName)).thenReturn(true);
+        when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
         
         // When & Then
-        assertThrows(AlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
+        assertThrows(ResourceAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
         verify(categoryRepository, never()).save(any());
     }
     
     @Test
-    void findById_NonExistingId_Throws() {
-        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> underTest.findById(99L));
+    public void partialUpdateById_UpdateItself_NoDatabaseHit() {
+        // Given
+        Category existing = getCategory("name");
+        Category patch = getCategory("name");
+        
+        when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
+        
+        // When
+        Category result = underTest.partialUpdateById(patch, existingId);
+        
+        // Then
+        verify(categoryRepository, never()).save(any());
+        assertSame(existing, result);
     }
+    
+    @Test
+    void findById_NonExistingId_Throws() {
+        when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> underTest.findById(nonExistingId));
+    }
+    
 }

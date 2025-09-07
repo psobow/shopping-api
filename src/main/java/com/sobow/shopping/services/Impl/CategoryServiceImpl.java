@@ -1,13 +1,13 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.exceptions.AlreadyExistsException;
+import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -18,6 +18,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
     }
     
+    @Transactional
     @Override
     public Category save(Category category) {
         assertCategoryUnique(category.getName());
@@ -64,13 +65,14 @@ public class CategoryServiceImpl implements CategoryService {
         if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
             assertCategoryUnique(patch.getName());
             existingCategory.setName(patch.getName());
+            categoryRepository.save(existingCategory);
         }
-        return categoryRepository.save(existingCategory);
+        return existingCategory;
     }
     
     private void assertCategoryUnique(String name) {
         if (categoryRepository.existsByName(name)) {
-            throw new AlreadyExistsException("Category", "name", name);
+            throw new ResourceAlreadyExistsException("Category", "name", name);
         }
     }
 }

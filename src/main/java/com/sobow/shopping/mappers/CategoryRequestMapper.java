@@ -1,19 +1,19 @@
 package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.domain.requests.CategoryCreateRequest;
+import com.sobow.shopping.domain.requests.CategoryRequest;
 
-public class CategoryRequestMapper implements Mapper<Category, CategoryCreateRequest> {
+public class CategoryRequestMapper implements Mapper<Category, CategoryRequest> {
     
     @Override
-    public Category mapToEntity(CategoryCreateRequest categoryCreateRequest) {
+    public Category mapToEntity(CategoryRequest categoryRequest) {
         return new Category().builder()
-                             .name(categoryCreateRequest.name())
+                             .name(categoryRequest.name())
                              .build();
     }
     
     @Override
-    public CategoryCreateRequest mapToDto(Category category) {
-        return null;
+    public CategoryRequest mapToDto(Category category) {
+        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
     }
 }

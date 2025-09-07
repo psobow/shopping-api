@@ -1,7 +1,7 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.exceptions.AlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
+import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -43,8 +43,8 @@ public class ExceptionController {
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
     
-    @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleResourceConflict(AlreadyExistsException e, HttpServletRequest request) {
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleResourceConflict(ResourceAlreadyExistsException e, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Resource already exists");
         pd.setDetail(e.getMessage());

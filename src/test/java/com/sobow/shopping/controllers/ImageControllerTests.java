@@ -46,9 +46,9 @@ public class ImageControllerTests {
     @MockitoBean
     private Mapper<Image, ImageResponse> imageMapper;
     
-    private final long existingId = 1L;
-    private final long invalidId = 0L;
-    private final long nonExistingId = 999L;
+    private final static long existingId = 1L;
+    private final static long invalidId = 0L;
+    private final static long nonExistingId = 999L;
     
     private static MockMultipartFile getValidMultipartFile() {
         return new MockMultipartFile(
