@@ -13,7 +13,7 @@ import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
-import com.sobow.shopping.mappers.ProductMapper;
+import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.Impl.ProductServiceImpl;
@@ -36,7 +36,7 @@ public class ProductServiceImplTests {
     private CategoryRepository categoryRepository;
     
     @Mock
-    private ProductMapper productMapper;
+    private Mapper<Product, ProductCreateRequest> productRequestMapper;
     
     @InjectMocks
     private ProductServiceImpl underTest;
@@ -51,7 +51,7 @@ public class ProductServiceImplTests {
         Product mapped = new Product();       // what mapper returns
         Category category = new Category();   // what repo returns
         
-        when(productMapper.mapToEntity(dto)).thenReturn(mapped);
+        when(productRequestMapper.mapToEntity(dto)).thenReturn(mapped);
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(productRepository.save(mapped)).thenReturn(mapped);
         // When

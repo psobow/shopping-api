@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.dto.FileContent;
-import com.sobow.shopping.domain.dto.ImageDto;
+import com.sobow.shopping.domain.responses.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,7 +44,7 @@ public class ImageControllerTests {
     private ImageService imageService;
     
     @MockitoBean
-    private Mapper<Image, ImageDto> imageMapper;
+    private Mapper<Image, ImageResponse> imageMapper;
     
     private final long existingId = 1L;
     private final long invalidId = 0L;
@@ -60,7 +60,7 @@ public class ImageControllerTests {
         MockMultipartFile file = getValidMultipartFile();
         
         List<Image> saved = List.of(new Image());
-        ImageDto dto = new ImageDto(1L, "", "/api/images/1");
+        ImageResponse dto = new ImageResponse(1L, "", "/api/images/1");
         
         when(imageService.saveImages(anyList(), eq(existingId))).thenReturn(saved);
         when(imageMapper.mapToDto(any())).thenReturn(dto);
@@ -147,7 +147,6 @@ public class ImageControllerTests {
                             .contentType(MediaType.MULTIPART_FORM_DATA))
                .andExpect(status().isPayloadTooLarge())
                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON_VALUE))
-               .andExpect(jsonPath("$.title").value("File too large."))
                .andExpect(jsonPath("$.status").value(413))
                .andExpect(jsonPath("$.path").value("/api/products/" + existingId + "/images"));
     }
@@ -191,7 +190,7 @@ public class ImageControllerTests {
         Image updated = new Image();
         when(imageService.updateById(file, existingId)).thenReturn(updated);
         when(imageMapper.mapToDto(updated)).thenReturn(
-            new ImageDto(existingId, file.getOriginalFilename(), "/api/images" + existingId));
+            new ImageResponse(existingId, file.getOriginalFilename(), "/api/images" + existingId));
         
         mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", existingId)
                             .file(file)

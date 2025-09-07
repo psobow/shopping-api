@@ -2,8 +2,8 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.dto.FileContent;
-import com.sobow.shopping.domain.dto.ImageDto;
 import com.sobow.shopping.domain.responses.ApiResponse;
+import com.sobow.shopping.domain.responses.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.validation.constraints.Min;
@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageController {
     
     private final ImageService imageService;
-    private final Mapper<Image, ImageDto> imageMapper;
+    private final Mapper<Image, ImageResponse> imageMapper;
     
     @PostMapping(
         path = "/products/{productId}/images",
@@ -43,13 +43,13 @@ public class ImageController {
         @RequestPart("file") @NotEmpty List<@NotNull MultipartFile> files,
         @PathVariable @Min(1) Long productId) {
         
-        List<ImageDto> imageDtoList = imageService.saveImages(files, productId)
-                                                  .stream()
-                                                  .map(imageMapper::mapToDto)
-                                                  .toList();
+        List<ImageResponse> imageResponseList = imageService.saveImages(files, productId)
+                                                            .stream()
+                                                            .map(imageMapper::mapToDto)
+                                                            .toList();
         
         return new ResponseEntity<>(
-            new ApiResponse("Upload success", imageDtoList),
+            new ApiResponse("Upload success", imageResponseList),
             HttpStatus.CREATED
         );
     }
@@ -72,6 +72,7 @@ public class ImageController {
     public ResponseEntity<ApiResponse> updateImage(
         @PathVariable @Min(1) Long id,
         @RequestPart("file") @NotNull MultipartFile file) {
+        
         Image updatedImage = imageService.updateById(file, id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", imageMapper.mapToDto(updatedImage))

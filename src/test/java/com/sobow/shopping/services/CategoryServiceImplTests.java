@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.exceptions.AlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,7 +56,7 @@ public class CategoryServiceImplTests {
         when(categoryRepository.existsByName(duplicate)).thenReturn(true);
         
         // When & Then
-        assertThrows(IllegalStateException.class, () -> underTest.save(category));
+        assertThrows(AlreadyExistsException.class, () -> underTest.save(category));
         verify(categoryRepository, never()).save(any());
     }
     
@@ -99,7 +100,7 @@ public class CategoryServiceImplTests {
         when(categoryRepository.existsByName(newName)).thenReturn(true);
         
         // When & Then
-        assertThrows(IllegalStateException.class, () -> underTest.partialUpdateById(patch, existingId));
+        assertThrows(AlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
         verify(categoryRepository, never()).save(any());
     }
     
