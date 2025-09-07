@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductMapper implements Mapper<Product, ProductCreateRequest> {
+public class ProductRequestMapper implements Mapper<Product, ProductCreateRequest> {
     
     public Product mapToEntity(ProductCreateRequest productCreateRequest) {
         return new Product().builder()
@@ -19,6 +19,6 @@ public class ProductMapper implements Mapper<Product, ProductCreateRequest> {
     
     @Override
     public ProductCreateRequest mapToDto(Product product) {
-        return null;
+        throw new UnsupportedOperationException("mapToDto is not implemented yet");
     }
 }
