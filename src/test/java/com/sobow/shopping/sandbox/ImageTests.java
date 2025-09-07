@@ -20,7 +20,7 @@ public class ImageTests {
     private ImageRepository imageRepository;
     
     @Test
-    public void test() throws IOException, SQLException {
+    public void sandboxTest() throws IOException, SQLException {
         
         // Load the file from resources
         ClassPathResource resource = new ClassPathResource("doge.png");
@@ -43,6 +43,6 @@ public class ImageTests {
         image.setFileType("image/png");
         image.setImage(blob);
         
-        Image saved = imageRepository.save(image);
+        // Image saved = imageRepository.save(image);
     }
 }

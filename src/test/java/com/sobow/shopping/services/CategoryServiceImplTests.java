@@ -41,7 +41,7 @@ public class CategoryServiceImplTests {
     }
     
     @Test
-    void findById_should_ThrowNotFound_when_IdDoesNotExist() {
+    void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
         when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> underTest.findById(nonExistingId));
     }
@@ -51,7 +51,7 @@ public class CategoryServiceImplTests {
     class save {
         
         @Test
-        public void save_should_ReturnSavedCategory_when_Valid() {
+        public void save_should_ReturnSavedCategory_when_ValidInput() {
             // Given
             Category category = getCategory("Unique");
             
@@ -68,9 +68,9 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_NameAlreadyUsed() {
+        public void save_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            Category category = getCategory("Name Already Used");
+            Category category = getCategory("Name Already Exists");
             
             when(categoryRepository.existsByName(category.getName())).thenReturn(true);
             
@@ -85,7 +85,7 @@ public class CategoryServiceImplTests {
     class partialUpdateById {
         
         @Test
-        public void partialUpdateById_should_ReturnUpdatedCategory_when_ValidPatch() {
+        public void partialUpdateById_should_ReturnUpdatedCategory_when_ValidInput() {
             // Given
             Category existing = getCategory("old");
             Category patch = getCategory("new");
@@ -105,10 +105,10 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void partialUpdateById_should_ThrowAlreadyExists_when_NameAlreadyUsed() {
+        public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
             Category existing = getCategory("old");
-            Category patch = getCategory("Name Already Used");
+            Category patch = getCategory("Name Already Exists");
             
             when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(true);

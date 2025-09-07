@@ -40,7 +40,7 @@ public class ImageController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
-        @RequestPart("file") @NotEmpty List<@NotNull MultipartFile> files,
+        @RequestPart("file") @NotEmpty List<MultipartFile> files,
         @PathVariable @Min(1) Long productId) {
         
         List<ImageResponse> imageResponseList = imageService.saveImages(files, productId)
@@ -70,8 +70,8 @@ public class ImageController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
-        @PathVariable @Min(1) Long id,
-        @RequestPart("file") @NotNull MultipartFile file) {
+        @RequestPart("file") @NotNull MultipartFile file,
+        @PathVariable @Min(1) Long id) {
         
         Image updatedImage = imageService.updateById(file, id);
         return ResponseEntity.ok(

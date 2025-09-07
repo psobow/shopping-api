@@ -6,6 +6,9 @@ import com.sobow.shopping.domain.responses.ApiResponse;
 import com.sobow.shopping.domain.responses.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +44,7 @@ public class CategoryController {
     }
     
     @PostMapping
-    public ResponseEntity<ApiResponse> addCategory(@RequestBody CategoryRequest request) {
+    public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid CategoryRequest request) {
         Category category = categoryRequestMapper.mapToEntity(request);
         Category saved = categoryService.save(category);
         return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
@@ -49,7 +52,8 @@ public class CategoryController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(@RequestBody CategoryRequest request, @PathVariable Long id) {
+    public ResponseEntity<ApiResponse> updateCategory(@RequestBody @Valid CategoryRequest request,
+                                                      @PathVariable @Min(1) Long id) {
         Category updated = categoryService.partialUpdateById(categoryRequestMapper.mapToEntity(request), id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", categoryResponseMapper.mapToDto(updated))
@@ -57,19 +61,19 @@ public class CategoryController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getCategory(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Min(1) Long id) {
         Category category = categoryService.findById(id);
         return ResponseEntity.ok(new ApiResponse("Found", categoryResponseMapper.mapToDto(category)));
     }
     
     @GetMapping(params = "name")
-    public ResponseEntity<ApiResponse> getCategoryByName(@RequestParam String name) {
+    public ResponseEntity<ApiResponse> getCategoryByName(@RequestParam @NotBlank String name) {
         Category category = categoryService.findByName(name);
         return ResponseEntity.ok(new ApiResponse("Found", categoryResponseMapper.mapToDto(category)));
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable @Min(1) Long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

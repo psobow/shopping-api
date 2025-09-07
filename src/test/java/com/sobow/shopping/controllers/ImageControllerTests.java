@@ -69,7 +69,7 @@ public class ImageControllerTests {
     class saveImages {
         
         @Test
-        public void saveImages_should_Return201WithList_when_ValidBatch() throws Exception {
+        public void saveImages_should_Return201WithList_when_ValidRequest() throws Exception {
             MockMultipartFile file = getValidMultipartFile();
             
             List<Image> saved = List.of(new Image());
@@ -149,7 +149,7 @@ public class ImageControllerTests {
         }
         
         @Test
-        public void saveImages_should_Return413PayloadTooLarge_when_FileExceedsLimit() throws Exception {
+        public void saveImages_should_Return413_when_FileExceedsLimit() throws Exception {
             MockMultipartFile file = getValidMultipartFile();
             
             when(imageService.saveImages(anyList(), eq(existingId)))
@@ -170,7 +170,7 @@ public class ImageControllerTests {
     class downloadImage {
         
         @Test
-        public void downloadImage_should_Return200WithFile_when_IdValid() throws Exception {
+        public void downloadImage_should_Return200WithFile_when_ImageIdValid() throws Exception {
             byte[] bytes = new byte[]{1, 2, 3};
             FileContent fileContent = new FileContent(
                 "photo.png",
@@ -189,14 +189,14 @@ public class ImageControllerTests {
         }
         
         @Test
-        public void downloadImage_should_Return400_when_IdLessThanOne() throws Exception {
+        public void downloadImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
             mockMvc.perform(get("/api/images/{id}", invalidId))
                    .andExpect(status().isBadRequest());
             verify(imageService, never()).getImageContent(anyLong());
         }
         
         @Test
-        public void downloadImage_should_Return404_when_IdDoesNotExist() throws Exception {
+        public void downloadImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
             when(imageService.getImageContent(nonExistingId)).thenThrow(new EntityNotFoundException());
             mockMvc.perform(get("/api/images/{id}", nonExistingId))
                    .andExpect(status().isNotFound());
@@ -208,7 +208,7 @@ public class ImageControllerTests {
     class updateImage {
         
         @Test
-        public void updateImage_should_Return200WithDto_when_Valid() throws Exception {
+        public void updateImage_should_Return200WithDto_when_ValidRequest() throws Exception {
             MockMultipartFile file = getValidMultipartFile();
             Image updated = new Image();
             when(imageService.updateById(file, existingId)).thenReturn(updated);
@@ -233,7 +233,7 @@ public class ImageControllerTests {
         }
         
         @Test
-        public void updateImage_should_Return400_when_IdLessThanOne() throws Exception {
+        public void updateImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
             MockMultipartFile file = getValidMultipartFile();
             mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", invalidId)
                                 .file(file)

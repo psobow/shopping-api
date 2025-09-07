@@ -52,7 +52,7 @@ public class ProductServiceImplTests {
     class save {
         
         @Test
-        public void save_should_ReturnSavedProduct_when_Valid() {
+        public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             ProductCreateRequest dto = new ProductCreateRequest(
                 "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", productExistingId);
@@ -72,7 +72,7 @@ public class ProductServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowNotFound_when_CategoryMissing() {
+        public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
             ProductCreateRequest dto = new ProductCreateRequest(
                 "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", nonExistingId);
@@ -89,7 +89,7 @@ public class ProductServiceImplTests {
     class partialUpdateById {
         
         @Test
-        public void partialUpdateById_should_ReturnUpdatedProduct_when_ValidPatch() {
+        public void partialUpdateById_should_ReturnUpdatedProduct_when_ValidInput() {
             // Given
             Product product = new Product();
             Category category = new Category();

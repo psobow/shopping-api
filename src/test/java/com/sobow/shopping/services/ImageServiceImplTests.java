@@ -54,7 +54,7 @@ public class ImageServiceImplTests {
     class saveImages {
         
         @Test
-        public void saveImages_should_PersistAndReturnEntities_when_ValidBatch() throws Exception {
+        public void saveImages_should_PersistAndReturnEntities_when_ValidInput() throws Exception {
             // Given
             Product product = new Product();
             MockMultipartFile f1 = new MockMultipartFile(
@@ -101,7 +101,7 @@ public class ImageServiceImplTests {
     class updateById {
         
         @Test
-        public void updateById_should_ReturnUpdatedImage_when_Valid() throws Exception {
+        public void updateById_should_ReturnUpdatedImage_when_ValidInput() throws Exception {
             // Given
             Image image = new Image();
             
