@@ -1,5 +1,6 @@
 package com.sobow.shopping.controllers;
 
+import com.sobow.shopping.exceptions.AlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public class ExceptionController {
         ImageProcessingException exception, HttpServletRequest request) {
         
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
-        problemDetail.setTitle("Unable to process image.");
+        problemDetail.setTitle("Unable to process image");
         problemDetail.setDetail(exception.getMessage());
         problemDetail.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
@@ -27,7 +28,7 @@ public class ExceptionController {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleNotFound(EntityNotFoundException exception, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        pd.setTitle("Resource not found.");
+        pd.setTitle("Resource not found");
         pd.setDetail(exception.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
@@ -36,7 +37,16 @@ public class ExceptionController {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ProblemDetail> handleMaxSize(MaxUploadSizeExceededException e, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.PAYLOAD_TOO_LARGE);
-        pd.setTitle("File too large.");
+        pd.setTitle("File too large");
+        pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleResourceConflict(AlreadyExistsException e, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Resource already exists");
         pd.setDetail(e.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
