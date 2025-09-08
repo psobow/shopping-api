@@ -64,6 +64,11 @@ public class ImageControllerTests {
         verify(imageService).deleteById(existingId);
     }
     
+    @Test
+    public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
+    }
+    
+    
     @Nested
     @DisplayName("saveImages")
     class saveImages {

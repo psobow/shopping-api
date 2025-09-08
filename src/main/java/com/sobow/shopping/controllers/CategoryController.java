@@ -40,7 +40,7 @@ public class CategoryController {
                                                                      .map(categoryResponseMapper::mapToDto)
                                                                      .toList();
         
-        return ResponseEntity.ok(new ApiResponse("Found categories", categoryResponseList));
+        return ResponseEntity.ok(new ApiResponse("Found", categoryResponseList));
     }
     
     @PostMapping

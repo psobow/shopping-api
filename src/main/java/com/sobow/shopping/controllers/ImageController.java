@@ -80,7 +80,7 @@ public class ImageController {
     }
     
     @DeleteMapping("/images/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteImage(@PathVariable @Min(1) Long id) {
         imageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

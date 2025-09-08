@@ -141,7 +141,7 @@ public class ImageServiceImplTests {
     class getImageContent {
         
         @Test
-        void getImageContent_should_ReturnFileContent_when_IdValid() throws SQLException {
+        void getImageContent_should_ReturnFileContent_when_ImageIdValid() throws SQLException {
             // Given
             Image image = new Image();
             image.setFileName("photo.png");

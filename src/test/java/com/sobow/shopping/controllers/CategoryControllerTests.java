@@ -18,13 +18,9 @@ public class CategoryControllerTests {
     @MockitoBean
     private CategoryService categoryService;
     
-    @Test
-    public void deleteCategory_should_Return204_when_Deleted() {
-    }
-    
     @Nested
     @DisplayName("getCategories")
-    class getCategories {
+    class getCategory {
         
         @Test
         public void getAllCategories_should_Return200WithList_when_CategoriesExists() {
@@ -35,7 +31,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void getCategory_should_Return200WithDto_when_IdValid() {
+        public void getCategory_should_Return200WithDto_when_CategoryIdValid() {
         }
         
         @Test
@@ -68,7 +64,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void addCategory_should_Return400_when_CategoryNameBlank() {
+        public void addCategory_should_Return400_when_RequestBodyIsInvalid() {
         }
         
         @Test
@@ -85,7 +81,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void updateCategory_should_Return400_when_CategoryNameBlank() {
+        public void updateCategory_should_Return400_when_RequestBodyIsInvalid() {
         }
         
         @Test
@@ -98,6 +94,19 @@ public class CategoryControllerTests {
         
         @Test
         public void updateCategory_should_Return409_when_CategoryNameAlreadyExists() {
+        }
+    }
+    
+    @Nested
+    @DisplayName("deleteCategories")
+    class deleteCategory {
+        
+        @Test
+        public void deleteCategory_should_Return204_when_Deleted() {
+        }
+        
+        @Test
+        public void deleteCategory_should_Return400_when_CategoryIdLessThanOne() {
         }
     }
 }
