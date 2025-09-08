@@ -27,6 +27,46 @@ public class ProductControllerTests {
     private Mapper<Product, ProductResponse> productResponseMapper;
     
     @Nested
+    @DisplayName("createProduct")
+    class createProduct {
+        
+        @Test
+        public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void createProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() {
+            fail("TODO: implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("updateProduct")
+    class updateProduct {
+        
+        @Test
+        public void updateProduct_should_Return200WithDto_when_ValidRequest() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateProduct_should_Return400_when_ProductIdLessThanOne() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateProduct_should_Return404_when_ProductIdDoesNotExist() {
+            fail("TODO: implement me");
+        }
+    }
+    
+    @Nested
     @DisplayName("getProducts")
     class getProducts {
         
@@ -46,19 +86,28 @@ public class ProductControllerTests {
         }
         
         @Test
-        public void getProduct_should_Return404_when_ProductIdDoesNotExist() {
+        public void getProduct_should_Return400_when_ProductIdLessThanOne() {
             fail("TODO: implement me");
         }
         
         @Test
-        public void getProduct_should_Return400_when_ProductIdLessThanOne() {
+        public void getProduct_should_Return404_when_ProductIdDoesNotExist() {
             fail("TODO: implement me");
         }
     }
     
     @Nested
-    @DisplayName("createProduct")
-    class createProduct {
-    
+    @DisplayName("deleteProduct")
+    class deleteProduct {
+        
+        @Test
+        public void deleteProduct_should_Return204_when_Deleted() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void deleteProduct_should_Return400_when_ProductIdLessThanOne() {
+            fail("TODO: implement me");
+        }
     }
 }

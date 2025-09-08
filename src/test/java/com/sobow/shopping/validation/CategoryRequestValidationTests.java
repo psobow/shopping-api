@@ -34,10 +34,10 @@ public class CategoryRequestValidationTests {
     
     @ParameterizedTest(name = "{index}: Category field: {1} {2}")
     @MethodSource("invalidCases")
-    public void shouldFailValidation(CategoryRequest request, String fieldName, String reason) {
+    public void shouldFailValidation(CategoryRequest request, String fieldNameWithInvalidValue, String reason) {
         var validationSet = validator.validate(request);
         assertThat(validationSet).anySatisfy(violation -> {
-            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldName);
+            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldNameWithInvalidValue);
         });
     }
 }

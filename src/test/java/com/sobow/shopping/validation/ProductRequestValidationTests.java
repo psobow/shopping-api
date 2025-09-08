@@ -223,19 +223,19 @@ public class ProductRequestValidationTests {
     
     @ParameterizedTest(name = "{index}: Product field: {1} {2}")
     @MethodSource("invalidCasesOnCreate")
-    public void shouldFailValidationOnCreate(ProductRequest request, String fieldName, String reason) {
+    public void shouldFailValidationOnCreate(ProductRequest request, String fieldNameWithInvalidValue, String reason) {
         Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Create.class, Update.class);
         assertThat(violationSet).anySatisfy(violation -> {
-            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldName);
+            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldNameWithInvalidValue);
         });
     }
     
     @ParameterizedTest(name = "{index}: Product field: {1} {2}")
     @MethodSource("invalidCasesOnUpdate")
-    public void shouldFailValidationOnUpdate(ProductRequest request, String fieldName, String reason) {
+    public void shouldFailValidationOnUpdate(ProductRequest request, String fieldNameWithInvalidValue, String reason) {
         Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Update.class);
         assertThat(violationSet).anySatisfy(violation -> {
-            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldName);
+            assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldNameWithInvalidValue);
         });
     }
 }

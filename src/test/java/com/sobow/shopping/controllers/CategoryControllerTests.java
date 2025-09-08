@@ -31,6 +31,56 @@ public class CategoryControllerTests {
     private Mapper<Category, CategoryRequest> categoryRequestMapper;
     
     @Nested
+    @DisplayName("createCategory")
+    class createCategory {
+        
+        @Test
+        public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void createCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void createCategory_should_Return409_when_CategoryNameAlreadyExists() {
+            fail("TODO: implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("updateCategory")
+    class updateCategory {
+        
+        @Test
+        public void updateCategory_should_Return200WithDto_when_ValidRequest() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateCategory_should_Return400_when_CategoryIdLessThanOne() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateCategory_should_Return404_when_CategoryIdDoestNotExist() {
+            fail("TODO: implement me");
+        }
+        
+        @Test
+        public void updateCategory_should_Return409_when_CategoryNameAlreadyExists() {
+            fail("TODO: implement me");
+        }
+    }
+    
+    @Nested
     @DisplayName("getCategory")
     class getCategory {
         
@@ -71,56 +121,6 @@ public class CategoryControllerTests {
         
         @Test
         public void getCategoryByName_should_Return400_when_CategoryNameBlank() {
-            fail("TODO: implement me");
-        }
-    }
-    
-    @Nested
-    @DisplayName("createCategory")
-    class createCategory {
-        
-        @Test
-        public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void createCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void createCategory_should_Return409_when_CategoryNameAlreadyExists() {
-            fail("TODO: implement me");
-        }
-    }
-    
-    @Nested
-    @DisplayName("updateCategory")
-    class updateCategory {
-        
-        @Test
-        public void updateCategory_should_Return200WithDto_when_ValidRequest() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void updateCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void updateCategory_should_Return400_when_CategoryIdLessThanOne() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void updateCategory_should_Return404_when_CategoryIdDoestNotExists() {
-            fail("TODO: implement me");
-        }
-        
-        @Test
-        public void updateCategory_should_Return409_when_CategoryNameAlreadyExists() {
             fail("TODO: implement me");
         }
     }
