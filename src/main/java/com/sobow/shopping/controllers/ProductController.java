@@ -5,11 +5,12 @@ import com.sobow.shopping.domain.responses.ApiResponse;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +33,7 @@ public class ProductController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getProduct(@Min(1) Long id) {
+    public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive Long id) {
         Product product = productService.findById(id);
         return ResponseEntity.ok(new ApiResponse("Found", productResponseMapper.mapToDto(product)));
     }

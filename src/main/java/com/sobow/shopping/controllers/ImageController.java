@@ -6,9 +6,9 @@ import com.sobow.shopping.domain.responses.ApiResponse;
 import com.sobow.shopping.domain.responses.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -41,8 +41,7 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
-        @PathVariable @Min(1) Long productId) {
-        
+        @PathVariable @Positive Long productId) {
         List<ImageResponse> imageResponseList = imageService.saveImages(files, productId)
                                                             .stream()
                                                             .map(imageMapper::mapToDto)
@@ -55,7 +54,7 @@ public class ImageController {
     }
     
     @GetMapping("/images/{id}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive Long id) {
         FileContent fileContent = imageService.getImageContent(id);
         ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
         return ResponseEntity.ok()
@@ -71,8 +70,7 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
         @RequestPart("file") @NotNull MultipartFile file,
-        @PathVariable @Min(1) Long id) {
-        
+        @PathVariable @Positive Long id) {
         Image updatedImage = imageService.updateById(file, id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", imageMapper.mapToDto(updatedImage))
@@ -80,7 +78,7 @@ public class ImageController {
     }
     
     @DeleteMapping("/images/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<Void> deleteImage(@PathVariable @Positive Long id) {
         imageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

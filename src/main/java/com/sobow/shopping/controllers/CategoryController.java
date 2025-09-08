@@ -8,8 +8,8 @@ import com.sobow.shopping.domain.responses.ApiResponse;
 import com.sobow.shopping.domain.responses.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateCategory(
         @RequestBody @Validated(Update.class) CategoryRequest request,
-        @PathVariable @Min(1) Long id) {
+        @PathVariable @Positive Long id) {
         Category updated = categoryService.partialUpdateById(categoryRequestMapper.mapToEntity(request), id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", categoryResponseMapper.mapToDto(updated))
@@ -65,7 +65,7 @@ public class CategoryController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Positive Long id) {
         Category category = categoryService.findById(id);
         return ResponseEntity.ok(new ApiResponse("Found", categoryResponseMapper.mapToDto(category)));
     }
@@ -77,7 +77,7 @@ public class CategoryController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable @Positive Long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
