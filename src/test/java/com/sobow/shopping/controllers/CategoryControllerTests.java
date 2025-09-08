@@ -31,7 +31,7 @@ public class CategoryControllerTests {
     private Mapper<Category, CategoryRequest> categoryRequestMapper;
     
     @Nested
-    @DisplayName("getCategories")
+    @DisplayName("getCategory")
     class getCategory {
         
         @Test
@@ -76,21 +76,21 @@ public class CategoryControllerTests {
     }
     
     @Nested
-    @DisplayName("addCategory")
-    class addCategory {
+    @DisplayName("createCategory")
+    class createCategory {
         
         @Test
-        public void addCategory_should_Return201WithDtoAndLocation_when_ValidRequest() {
+        public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() {
             fail("TODO: implement me");
         }
         
         @Test
-        public void addCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
+        public void createCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
             fail("TODO: implement me");
         }
         
         @Test
-        public void addCategory_should_Return409_when_CategoryNameAlreadyExists() {
+        public void createCategory_should_Return409_when_CategoryNameAlreadyExists() {
             fail("TODO: implement me");
         }
     }
@@ -126,7 +126,7 @@ public class CategoryControllerTests {
     }
     
     @Nested
-    @DisplayName("deleteCategories")
+    @DisplayName("deleteCategory")
     class deleteCategory {
         
         @Test
