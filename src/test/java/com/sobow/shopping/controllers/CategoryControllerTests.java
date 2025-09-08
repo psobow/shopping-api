@@ -64,7 +64,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void addCategory_should_Return400_when_RequestBodyIsInvalid() {
+        public void addCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
         }
         
         @Test
@@ -81,7 +81,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void updateCategory_should_Return400_when_RequestBodyIsInvalid() {
+        public void updateCategory_should_Return400_when_RequestBodyViolatesDtoConstraints() {
         }
         
         @Test
