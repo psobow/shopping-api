@@ -1,5 +1,7 @@
 package com.sobow.shopping.controllers;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import com.sobow.shopping.mappers.Mapper;
@@ -30,22 +32,27 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() {
+            fail("TODO: implement me");
         }
         
         @Test
         public void getAllProducts_should_Return200WithEmptyList_when_ProductsDoesNotExist() {
+            fail("TODO: implement me");
         }
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() {
+            fail("TODO: implement me");
         }
         
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() {
+            fail("TODO: implement me");
         }
         
         @Test
         public void getProduct_should_Return400_when_ProductIdLessThanOne() {
+            fail("TODO: implement me");
         }
     }
 }
