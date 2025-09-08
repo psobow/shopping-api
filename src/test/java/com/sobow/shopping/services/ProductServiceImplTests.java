@@ -11,8 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.domain.requests.ProductRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -38,7 +37,7 @@ public class ProductServiceImplTests {
     private CategoryRepository categoryRepository;
     
     @Mock
-    private Mapper<Product, ProductCreateRequest> productRequestMapper;
+    private Mapper<Product, ProductRequest> productRequestMapper;
     
     @InjectMocks
     private ProductServiceImpl underTest;
@@ -54,7 +53,7 @@ public class ProductServiceImplTests {
         @Test
         public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
-            ProductCreateRequest dto = new ProductCreateRequest(
+            ProductRequest dto = new ProductRequest(
                 "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", productExistingId);
             
             Product mapped = new Product();       // what mapper returns
@@ -74,7 +73,7 @@ public class ProductServiceImplTests {
         @Test
         public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
-            ProductCreateRequest dto = new ProductCreateRequest(
+            ProductRequest dto = new ProductRequest(
                 "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", nonExistingId);
             when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());
             
@@ -100,8 +99,8 @@ public class ProductServiceImplTests {
             when(productRepository.save(product)).thenReturn(product);
             
             // When
-            ProductUpdateRequest patch =
-                new ProductUpdateRequest("newProductName", null, null, null, null, categoryExistingId);
+            ProductRequest patch =
+                new ProductRequest("newProductName", null, null, null, null, categoryExistingId);
             Product result = underTest.partialUpdateById(patch, productExistingId);
             
             // Then
@@ -119,8 +118,8 @@ public class ProductServiceImplTests {
         public void partialUpdateById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
             // Given
             Product product = new Product();
-            ProductUpdateRequest patch =
-                new ProductUpdateRequest(null, null, null, null, null, nonExistingId);
+            ProductRequest patch =
+                new ProductRequest(null, null, null, null, null, nonExistingId);
             
             when(productRepository.findById(productExistingId)).thenReturn(Optional.of(product));
             when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());

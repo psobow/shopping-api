@@ -1,24 +1,24 @@
 package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductRequestMapper implements Mapper<Product, ProductCreateRequest> {
+public class ProductRequestMapper implements Mapper<Product, ProductRequest> {
     
-    public Product mapToEntity(ProductCreateRequest productCreateRequest) {
+    public Product mapToEntity(ProductRequest productRequest) {
         return new Product().builder()
-                            .name(productCreateRequest.name())
-                            .brandName(productCreateRequest.brandName())
-                            .price(productCreateRequest.price())
-                            .availableQuantity(productCreateRequest.availableQuantity())
-                            .description(productCreateRequest.description())
+                            .name(productRequest.name())
+                            .brandName(productRequest.brandName())
+                            .price(productRequest.price())
+                            .availableQuantity(productRequest.availableQuantity())
+                            .description(productRequest.description())
                             .build();
     }
     
     @Override
-    public ProductCreateRequest mapToDto(Product product) {
+    public ProductRequest mapToDto(Product product) {
         throw new UnsupportedOperationException("mapToDto is not implemented yet");
     }
 }

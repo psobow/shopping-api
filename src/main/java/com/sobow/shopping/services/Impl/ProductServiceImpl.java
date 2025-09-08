@@ -2,8 +2,7 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.domain.requests.ProductRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -18,20 +17,20 @@ public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final Mapper<Product, ProductCreateRequest> productMapper;
+    private final Mapper<Product, ProductRequest> productMapper;
     
     public ProductServiceImpl(ProductRepository productRepository,
                               CategoryRepository categoryRepository,
-                              Mapper<Product, ProductCreateRequest> productMapper) {
+                              Mapper<Product, ProductRequest> productMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.productMapper = productMapper;
     }
     
     @Override
-    public Product save(ProductCreateRequest productCreateRequest) {
-        Category category = findCategoryById(productCreateRequest.categoryId());
-        Product product = productMapper.mapToEntity(productCreateRequest);
+    public Product save(ProductRequest productRequest) {
+        Category category = findCategoryById(productRequest.categoryId());
+        Product product = productMapper.mapToEntity(productRequest);
         product.setCategory(category);
         return productRepository.save(product);
     }
@@ -54,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product partialUpdateById(ProductUpdateRequest patch, Long id) {
+    public Product partialUpdateById(ProductRequest patch, Long id) {
         
         Product existingProduct = findById(id);
         
