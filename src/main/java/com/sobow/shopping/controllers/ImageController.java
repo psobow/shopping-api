@@ -53,17 +53,6 @@ public class ImageController {
         );
     }
     
-    @GetMapping("/images/{id}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive Long id) {
-        FileContent fileContent = imageService.getImageContent(id);
-        ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
-        return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(fileContent.fileType()))
-                             .contentLength(fileContent.length())
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileContent.fileName() + "\"")
-                             .body(byteArrayResource);
-    }
-    
     @PutMapping(
         path = "/images/{id}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -75,6 +64,17 @@ public class ImageController {
         return ResponseEntity.ok(
             new ApiResponse("Updated", imageMapper.mapToDto(updatedImage))
         );
+    }
+    
+    @GetMapping("/images/{id}")
+    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive Long id) {
+        FileContent fileContent = imageService.getImageContent(id);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
+        return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType(fileContent.fileType()))
+                             .contentLength(fileContent.length())
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileContent.fileName() + "\"")
+                             .body(byteArrayResource);
     }
     
     @DeleteMapping("/images/{id}")

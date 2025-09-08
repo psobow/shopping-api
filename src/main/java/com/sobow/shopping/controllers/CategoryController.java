@@ -33,6 +33,25 @@ public class CategoryController {
     private final Mapper<Category, CategoryResponse> categoryResponseMapper;
     private final Mapper<Category, CategoryRequest> categoryRequestMapper;
     
+    @PostMapping
+    public ResponseEntity<ApiResponse> createCategory(
+        @RequestBody @Valid CategoryRequest categoryRequest) {
+        Category category = categoryRequestMapper.mapToEntity(categoryRequest);
+        Category saved = categoryService.save(category);
+        return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
+                             .body(new ApiResponse("Created", categoryResponseMapper.mapToDto(saved)));
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateCategory(
+        @RequestBody @Valid CategoryRequest categoryRequest,
+        @PathVariable @Positive Long id) {
+        Category updated = categoryService.partialUpdateById(categoryRequestMapper.mapToEntity(categoryRequest), id);
+        return ResponseEntity.ok(
+            new ApiResponse("Updated", categoryResponseMapper.mapToDto(updated))
+        );
+    }
+    
     @GetMapping
     public ResponseEntity<ApiResponse> getAllCategories() {
         List<CategoryResponse> categoryResponseList = categoryService.findAll()
@@ -41,25 +60,6 @@ public class CategoryController {
                                                                      .toList();
         
         return ResponseEntity.ok(new ApiResponse("Found", categoryResponseList));
-    }
-    
-    @PostMapping
-    public ResponseEntity<ApiResponse> createCategory(
-        @RequestBody @Valid CategoryRequest request) {
-        Category category = categoryRequestMapper.mapToEntity(request);
-        Category saved = categoryService.save(category);
-        return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
-                             .body(new ApiResponse("Created", categoryResponseMapper.mapToDto(saved)));
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(
-        @RequestBody @Valid CategoryRequest request,
-        @PathVariable @Positive Long id) {
-        Category updated = categoryService.partialUpdateById(categoryRequestMapper.mapToEntity(request), id);
-        return ResponseEntity.ok(
-            new ApiResponse("Updated", categoryResponseMapper.mapToDto(updated))
-        );
     }
     
     @GetMapping("/{id}")
