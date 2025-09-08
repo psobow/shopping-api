@@ -15,7 +15,7 @@ public class CategoryRequestValidationTests {
     
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
     
-    public static Stream<Arguments> invalidCases() {
+    private static Stream<Arguments> invalidCases() {
         return Stream.of(
             arguments(new CategoryRequest(null),
                       "name",

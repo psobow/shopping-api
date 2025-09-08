@@ -57,18 +57,6 @@ public class ImageControllerTests {
             "file", "a.png", "image/png", new byte[]{1});
     }
     
-    @Test
-    public void deleteImage_should_Return204_when_Deleted() throws Exception {
-        mockMvc.perform(delete("/api/images/{id}", existingId))
-               .andExpect(status().isNoContent());
-        verify(imageService).deleteById(existingId);
-    }
-    
-    @Test
-    public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
-    }
-    
-    
     @Nested
     @DisplayName("saveImages")
     class saveImages {
@@ -263,6 +251,22 @@ public class ImageControllerTests {
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isNotFound());
+        }
+    }
+    
+    @Nested
+    @DisplayName("deleteImage")
+    class deleteImage {
+        
+        @Test
+        public void deleteImage_should_Return204_when_Deleted() throws Exception {
+            mockMvc.perform(delete("/api/images/{id}", existingId))
+                   .andExpect(status().isNoContent());
+            verify(imageService).deleteById(existingId);
+        }
+        
+        @Test
+        public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
         }
     }
 }

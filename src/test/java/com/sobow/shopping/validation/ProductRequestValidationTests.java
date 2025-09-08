@@ -34,7 +34,7 @@ public class ProductRequestValidationTests {
         );
     }
     
-    public static Stream<Arguments> createInvalidCases() {
+    private static Stream<Arguments> invalidCasesOnCreate() {
         return Stream.of(
             arguments(new ProductRequest(
                           null, valid().brandName(), valid().price(),
@@ -146,7 +146,7 @@ public class ProductRequestValidationTests {
         );
     }
     
-    public static Stream<Arguments> updateInvalidCases() {
+    private static Stream<Arguments> invalidCasesOnUpdate() {
         return Stream.of(
             arguments(new ProductRequest(
                           EMPTY_STRING, valid().brandName(), valid().price(),
@@ -222,7 +222,7 @@ public class ProductRequestValidationTests {
     }
     
     @ParameterizedTest(name = "{index}: Product field: {1} {2}")
-    @MethodSource("createInvalidCases")
+    @MethodSource("invalidCasesOnCreate")
     public void shouldFailValidationOnCreate(ProductRequest request, String fieldName, String reason) {
         Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Create.class, Update.class);
         assertThat(violationSet).anySatisfy(violation -> {
@@ -230,8 +230,8 @@ public class ProductRequestValidationTests {
         });
     }
     
-    @ParameterizedTest(name = "{index}: Product field: field {1} {2}")
-    @MethodSource("updateInvalidCases")
+    @ParameterizedTest(name = "{index}: Product field: {1} {2}")
+    @MethodSource("invalidCasesOnUpdate")
     public void shouldFailValidationOnUpdate(ProductRequest request, String fieldName, String reason) {
         Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Update.class);
         assertThat(violationSet).anySatisfy(violation -> {
