@@ -47,12 +47,15 @@ public class ImageControllerTests {
     @MockitoBean
     private Mapper<Image, ImageResponse> imageMapper;
     
-    private final static long productId = 1L;
-    private final static long imageId = 2L;
-    private final static long invalidId = 0L;
-    private final static long nonExistingId = 999L;
+    private final static String PRODUCT_IMAGES_BY_PRODUCT_ID_PATH = "/api/products/{productId}/images";
+    private final static String IMAGES_BY_ID_PATH = "/api/images/{id}";
     
-    private static MockMultipartFile getValidMultipartFile() {
+    private final static long EXISTING_PRODUCT_ID = 1L;
+    private final static long EXISTING_IMAGE_ID = 2L;
+    private final static long NON_EXISTING_ID = 999L;
+    private final static long INVALID_ID = 0L;
+    
+    private static MockMultipartFile getMultipartFile() {
         return new MockMultipartFile(
             "file", "photo.png", "image/png", new byte[]{1});
     }
@@ -63,30 +66,29 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return201WithList_when_ValidRequest() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
+            MockMultipartFile file = getMultipartFile();
             
             List<Image> saved = List.of(new Image());
-            Long newImageId = 1L;
-            ImageResponse dto = new ImageResponse(newImageId, file.getOriginalFilename(), "/api/images/" + newImageId);
+            ImageResponse response = new ImageResponse(EXISTING_IMAGE_ID, file.getOriginalFilename(),
+                                                       "/api/images/" + EXISTING_IMAGE_ID);
             
-            when(imageService.saveImages(List.of(file), productId)).thenReturn(saved);
-            when(imageMapper.mapToDto(saved.get(0))).thenReturn(dto);
+            when(imageService.saveImages(List.of(file), EXISTING_PRODUCT_ID)).thenReturn(saved);
+            when(imageMapper.mapToDto(saved.get(0))).thenReturn(response);
             
-            mockMvc.perform(multipart("/api/products/{productId}/images", productId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, EXISTING_PRODUCT_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isCreated())
                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                    .andExpect(jsonPath("$.message").value("Upload success"))
-                   .andExpect(jsonPath("$.data[0].id").value(newImageId))
-                   .andExpect(jsonPath("$.data[0].fileName").value(file.getOriginalFilename()))
-                   .andExpect(jsonPath("$.data[0].downloadUrl")
-                                  .value("/api/images/" + newImageId));
+                   .andExpect(jsonPath("$.data[0].id").value(EXISTING_IMAGE_ID))
+                   .andExpect(jsonPath("$.data[0].fileName").value(response.fileName()))
+                   .andExpect(jsonPath("$.data[0].downloadUrl").value(response.downloadUrl()));
         }
         
         @Test
         public void saveImages_should_Return400_when_FilePartMissing() throws Exception {
-            mockMvc.perform(multipart("/api/products/{productId}/images", productId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, EXISTING_PRODUCT_ID)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
@@ -102,7 +104,7 @@ public class ImageControllerTests {
                 new byte[]{1}
             );
             
-            mockMvc.perform(multipart("/api/products/{productId}/images", productId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, EXISTING_PRODUCT_ID)
                                 .file(badFile)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
@@ -112,9 +114,9 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
+            MockMultipartFile file = getMultipartFile();
             
-            mockMvc.perform(multipart("/api/products/{productId}/images", invalidId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, INVALID_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
@@ -124,12 +126,12 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
+            MockMultipartFile file = getMultipartFile();
             
-            when(imageService.saveImages(List.of(file), nonExistingId))
+            when(imageService.saveImages(List.of(file), NON_EXISTING_ID))
                 .thenThrow(new EntityNotFoundException());
             
-            mockMvc.perform(multipart("/api/products/{productId}/images", nonExistingId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, NON_EXISTING_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isNotFound());
@@ -137,7 +139,7 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return415_when_ContentTypeUnsupported() throws Exception {
-            mockMvc.perform(multipart("/api/products/{productId}/images", productId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, EXISTING_PRODUCT_ID)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
@@ -147,12 +149,12 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return413_when_FileExceedsLimit() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
+            MockMultipartFile file = getMultipartFile();
             
-            when(imageService.saveImages(List.of(file), productId))
+            when(imageService.saveImages(List.of(file), EXISTING_PRODUCT_ID))
                 .thenThrow(new MaxUploadSizeExceededException(DataSize.ofMegabytes(5).toBytes()));
             
-            mockMvc.perform(multipart("/api/products/{productId}/images", productId)
+            mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, EXISTING_PRODUCT_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isPayloadTooLarge())
@@ -166,27 +168,28 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return200WithDto_when_ValidRequest() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
+            MockMultipartFile file = getMultipartFile();
             Image updated = new Image();
+            ImageResponse response = new ImageResponse(EXISTING_IMAGE_ID, file.getOriginalFilename(),
+                                                       "/api/images" + EXISTING_IMAGE_ID);
             
-            when(imageService.updateById(file, imageId)).thenReturn(updated);
-            when(imageMapper.mapToDto(updated)).thenReturn(
-                new ImageResponse(imageId, file.getOriginalFilename(), "/api/images" + imageId));
+            when(imageService.updateById(file, EXISTING_IMAGE_ID)).thenReturn(updated);
+            when(imageMapper.mapToDto(updated)).thenReturn(response);
             
-            mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", imageId)
+            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, EXISTING_IMAGE_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                    .andExpect(jsonPath("$.message").value("Updated"))
-                   .andExpect(jsonPath("$.data.id").value(imageId))
-                   .andExpect(jsonPath("$.data.fileName").value(file.getOriginalFilename()))
-                   .andExpect(jsonPath("$.data.downloadUrl").value("/api/images" + imageId));
+                   .andExpect(jsonPath("$.data.id").value(response.id()))
+                   .andExpect(jsonPath("$.data.fileName").value(response.fileName()))
+                   .andExpect(jsonPath("$.data.downloadUrl").value(response.downloadUrl()));
         }
         
         @Test
         public void updateImage_should_Return400_when_FilePartMissing() throws Exception {
-            mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", imageId)
+            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, EXISTING_IMAGE_ID)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
@@ -195,8 +198,8 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
-            mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", invalidId)
+            MockMultipartFile file = getMultipartFile();
+            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, INVALID_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
@@ -206,7 +209,7 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return415_when_ContentTypeUnsupported() throws Exception {
-            mockMvc.perform(put("/api/images/{id}", imageId)
+            mockMvc.perform(put(IMAGES_BY_ID_PATH, EXISTING_IMAGE_ID)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
@@ -216,10 +219,10 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
-            MockMultipartFile file = getValidMultipartFile();
-            when(imageService.updateById(file, nonExistingId)).thenThrow(new EntityNotFoundException());
+            MockMultipartFile file = getMultipartFile();
+            when(imageService.updateById(file, NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
             
-            mockMvc.perform(multipart(HttpMethod.PUT, "/api/images/{id}", nonExistingId)
+            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, NON_EXISTING_ID)
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isNotFound());
@@ -240,19 +243,20 @@ public class ImageControllerTests {
                 bytes
             );
             
-            when(imageService.getImageContent(imageId)).thenReturn(fileContent);
+            when(imageService.getImageContent(EXISTING_IMAGE_ID)).thenReturn(fileContent);
             
-            mockMvc.perform(get("/api/images/{id}", imageId))
+            mockMvc.perform(get(IMAGES_BY_ID_PATH, EXISTING_IMAGE_ID))
                    .andExpect(status().isOk())
-                   .andExpect(header().string("Content-Type", "image/png"))
+                   .andExpect(header().string("Content-Type", fileContent.fileType()))
                    .andExpect(header().string("Content-Length", String.valueOf(bytes.length)))
-                   .andExpect(header().string("Content-Disposition", "attachment; filename=\"photo.png\""))
+                   .andExpect(header().string("Content-Disposition", String.format(
+                       "attachment; filename=\"%s\"", fileContent.fileName())))
                    .andExpect(content().bytes(bytes));
         }
         
         @Test
         public void downloadImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
-            mockMvc.perform(get("/api/images/{id}", invalidId))
+            mockMvc.perform(get(IMAGES_BY_ID_PATH, INVALID_ID))
                    .andExpect(status().isBadRequest());
             
             verify(imageService, never()).getImageContent(anyLong());
@@ -260,9 +264,9 @@ public class ImageControllerTests {
         
         @Test
         public void downloadImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
-            when(imageService.getImageContent(nonExistingId)).thenThrow(new EntityNotFoundException());
+            when(imageService.getImageContent(NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
             
-            mockMvc.perform(get("/api/images/{id}", nonExistingId))
+            mockMvc.perform(get(IMAGES_BY_ID_PATH, NON_EXISTING_ID))
                    .andExpect(status().isNotFound());
         }
     }
@@ -273,16 +277,16 @@ public class ImageControllerTests {
         
         @Test
         public void deleteImage_should_Return204_when_Deleted() throws Exception {
-            mockMvc.perform(delete("/api/images/{id}", imageId))
+            mockMvc.perform(delete(IMAGES_BY_ID_PATH, EXISTING_IMAGE_ID))
                    .andExpect(status().isNoContent());
-            verify(imageService).deleteById(imageId);
+            verify(imageService).deleteById(EXISTING_IMAGE_ID);
         }
         
         @Test
         public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
-            mockMvc.perform(delete("/api/images/{id}", invalidId))
+            mockMvc.perform(delete(IMAGES_BY_ID_PATH, INVALID_ID))
                    .andExpect(status().isBadRequest());
-            verify(imageService, never()).deleteById(invalidId);
+            verify(imageService, never()).deleteById(INVALID_ID);
         }
     }
 }
