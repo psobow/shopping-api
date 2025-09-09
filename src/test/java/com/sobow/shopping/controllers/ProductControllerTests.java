@@ -33,6 +33,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(ProductController.class)
 public class ProductControllerTests {
     
+    private static final String PRODUCTS_PATH = "/api/products";
+    private static final String PRODUCTS_BY_ID_PATH = "/api/products/{id}";
+    private static final Long EXISTING_PRODUCT_ID = 100L;
+    private static final Long NON_EXISTING_PRODUCT_ID = 999L;
+    private static final Long INVALID_PRODUCT_ID = -1L;
+    private ProductFixtures productFixtures = ProductFixtures.defaults();
+    
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
     @Autowired
@@ -44,17 +51,12 @@ public class ProductControllerTests {
     @MockitoBean
     private Mapper<Product, ProductResponse> productResponseMapper;
     
-    private static final String PRODUCTS_PATH = "/api/products";
-    private static final String PRODUCTS_BY_ID_PATH = "/api/products/{id}";
-    
     @Nested
     @DisplayName("createProduct")
     class createProduct {
         
         @Test
         public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
-            ProductFixtures productFixtures = ProductFixtures.defaults();
-            
             ProductRequest request = productFixtures.request();
             Product saved = productFixtures.entity();
             ProductResponse response = productFixtures.response();
@@ -82,7 +84,8 @@ public class ProductControllerTests {
         @Test
         public void createProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
             ProductRequest invalidRequest =
-                new ProductRequest("", "  ", new BigDecimal(0), -1, null, null
+                new ProductRequest("", "  ", new BigDecimal(0),
+                                   -1, null, null
                 );
             
             String json = objectMapper.writeValueAsString(invalidRequest);
@@ -100,18 +103,18 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
-            ProductFixtures productFixtures = ProductFixtures.defaults();
-            Long productId = productFixtures.productId;
+            productFixtures.withName("newProductName");
+            
             ProductRequest request = productFixtures.request();
             Product updated = productFixtures.entity();
             ProductResponse response = productFixtures.response();
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(productService.partialUpdateById(request, productId)).thenReturn(updated);
+            when(productService.partialUpdateById(request, EXISTING_PRODUCT_ID)).thenReturn(updated);
             when(productResponseMapper.mapToDto(updated)).thenReturn(response);
             
-            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, productId)
+            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, EXISTING_PRODUCT_ID)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isOk())
@@ -127,14 +130,13 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
-            Long productId = 1L;
             ProductRequest invalidRequest =
-                new ProductRequest("   ", "  ", new BigDecimal(0), -1, "", null
+                new ProductRequest("   ", "  ", new BigDecimal(0),
+                                   -1, "", null
                 );
-            
             String json = objectMapper.writeValueAsString(invalidRequest);
             
-            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, productId)
+            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, EXISTING_PRODUCT_ID)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isBadRequest());
@@ -142,13 +144,13 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            ProductFixtures productFixtures = ProductFixtures.defaults();
+            productFixtures.withName("newProductName");
+            
             ProductRequest request = productFixtures.request();
-            Long invalidProductId = -1L;
             
             String json = objectMapper.writeValueAsString(request);
             
-            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, invalidProductId)
+            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, INVALID_PRODUCT_ID)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isBadRequest());
@@ -156,15 +158,16 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            ProductFixtures productFixtures = ProductFixtures.defaults();
-            ProductRequest request = productFixtures.request();
-            Long nonExistingId = 999L;
+            productFixtures.withName("newProductName");
             
-            when(productService.partialUpdateById(request, nonExistingId)).thenThrow(new EntityNotFoundException());
+            ProductRequest request = productFixtures.request();
+            
+            when(productService.partialUpdateById(request, NON_EXISTING_PRODUCT_ID))
+                .thenThrow(new EntityNotFoundException());
             
             String json = objectMapper.writeValueAsString(request);
             
-            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, nonExistingId)
+            mockMvc.perform(put(PRODUCTS_BY_ID_PATH, NON_EXISTING_PRODUCT_ID)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isNotFound());
@@ -177,7 +180,6 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() throws Exception {
-            ProductFixtures productFixtures = ProductFixtures.defaults();
             Product product = productFixtures.entity();
             ProductResponse response = productFixtures.response();
             
@@ -208,16 +210,13 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() throws Exception {
-            
-            ProductFixtures productFixtures = ProductFixtures.defaults();
-            Long productId = productFixtures.productId;
             Product product = productFixtures.entity();
             ProductResponse response = productFixtures.response();
             
-            when(productService.findById(productId)).thenReturn(product);
+            when(productService.findById(EXISTING_PRODUCT_ID)).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
-            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, productId))
+            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, EXISTING_PRODUCT_ID))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
                    .andExpect(jsonPath("$.data.id").value(response.id()))
@@ -231,18 +230,15 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            Long invalidId = -1L;
-            
-            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, invalidId))
+            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, INVALID_PRODUCT_ID))
                    .andExpect(status().isBadRequest());
         }
         
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            Long nonExistingId = 999L;
-            when(productService.findById(nonExistingId)).thenThrow(new EntityNotFoundException());
+            when(productService.findById(NON_EXISTING_PRODUCT_ID)).thenThrow(new EntityNotFoundException());
             
-            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, nonExistingId))
+            mockMvc.perform(get(PRODUCTS_BY_ID_PATH, NON_EXISTING_PRODUCT_ID))
                    .andExpect(status().isNotFound());
         }
     }
@@ -253,15 +249,13 @@ public class ProductControllerTests {
         
         @Test
         public void deleteProduct_should_Return204_when_Deleted() throws Exception {
-            Long productId = 1L;
-            mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, productId))
+            mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, EXISTING_PRODUCT_ID))
                    .andExpect(status().isNoContent());
         }
         
         @Test
         public void deleteProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            Long invalidProductId = -1L;
-            mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, invalidProductId))
+            mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, INVALID_PRODUCT_ID))
                    .andExpect(status().isBadRequest());
         }
     }
