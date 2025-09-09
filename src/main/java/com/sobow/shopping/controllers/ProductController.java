@@ -33,17 +33,17 @@ public class ProductController {
     
     @PostMapping
     public ResponseEntity<ApiResponse> createProduct(
-        @RequestBody @Validated({Create.class, Update.class}) ProductRequest productRequest) {
-        Product saved = productService.save(productRequest);
+        @RequestBody @Validated({Create.class, Update.class}) ProductRequest request) {
+        Product saved = productService.save(request);
         return ResponseEntity.created(URI.create("/api/products/" + saved.getId()))
                              .body(new ApiResponse("Created", productResponseMapper.mapToDto(saved)));
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateProduct(
-        @RequestBody @Validated(Update.class) ProductRequest productRequest,
+        @RequestBody @Validated(Update.class) ProductRequest request,
         @PathVariable @Positive Long id) {
-        Product updated = productService.partialUpdateById(productRequest, id);
+        Product updated = productService.partialUpdateById(request, id);
         return ResponseEntity.ok(
             new ApiResponse("Updated", productResponseMapper.mapToDto(updated))
         );
