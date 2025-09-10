@@ -2,7 +2,9 @@ package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.requests.CategoryRequest;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CategoryRequestMapper implements Mapper<Category, CategoryRequest> {
     
     @Override

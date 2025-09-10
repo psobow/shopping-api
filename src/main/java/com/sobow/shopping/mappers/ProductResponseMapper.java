@@ -2,7 +2,9 @@ package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.responses.ProductResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductResponseMapper implements Mapper<Product, ProductResponse> {
     
     @Override
