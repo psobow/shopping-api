@@ -244,6 +244,48 @@ public class ProductControllerTests {
     }
     
     @Nested
+    @DisplayName("getWithFilters")
+    class getWithFilters {
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDts_when_FilterByNameAndBrand() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByNameAndCategory() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByBrandAndCategory() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_FilterByAllParams() throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return200WithDto_when_NoFiltersProvidedAndProductsExist()
+            throws Exception {
+        }
+        
+        @Test
+        public void searchProducts_should_Return404WithEmptyList_when_NoProductsFound() throws Exception {
+        }
+    }
+    
+    @Nested
     @DisplayName("deleteProduct")
     class deleteProduct {
         

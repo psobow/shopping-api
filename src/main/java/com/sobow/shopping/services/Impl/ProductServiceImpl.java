@@ -83,30 +83,30 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
-    public static Specification<Product> nameContains(String name) {
+    private static Specification<Product> nameContains(String name) {
         return (root, query, criteriaBuilder) ->
             criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
                                  "%" + name.toLowerCase() + "%"
             );
     }
     
-    public static Specification<Product> brandNameEquals(String brandName) {
+    private static Specification<Product> brandNameEquals(String brandName) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brandName"), brandName);
     }
     
-    public static Specification<Product> categoryNameEquals(String categoryName) {
+    private static Specification<Product> categoryNameEquals(String categoryName) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
     }
     
     @Override
     public List<Product> search(Optional<String> name,
-                                Optional<String> brand,
-                                Optional<String> category) {
+                                Optional<String> brandName,
+                                Optional<String> categoryName) {
         
         var spec = Specification.allOf(
             name.map(ProductServiceImpl::nameContains).orElse(null),
-            brand.map(ProductServiceImpl::brandNameEquals).orElse(null),
-            category.map(ProductServiceImpl::categoryNameEquals).orElse(null)
+            brandName.map(ProductServiceImpl::brandNameEquals).orElse(null),
+            categoryName.map(ProductServiceImpl::categoryNameEquals).orElse(null)
         );
         return productRepository.findAll(spec);
     }
