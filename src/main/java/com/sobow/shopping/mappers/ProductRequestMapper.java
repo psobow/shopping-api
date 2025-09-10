@@ -2,6 +2,7 @@ package com.sobow.shopping.mappers;
 
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductRequest;
+import java.util.ArrayList;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,7 @@ public class ProductRequestMapper implements Mapper<Product, ProductRequest> {
                             .price(productRequest.price())
                             .availableQuantity(productRequest.availableQuantity())
                             .description(productRequest.description())
+                            .images(new ArrayList<>())
                             .build();
     }
     

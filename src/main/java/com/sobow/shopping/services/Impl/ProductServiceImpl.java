@@ -19,20 +19,20 @@ public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final Mapper<Product, ProductRequest> productMapper;
+    private final Mapper<Product, ProductRequest> productRequestMapper;
     
     public ProductServiceImpl(ProductRepository productRepository,
                               CategoryRepository categoryRepository,
-                              Mapper<Product, ProductRequest> productMapper) {
+                              Mapper<Product, ProductRequest> productRequestMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-        this.productMapper = productMapper;
+        this.productRequestMapper = productRequestMapper;
     }
     
     @Override
     public Product save(ProductRequest productRequest) {
         Category category = findCategoryById(productRequest.categoryId());
-        Product product = productMapper.mapToEntity(productRequest);
+        Product product = productRequestMapper.mapToEntity(productRequest);
         product.setCategory(category);
         return productRepository.save(product);
     }
