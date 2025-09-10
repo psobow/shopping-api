@@ -8,14 +8,13 @@ import java.math.BigDecimal;
 
 public class ProductFixtures {
     
-    public long categoryId = 2L;
-    public String categoryName = "categoryName";
     public long productId = 1L;
     public String productName = "productName";
     public String brandName = "brandName";
     public BigDecimal price = new BigDecimal("10.00");
     public int availableQuantity = 5;
     public String description = "productDescription";
+    public Category category = new Category(2L, "categoryName", null);
     
     // default factory
     public static ProductFixtures defaults() {
@@ -28,31 +27,32 @@ public class ProductFixtures {
         return this;
     }
     
-    public ProductFixtures withCategoryId(long newId) {
-        this.categoryId = newId;
-        return this;
-    }
-    
     public ProductFixtures withName(String newName) {
         this.productName = newName;
         return this;
     }
     
-    // builders for each object
-    public ProductRequest request() {
-        return new ProductRequest(productName, brandName, price, availableQuantity, description, categoryId);
+    public ProductFixtures withBrandName(String newBrandName) {
+        this.brandName = newBrandName;
+        return this;
     }
     
-    public Category category() {
-        return new Category(categoryId, categoryName, null);
+    public ProductFixtures withCategoryName(String newCategoryName) {
+        this.category.setName(newCategoryName);
+        return this;
+    }
+    
+    // builders for each object
+    public ProductRequest request() {
+        return new ProductRequest(productName, brandName, price, availableQuantity, description, category.getId());
     }
     
     public Product entity() {
-        return new Product(productId, productName, brandName, price, availableQuantity, description, category(), null);
+        return new Product(productId, productName, brandName, price, availableQuantity, description, category, null);
     }
     
     public ProductResponse response() {
-        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description, categoryId);
+        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description, category.getId());
     }
 }
 

@@ -35,9 +35,16 @@ public class ProductControllerTests {
     
     private static final String PRODUCTS_PATH = "/api/products";
     private static final String PRODUCTS_BY_ID_PATH = "/api/products/{id}";
+    private static final String PRODUCTS_SEARCH_PATH = "/api/products/search";
+    
+    private static final String EXISTING_PRODUCT_NAME = "existing product name";
+    private static final String EXISTING_BRAND_NAME = "existing brand name";
+    private static final String EXISTING_CATEGORY_NAME = "existing category name";
+    
     private static final Long EXISTING_PRODUCT_ID = 100L;
     private static final Long NON_EXISTING_PRODUCT_ID = 999L;
     private static final Long INVALID_PRODUCT_ID = -1L;
+    
     private ProductFixtures productFixtures = ProductFixtures.defaults();
     
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -249,39 +256,81 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
+            productFixtures.withName(EXISTING_PRODUCT_NAME);
+            
+            Product product = productFixtures.entity();
+            ProductResponse response = productFixtures.response();
+            
+            when(productService.search(EXISTING_PRODUCT_NAME, null, null)).thenReturn(List.of(product));
+            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            
+            mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
+                                .param("name", EXISTING_PRODUCT_NAME))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Found"))
+                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
+                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
+                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
+                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
+                   .andExpect(jsonPath("$.data[0].availableQuantity").value(response.availableQuantity()))
+                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
+                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()));
         }
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
+            productFixtures.withBrandName(EXISTING_BRAND_NAME);
+            
+            Product product = productFixtures.entity();
+            ProductResponse response = productFixtures.response();
+            
+            when(productService.search(null, EXISTING_BRAND_NAME, null)).thenReturn(List.of(product));
+            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            
+            mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
+                                .param("brandName", EXISTING_BRAND_NAME))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Found"))
+                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
+                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
+                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
+                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
+                   .andExpect(jsonPath("$.data[0].availableQuantity").value(response.availableQuantity()))
+                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
+                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()));
         }
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
-        }
-        
-        @Test
-        public void searchProducts_should_Return200WithDts_when_FilterByNameAndBrand() throws Exception {
-        }
-        
-        @Test
-        public void searchProducts_should_Return200WithDto_when_FilterByNameAndCategory() throws Exception {
-        }
-        
-        @Test
-        public void searchProducts_should_Return200WithDto_when_FilterByBrandAndCategory() throws Exception {
-        }
-        
-        @Test
-        public void searchProducts_should_Return200WithDto_when_FilterByAllParams() throws Exception {
-        }
-        
-        @Test
-        public void searchProducts_should_Return200WithDto_when_NoFiltersProvidedAndProductsExist()
-            throws Exception {
+            productFixtures.withCategoryName(EXISTING_CATEGORY_NAME);
+            
+            Product product = productFixtures.entity();
+            ProductResponse response = productFixtures.response();
+            
+            when(productService.search(null, null, EXISTING_CATEGORY_NAME)).thenReturn(List.of(product));
+            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            
+            mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
+                                .param("categoryName", EXISTING_CATEGORY_NAME))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Found"))
+                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
+                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
+                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
+                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
+                   .andExpect(jsonPath("$.data[0].availableQuantity").value(response.availableQuantity()))
+                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
+                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()));
         }
         
         @Test
         public void searchProducts_should_Return404WithEmptyList_when_NoProductsFound() throws Exception {
+            
+            mockMvc.perform(get(PRODUCTS_SEARCH_PATH))
+                   .andExpect(status().isNotFound())
+                   .andExpect(jsonPath("$.message").value("Not found"))
+                   .andExpect(jsonPath("$.data").isArray())
+                   .andExpect(jsonPath("$.data", hasSize(0)));
         }
     }
     

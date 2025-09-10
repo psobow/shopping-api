@@ -83,11 +83,14 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
-    private static Specification<Product> nameContains(String name) {
-        return (root, query, criteriaBuilder) ->
-            criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
-                                 "%" + name.toLowerCase() + "%"
-            );
+    private static String trimToNull(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s.trim();
+    }
+    
+    private static Specification<Product> nameLike(String name) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.like(
+            criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"
+        );
     }
     
     private static Specification<Product> brandNameEquals(String brandName) {
@@ -99,14 +102,19 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public List<Product> search(Optional<String> name,
-                                Optional<String> brandName,
-                                Optional<String> categoryName) {
+    public List<Product> search(String name,
+                                String brandName,
+                                String categoryName) {
+        
+        // normalize blanks to nulls
+        name = trimToNull(name);
+        brandName = trimToNull(brandName);
+        categoryName = trimToNull(categoryName);
         
         var spec = Specification.allOf(
-            name.map(ProductServiceImpl::nameContains).orElse(null),
-            brandName.map(ProductServiceImpl::brandNameEquals).orElse(null),
-            categoryName.map(ProductServiceImpl::categoryNameEquals).orElse(null)
+            Optional.of(name).map(ProductServiceImpl::nameLike).orElse(null),
+            Optional.of(brandName).map(ProductServiceImpl::brandNameEquals).orElse(null),
+            Optional.of(categoryName).map(ProductServiceImpl::categoryNameEquals).orElse(null)
         );
         return productRepository.findAll(spec);
     }
