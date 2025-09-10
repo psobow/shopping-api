@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain.responses;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record ProductResponse(Long id,
                               String name,
@@ -8,6 +9,7 @@ public record ProductResponse(Long id,
                               BigDecimal price,
                               Integer availableQuantity,
                               String description,
-                              Long categoryId) {
+                              Long categoryId,
+                              List<Long> imagesId) {
     
 }

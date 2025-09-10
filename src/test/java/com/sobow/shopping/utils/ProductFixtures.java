@@ -1,10 +1,12 @@
 package com.sobow.shopping.utils;
 
 import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductRequest;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductFixtures {
     
@@ -15,6 +17,10 @@ public class ProductFixtures {
     public int availableQuantity = 5;
     public String description = "productDescription";
     public Category category = new Category(2L, "categoryName", null);
+    
+    public List<Image> imageList = List.of(
+        new Image(3L, "photo.png", "image/png", null, null, null)
+    );
     
     // default factory
     public static ProductFixtures defaults() {
@@ -48,11 +54,12 @@ public class ProductFixtures {
     }
     
     public Product entity() {
-        return new Product(productId, productName, brandName, price, availableQuantity, description, category, null);
+        return new Product(productId, productName, brandName, price, availableQuantity, description, category, imageList);
     }
     
     public ProductResponse response() {
-        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description, category.getId());
+        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description, category.getId(),
+                                   imageList.stream().map(Image::getId).toList());
     }
 }
 

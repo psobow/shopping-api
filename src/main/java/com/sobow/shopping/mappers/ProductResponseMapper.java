@@ -1,5 +1,6 @@
 package com.sobow.shopping.mappers;
 
+import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,11 @@ public class ProductResponseMapper implements Mapper<Product, ProductResponse> {
                                    product.getPrice(),
                                    product.getAvailableQuantity(),
                                    product.getDescription(),
-                                   product.getCategory().getId());
+                                   product.getCategory().getId(),
+                                   product.getImages()
+                                          .stream()
+                                          .map(Image::getId)
+                                          .toList()
+        );
     }
 }
