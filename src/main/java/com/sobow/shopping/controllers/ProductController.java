@@ -11,7 +11,9 @@ import com.sobow.shopping.services.ProductService;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -69,5 +72,34 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable @Positive Long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    private static String trimToNull(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s.trim();
+    }
+    
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> search(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String brandName,
+        @RequestParam(required = false) String categoryName
+    ) {
+        // normalize blanks to nulls
+        name = trimToNull(name);
+        brandName = trimToNull(brandName);
+        categoryName = trimToNull(categoryName);
+        
+        List<Product> foundProducts = productService.search(Optional.ofNullable(name),
+                                                            Optional.ofNullable(brandName),
+                                                            Optional.ofNullable(categoryName));
+        
+        List<ProductResponse> response = foundProducts.stream()
+                                                      .map(productResponseMapper::mapToDto)
+                                                      .toList();
+        
+        HttpStatus status = response.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+        String message = response.isEmpty() ? "Not found" : "Found";
+        
+        return new ResponseEntity<>(new ApiResponse(message, response), status);
     }
 }

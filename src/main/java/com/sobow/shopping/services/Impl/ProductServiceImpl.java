@@ -9,6 +9,8 @@ import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,33 +83,31 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
-    @Override
-    public List<Product> findByName(String name) {
-        return productRepository.findByName(name);
+    public static Specification<Product> nameContains(String name) {
+        return (root, query, criteriaBuilder) ->
+            criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+                                 "%" + name.toLowerCase() + "%"
+            );
+    }
+    
+    public static Specification<Product> brandNameEquals(String brandName) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brandName"), brandName);
+    }
+    
+    public static Specification<Product> categoryNameEquals(String categoryName) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
     }
     
     @Override
-    public List<Product> findByCategory_Name(String categoryName) {
-        return productRepository.findByCategory_Name(categoryName);
-    }
-    
-    @Override
-    public List<Product> findByCategory_NameAndBrandName(String categoryName, String brandName) {
-        return productRepository.findByCategory_NameAndBrandName(categoryName, brandName);
-    }
-    
-    @Override
-    public List<Product> findByBrandName(String brandName) {
-        return productRepository.findByBrandName(brandName);
-    }
-    
-    @Override
-    public List<Product> findByBrandNameAndName(String brandName, String name) {
-        return productRepository.findByBrandNameAndName(brandName, name);
-    }
-    
-    @Override
-    public Long countByBrandNameAndName(String brandName, String name) {
-        return productRepository.countByBrandNameAndName(brandName, name);
+    public List<Product> search(Optional<String> name,
+                                Optional<String> brand,
+                                Optional<String> category) {
+        
+        var spec = Specification.allOf(
+            name.map(ProductServiceImpl::nameContains).orElse(null),
+            brand.map(ProductServiceImpl::brandNameEquals).orElse(null),
+            category.map(ProductServiceImpl::categoryNameEquals).orElse(null)
+        );
+        return productRepository.findAll(spec);
     }
 }

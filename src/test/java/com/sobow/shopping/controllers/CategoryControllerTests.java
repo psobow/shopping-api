@@ -288,7 +288,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void getCategoryByName_should_Return400_when_CategoryNameBlank() throws Exception {
+        public void getCategoryByName_should_Return400_when_RequestParamBlank() throws Exception {
             mockMvc.perform(get(CATEGORIES_PATH)
                                 .param("name", CATEGORY_NAME_BLANK))
                    .andExpect(status().isBadRequest());
