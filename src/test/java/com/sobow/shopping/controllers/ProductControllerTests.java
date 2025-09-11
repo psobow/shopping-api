@@ -64,9 +64,11 @@ public class ProductControllerTests {
         
         @Test
         public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
-            ProductRequest request = productFixtures.request();
-            Product saved = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            productFixtures.withEmptyImages();
+            
+            ProductRequest request = productFixtures.getNewRequest();
+            Product saved = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -111,11 +113,11 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
-            productFixtures.withName("newProductName");
+            productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.request();
-            Product updated = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            ProductRequest request = productFixtures.getNewRequest();
+            Product updated = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -152,9 +154,9 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            productFixtures.withName("newProductName");
+            productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.request();
+            ProductRequest request = productFixtures.getNewRequest();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -166,9 +168,9 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            productFixtures.withName("newProductName");
+            productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.request();
+            ProductRequest request = productFixtures.getNewRequest();
             
             when(productService.partialUpdateById(request, NON_EXISTING_PRODUCT_ID))
                 .thenThrow(new EntityNotFoundException());
@@ -188,8 +190,8 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() throws Exception {
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             when(productService.findAll()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -219,8 +221,8 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() throws Exception {
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             when(productService.findById(EXISTING_PRODUCT_ID)).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -259,10 +261,10 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
-            productFixtures.withName(EXISTING_PRODUCT_NAME);
+            productFixtures.withProductName(EXISTING_PRODUCT_NAME);
             
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             when(productService.search(EXISTING_PRODUCT_NAME, null, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -285,8 +287,8 @@ public class ProductControllerTests {
         public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
             productFixtures.withBrandName(EXISTING_BRAND_NAME);
             
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             when(productService.search(null, EXISTING_BRAND_NAME, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -309,8 +311,8 @@ public class ProductControllerTests {
         public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
             productFixtures.withCategoryName(EXISTING_CATEGORY_NAME);
             
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = productFixtures.getNewEntity();
+            ProductResponse response = productFixtures.getNewResponse();
             
             when(productService.search(null, null, EXISTING_CATEGORY_NAME)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);

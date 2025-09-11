@@ -1,7 +1,13 @@
 package com.sobow.shopping.sandbox;
 
+import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Image;
+import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ImageRepository;
+import com.sobow.shopping.repositories.ProductRepository;
+import com.sobow.shopping.utils.ProductFixtures;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -21,8 +27,27 @@ public class SandboxTests {
     @Autowired
     private ImageRepository imageRepository;
     
+    @Autowired
+    private ProductRepository productRepository;
+    
+    @Autowired
+    private CategoryRepository categoryRepository;
+    
     @Test
-    public void sandboxTest() throws IOException, SQLException {
+    public void sandboxTest1() {
+        var productFixtures = ProductFixtures.defaults().withAllNullIds();
+        
+        Product product = productFixtures.getNewEntity();
+        
+        Category category = product.getCategory();
+        
+        Category saved = categoryRepository.save(category);
+        
+        Product found = productRepository.findById(saved.getId()).orElseThrow(() -> new EntityNotFoundException());
+    }
+    
+    @Test
+    public void sandboxTest2() throws IOException, SQLException {
         
         // Load the file from resources
         ClassPathResource resource = new ClassPathResource("doge.png");
