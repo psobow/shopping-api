@@ -4,8 +4,8 @@ import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductRequest;
 import com.sobow.shopping.mappers.Mapper;
-import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ProductRepository;
+import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -18,20 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final Mapper<Product, ProductRequest> productRequestMapper;
     
     public ProductServiceImpl(ProductRepository productRepository,
-                              CategoryRepository categoryRepository,
+                              CategoryService categoryService,
                               Mapper<Product, ProductRequest> productRequestMapper) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
         this.productRequestMapper = productRequestMapper;
     }
     
     @Override
     public Product save(ProductRequest productRequest) {
-        Category category = findCategoryById(productRequest.categoryId());
+        Category category = categoryService.findById(productRequest.categoryId());
         Product product = productRequestMapper.mapToEntity(productRequest);
         product.setCategory(category);
         return productRepository.save(product);
@@ -65,17 +65,11 @@ public class ProductServiceImpl implements ProductService {
         if (patch.availableQuantity() != null) existingProduct.setAvailableQuantity(patch.availableQuantity());
         if (patch.description() != null) existingProduct.setDescription(patch.description());
         if (patch.categoryId() != null) {
-            Category category = findCategoryById(patch.categoryId());
+            Category category = categoryService.findById(patch.categoryId());
             existingProduct.setCategory(category);
         }
         
         return productRepository.save(existingProduct);
-    }
-    
-    private Category findCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                                 .orElseThrow(() -> new EntityNotFoundException(
-                                     "Category with id " + categoryId + " not found"));
     }
     
     @Override
