@@ -8,13 +8,15 @@ import java.nio.file.Files;
 import java.sql.Blob;
 import java.sql.SQLException;
 import javax.sql.rowset.serial.SerialBlob;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.core.io.ClassPathResource;
 
 @DataJpaTest
-public class ImageTests {
+@Disabled("sandbox only – excluded from build")
+public class SandboxTests {
     
     @Autowired
     private ImageRepository imageRepository;
