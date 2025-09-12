@@ -1,6 +1,8 @@
 package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.exceptions.ImageProcessingException;
+import com.sobow.shopping.exceptions.InsufficientStockException;
+import com.sobow.shopping.exceptions.OutOfStockException;
 import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,6 +50,29 @@ public class ExceptionController {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Resource already exists");
         pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<ProblemDetail> handleOutOfStock(OutOfStockException ex, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Out of stock");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("productId", ex.getProductId());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ProblemDetail> handleInsufficient(InsufficientStockException ex, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Insufficient stock");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("productId", ex.getProductId());
+        pd.setProperty("available", ex.getAvailable());
+        pd.setProperty("requested", ex.getRequested());
+        pd.setProperty("alreadyInCart", ex.getAlreadyInCart());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
