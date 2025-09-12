@@ -12,20 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@RequiredArgsConstructor
 @Service
 public class ImageServiceImpl implements ImageService {
     
     private final ProductService productService;
     private final ImageRepository imageRepository;
-    
-    public ImageServiceImpl(ProductService productService, ImageRepository imageRepository) {
-        this.productService = productService;
-        this.imageRepository = imageRepository;
-    }
     
     @Transactional
     @Override
@@ -42,8 +39,7 @@ public class ImageServiceImpl implements ImageService {
             }
             image.setFileName(file.getOriginalFilename());
             image.setFileType(file.getContentType());
-            image.setProduct(product);
-            imageRepository.save(image);
+            product.addImageAndLink(image);
             images.add(image);
         }
         return images;

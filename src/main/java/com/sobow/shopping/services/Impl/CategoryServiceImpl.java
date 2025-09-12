@@ -6,17 +6,15 @@ import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
     
     private final CategoryRepository categoryRepository;
-    
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
     
     @Transactional
     @Override

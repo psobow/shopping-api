@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Image;
@@ -47,7 +46,6 @@ public class ImageServiceImplTests {
     
     private final static long imageExistingId = 1L;
     private final static long productExistingId = 2L;
-    private final static long nonExistingId = 999L;
     
     @Nested
     @DisplayName("saveImages")
@@ -74,10 +72,6 @@ public class ImageServiceImplTests {
             assertEquals(f1.getOriginalFilename(), resultImage.getFileName());
             assertEquals(f1.getContentType(), resultImage.getFileType());
             assertSame(product, resultImage.getProduct());
-            
-            verify(productService).findById(productExistingId);
-            verify(imageRepository).save(any());
-            verifyNoMoreInteractions(imageRepository);
         }
         
         @Test

@@ -26,6 +26,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         LEFT JOIN FETCH p.category
         LEFT JOIN FETCH p.images
         """)
-    List<Product> findALlProductsWithCategoryAndImages();
+    List<Product> findAllProductsWithCategoryAndImages();
     
 }

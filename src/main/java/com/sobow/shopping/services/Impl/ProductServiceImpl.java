@@ -10,31 +10,21 @@ import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
     private final Mapper<Product, ProductRequest> productRequestMapper;
     
-    public ProductServiceImpl(ProductRepository productRepository,
-                              CategoryService categoryService,
-                              Mapper<Product, ProductRequest> productRequestMapper) {
-        this.productRepository = productRepository;
-        this.categoryService = categoryService;
-        this.productRequestMapper = productRequestMapper;
-    }
-    
-    @Override
-    public Product save(ProductRequest productRequest) {
-        Category category = categoryService.findById(productRequest.categoryId());
-        Product product = productRequestMapper.mapToEntity(productRequest);
-        product.setCategory(category);
-        return productRepository.save(product);
+    private static String trimToNull(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s.trim();
     }
     
     @Override
@@ -49,9 +39,10 @@ public class ProductServiceImpl implements ProductService {
             "Product with id " + id + " not found"));
     }
     
-    @Override
-    public List<Product> findALlProductsWithCategoryAndImages() {
-        return productRepository.findALlProductsWithCategoryAndImages();
+    private static Specification<Product> nameLike(String name) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.like(
+            criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"
+        );
     }
     
     @Override
@@ -88,24 +79,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
-    private static String trimToNull(String s) {
-        return (s == null || s.trim().isEmpty()) ? null : s.trim();
-    }
-    
-    private static Specification<Product> nameLike(String name) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.like(
-            criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"
-        );
-    }
-    
-    private static Specification<Product> brandNameEquals(String brandName) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brandName"), brandName);
-    }
-    
-    private static Specification<Product> categoryNameEquals(String categoryName) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
-    }
-    
     @Override
     public List<Product> search(String name,
                                 String brandName,
@@ -122,5 +95,27 @@ public class ProductServiceImpl implements ProductService {
             Optional.of(categoryName).map(ProductServiceImpl::categoryNameEquals).orElse(null)
         );
         return productRepository.findAll(spec);
+    }
+    
+    private static Specification<Product> brandNameEquals(String brandName) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brandName"), brandName);
+    }
+    
+    private static Specification<Product> categoryNameEquals(String categoryName) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
+    }
+    
+    @Transactional
+    @Override
+    public Product save(ProductRequest productRequest) {
+        Category category = categoryService.findById(productRequest.categoryId());
+        Product product = productRequestMapper.mapToEntity(productRequest);
+        category.addProductAndLink(product);
+        return productRepository.save(product);
+    }
+    
+    @Override
+    public List<Product> findAllProductsWithCategoryAndImages() {
+        return productRepository.findAllProductsWithCategoryAndImages();
     }
 }

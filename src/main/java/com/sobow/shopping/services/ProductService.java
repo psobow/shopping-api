@@ -12,7 +12,7 @@ public interface ProductService {
     
     Product findProductWithCategoryAndImagesById(Long id);
     
-    List<Product> findALlProductsWithCategoryAndImages();
+    List<Product> findAllProductsWithCategoryAndImages();
     
     void deleteById(Long id);
     
