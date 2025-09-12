@@ -32,9 +32,19 @@ public class Cart {
     @NotNull
     @PositiveOrZero
     @Digits(integer = 17, fraction = 2)
-    @Column(nullable = false, precision = 19, scale = 2)
-    private BigDecimal totalPrice = BigDecimal.ZERO;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal totalCartPrice = BigDecimal.ZERO;
     
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();
+    
+    public void addCartItemAndLink(CartItem item) {
+        cartItems.add(item);
+        item.setCart(this);
+    }
+    
+    public void removeCartItemAndUnlink(CartItem item) {
+        cartItems.remove(item);
+        item.setCart(null);
+    }
 }
