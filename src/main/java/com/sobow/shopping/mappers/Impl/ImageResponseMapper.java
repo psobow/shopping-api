@@ -1,7 +1,8 @@
-package com.sobow.shopping.mappers;
+package com.sobow.shopping.mappers.Impl;
 
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.responses.ImageResponse;
+import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
 @Component

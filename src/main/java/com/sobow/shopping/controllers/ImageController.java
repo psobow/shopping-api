@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageController {
     
     private final ImageService imageService;
-    private final Mapper<Image, ImageResponse> imageMapper;
+    private final Mapper<Image, ImageResponse> imageResponseMapper;
     
     @PostMapping(
         path = "/products/{productId}/images",
@@ -42,13 +42,13 @@ public class ImageController {
     public ResponseEntity<ApiResponse> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
         @PathVariable @Positive Long productId) {
-        List<ImageResponse> imageResponseList = imageService.saveImages(files, productId)
+        List<ImageResponse> responseList = imageService.saveImages(files, productId)
                                                             .stream()
-                                                            .map(imageMapper::mapToDto)
+                                                       .map(imageResponseMapper::mapToDto)
                                                             .toList();
         
         return new ResponseEntity<>(
-            new ApiResponse("Upload success", imageResponseList),
+            new ApiResponse("Upload success", responseList),
             HttpStatus.CREATED
         );
     }
@@ -61,9 +61,8 @@ public class ImageController {
         @RequestPart("file") @NotNull MultipartFile file,
         @PathVariable @Positive Long id) {
         Image updatedImage = imageService.updateById(file, id);
-        return ResponseEntity.ok(
-            new ApiResponse("Updated", imageMapper.mapToDto(updatedImage))
-        );
+        ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
+        return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
     @GetMapping("/images/{id}")

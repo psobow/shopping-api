@@ -38,8 +38,9 @@ public class CategoryController {
         @RequestBody @Valid CategoryRequest request) {
         Category mapped = categoryRequestMapper.mapToEntity(request);
         Category saved = categoryService.save(mapped);
+        CategoryResponse response = categoryResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
-                             .body(new ApiResponse("Created", categoryResponseMapper.mapToDto(saved)));
+                             .body(new ApiResponse("Created", response));
     }
     
     @PutMapping("/{id}")
@@ -48,31 +49,34 @@ public class CategoryController {
         @PathVariable @Positive Long id) {
         Category mapped = categoryRequestMapper.mapToEntity(request);
         Category updated = categoryService.partialUpdateById(mapped, id);
+        CategoryResponse response = categoryResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(
-            new ApiResponse("Updated", categoryResponseMapper.mapToDto(updated))
+            new ApiResponse("Updated", response)
         );
     }
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllCategories() {
-        List<CategoryResponse> categoryResponseList = categoryService.findAll()
+        List<CategoryResponse> responseList = categoryService.findAll()
                                                                      .stream()
                                                                      .map(categoryResponseMapper::mapToDto)
                                                                      .toList();
         
-        return ResponseEntity.ok(new ApiResponse("Found", categoryResponseList));
+        return ResponseEntity.ok(new ApiResponse("Found", responseList));
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getCategory(@PathVariable @Positive Long id) {
         Category category = categoryService.findById(id);
-        return ResponseEntity.ok(new ApiResponse("Found", categoryResponseMapper.mapToDto(category)));
+        CategoryResponse response = categoryResponseMapper.mapToDto(category);
+        return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
     @GetMapping(params = "name")
     public ResponseEntity<ApiResponse> getCategoryByName(@RequestParam @NotBlank String name) {
         Category category = categoryService.findByName(name);
-        return ResponseEntity.ok(new ApiResponse("Found", categoryResponseMapper.mapToDto(category)));
+        CategoryResponse response = categoryResponseMapper.mapToDto(category);
+        return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
     @DeleteMapping("/{id}")

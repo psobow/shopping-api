@@ -36,8 +36,9 @@ public class ProductController {
     public ResponseEntity<ApiResponse> createProduct(
         @RequestBody @Valid ProductCreateRequest request) {
         Product saved = productService.save(request);
+        ProductResponse response = productResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/products/" + saved.getId()))
-                             .body(new ApiResponse("Created", productResponseMapper.mapToDto(saved)));
+                             .body(new ApiResponse("Created", response));
     }
     
     @PutMapping("/{id}")
@@ -45,25 +46,27 @@ public class ProductController {
         @RequestBody @Valid ProductUpdateRequest request,
         @PathVariable @Positive Long id) {
         Product updated = productService.partialUpdateById(request, id);
+        ProductResponse response = productResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(
-            new ApiResponse("Updated", productResponseMapper.mapToDto(updated))
+            new ApiResponse("Updated", response)
         );
     }
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {
-        List<ProductResponse> productResponseList = productService.findAll()
+        List<ProductResponse> responseList = productService.findAll()
                                                                   .stream()
                                                                   .map(productResponseMapper::mapToDto)
                                                                   .toList();
         
-        return ResponseEntity.ok(new ApiResponse("Found", productResponseList));
+        return ResponseEntity.ok(new ApiResponse("Found", responseList));
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive Long id) {
         Product product = productService.findById(id);
-        return ResponseEntity.ok(new ApiResponse("Found", productResponseMapper.mapToDto(product)));
+        ProductResponse response = productResponseMapper.mapToDto(product);
+        return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
     @DeleteMapping("{id}")
@@ -80,13 +83,13 @@ public class ProductController {
     ) {
         List<Product> foundProducts = productService.search(name, brandName, categoryName);
         
-        List<ProductResponse> response = foundProducts.stream()
+        List<ProductResponse> responseList = foundProducts.stream()
                                                       .map(productResponseMapper::mapToDto)
                                                       .toList();
         
-        HttpStatus status = response.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
-        String message = response.isEmpty() ? "Not found" : "Found";
+        HttpStatus status = responseList.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+        String message = responseList.isEmpty() ? "Not found" : "Found";
         
-        return new ResponseEntity<>(new ApiResponse(message, response), status);
+        return new ResponseEntity<>(new ApiResponse(message, responseList), status);
     }
 }

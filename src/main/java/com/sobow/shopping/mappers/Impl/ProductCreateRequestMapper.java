@@ -1,7 +1,8 @@
-package com.sobow.shopping.mappers;
+package com.sobow.shopping.mappers.Impl;
 
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.mappers.Mapper;
 import java.util.ArrayList;
 import org.springframework.stereotype.Component;
 
