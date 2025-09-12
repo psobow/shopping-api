@@ -3,9 +3,8 @@ package com.sobow.shopping.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.sobow.shopping.domain.requests.ProductRequest;
-import com.sobow.shopping.domain.requests.markers.Create;
-import com.sobow.shopping.domain.requests.markers.Update;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -23,8 +22,8 @@ public class ProductRequestValidationTests {
     private static final String EMPTY_STRING = "";
     private static final String BLANK_STRING = "  ";
     
-    private static ProductRequest valid() {
-        return new ProductRequest(
+    private static ProductCreateRequest valid() {
+        return new ProductCreateRequest(
             "Valid name",
             "Valid brandName",
             new BigDecimal(10),
@@ -36,70 +35,70 @@ public class ProductRequestValidationTests {
     
     private static Stream<Arguments> invalidCasesOnCreate() {
         return Stream.of(
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           null, valid().brandName(), valid().price(),
                           valid().availableQuantity(), valid().description(),
                           valid().categoryId()),
                       "name",
                       "is null"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           EMPTY_STRING, valid().brandName(), valid().price(),
                           valid().availableQuantity(), valid().description(),
                           valid().categoryId()),
                       "name",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           BLANK_STRING, valid().brandName(), valid().price(),
                           valid().availableQuantity(), valid().description(),
                           valid().categoryId()),
                       "name",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), null,
                           valid().price(), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "brandName",
                       "is null"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), EMPTY_STRING,
                           valid().price(), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "brandName",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), BLANK_STRING,
                           valid().price(), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "brandName",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           null, valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "price",
                       "is null"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           new BigDecimal(0), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "price",
                       "is zero"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           new BigDecimal(-1), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "price",
                       "is negative"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), -1,
                           valid().description(), valid().categoryId()),
@@ -107,28 +106,28 @@ public class ProductRequestValidationTests {
                       "is negative"
             ),
             
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           null, valid().categoryId()),
                       "description",
                       "is null"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           EMPTY_STRING, valid().categoryId()),
                       "description",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           BLANK_STRING, valid().categoryId()),
                       "description",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           valid().description(), null),
@@ -136,7 +135,7 @@ public class ProductRequestValidationTests {
                       "is null"
             ),
             
-            arguments(new ProductRequest(
+            arguments(new ProductCreateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           valid().description(), 0L),
@@ -148,70 +147,70 @@ public class ProductRequestValidationTests {
     
     private static Stream<Arguments> invalidCasesOnUpdate() {
         return Stream.of(
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           EMPTY_STRING, valid().brandName(), valid().price(),
                           valid().availableQuantity(), valid().description(),
                           valid().categoryId()),
                       "name",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           BLANK_STRING, valid().brandName(), valid().price(),
                           valid().availableQuantity(), valid().description(),
                           valid().categoryId()),
                       "name",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), EMPTY_STRING,
                           valid().price(), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "brandName",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), BLANK_STRING,
                           valid().price(), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "brandName",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           new BigDecimal(0), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "price",
                       "is zero"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           new BigDecimal(-1), valid().availableQuantity(),
                           valid().description(), valid().categoryId()),
                       "price",
                       "is negative"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), -1,
                           valid().description(), valid().categoryId()),
                       "availableQuantity",
                       "is negative"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           EMPTY_STRING, valid().categoryId()),
                       "description",
                       "is empty"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           BLANK_STRING, valid().categoryId()),
                       "description",
                       "is blank"
             ),
-            arguments(new ProductRequest(
+            arguments(new ProductUpdateRequest(
                           valid().name(), valid().brandName(),
                           valid().price(), valid().availableQuantity(),
                           valid().description(), 0L),
@@ -223,8 +222,8 @@ public class ProductRequestValidationTests {
     
     @ParameterizedTest(name = "{index}: Product field: {1} {2}")
     @MethodSource("invalidCasesOnCreate")
-    public void shouldFailValidationOnCreate(ProductRequest request, String fieldNameWithInvalidValue, String reason) {
-        Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Create.class, Update.class);
+    public void shouldFailValidationOnCreate(ProductCreateRequest request, String fieldNameWithInvalidValue, String reason) {
+        Set<ConstraintViolation<ProductCreateRequest>> violationSet = validator.validate(request);
         assertThat(violationSet).anySatisfy(violation -> {
             assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldNameWithInvalidValue);
         });
@@ -232,8 +231,8 @@ public class ProductRequestValidationTests {
     
     @ParameterizedTest(name = "{index}: Product field: {1} {2}")
     @MethodSource("invalidCasesOnUpdate")
-    public void shouldFailValidationOnUpdate(ProductRequest request, String fieldNameWithInvalidValue, String reason) {
-        Set<ConstraintViolation<ProductRequest>> violationSet = validator.validate(request, Update.class);
+    public void shouldFailValidationOnUpdate(ProductUpdateRequest request, String fieldNameWithInvalidValue, String reason) {
+        Set<ConstraintViolation<ProductUpdateRequest>> violationSet = validator.validate(request);
         assertThat(violationSet).anySatisfy(violation -> {
             assertThat(violation.getPropertyPath().toString()).isEqualTo(fieldNameWithInvalidValue);
         });

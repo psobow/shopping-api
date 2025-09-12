@@ -23,6 +23,19 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(category);
     }
     
+    @Transactional
+    @Override
+    public Category partialUpdateById(Category patch, Long id) {
+        Category existingCategory = findById(id);
+        
+        if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
+            assertCategoryUnique(patch.getName());
+            existingCategory.setName(patch.getName());
+            categoryRepository.save(existingCategory);
+        }
+        return existingCategory;
+    }
+    
     @Override
     public Category findById(Long id) {
         return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
@@ -53,19 +66,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public boolean existsByName(String name) {
         return categoryRepository.existsByName(name);
-    }
-    
-    @Transactional
-    @Override
-    public Category partialUpdateById(Category patch, Long id) {
-        Category existingCategory = findById(id);
-        
-        if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
-            assertCategoryUnique(patch.getName());
-            existingCategory.setName(patch.getName());
-            categoryRepository.save(existingCategory);
-        }
-        return existingCategory;
     }
     
     private void assertCategoryUnique(String name) {

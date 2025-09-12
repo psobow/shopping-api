@@ -12,7 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductRequest;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
@@ -66,7 +67,7 @@ public class ProductControllerTests {
         public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
             productFixtures.withEmptyImages();
             
-            ProductRequest request = productFixtures.getNewRequest();
+            ProductCreateRequest request = productFixtures.getNewCreateRequest();
             Product saved = productFixtures.getNewEntity();
             ProductResponse response = productFixtures.getNewResponse();
             
@@ -93,9 +94,9 @@ public class ProductControllerTests {
         
         @Test
         public void createProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
-            ProductRequest invalidRequest =
-                new ProductRequest("", "  ", new BigDecimal(0),
-                                   -1, null, null
+            ProductCreateRequest invalidRequest =
+                new ProductCreateRequest("", "  ", new BigDecimal(0),
+                                         -1, null, null
                 );
             
             String json = objectMapper.writeValueAsString(invalidRequest);
@@ -115,7 +116,7 @@ public class ProductControllerTests {
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
             productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.getNewRequest();
+            ProductUpdateRequest request = productFixtures.getNewUpdateRequest();
             Product updated = productFixtures.getNewEntity();
             ProductResponse response = productFixtures.getNewResponse();
             
@@ -140,9 +141,9 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
-            ProductRequest invalidRequest =
-                new ProductRequest("   ", "  ", new BigDecimal(0),
-                                   -1, "", null
+            ProductCreateRequest invalidRequest =
+                new ProductCreateRequest("   ", "  ", new BigDecimal(0),
+                                         -1, "", null
                 );
             String json = objectMapper.writeValueAsString(invalidRequest);
             
@@ -156,7 +157,7 @@ public class ProductControllerTests {
         public void updateProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
             productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.getNewRequest();
+            ProductCreateRequest request = productFixtures.getNewCreateRequest();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -170,7 +171,7 @@ public class ProductControllerTests {
         public void updateProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
             productFixtures.withProductName("newProductName");
             
-            ProductRequest request = productFixtures.getNewRequest();
+            ProductUpdateRequest request = productFixtures.getNewUpdateRequest();
             
             when(productService.partialUpdateById(request, NON_EXISTING_PRODUCT_ID))
                 .thenThrow(new EntityNotFoundException());

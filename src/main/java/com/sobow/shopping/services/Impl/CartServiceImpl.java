@@ -28,6 +28,11 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
+    public void removeCartForUser(Long userId) {
+        throw new UnsupportedOperationException("removeCartForUser is not implemented yet");
+    }
+    
+    @Override
     public Cart findCartById(Long id) {
         return cartRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
@@ -77,17 +82,17 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem removeCartItem(Long cartId, CartItem cartItem) {
+    public CartItem removeCartItem(Long cartId, Long cartItemId) {
         return null;
     }
     
     @Override
-    public CartItem incrementCartItemQty(Long cartId, CartItem cartItem) {
+    public CartItem incrementCartItemQty(Long cartId, Long cartItemId) {
         return null;
     }
     
     @Override
-    public CartItem decrementCartItemQty(Long cartId, CartItem cartItem) {
+    public CartItem decrementCartItemQty(Long cartId, Long cartItemId) {
         return null;
     }
     

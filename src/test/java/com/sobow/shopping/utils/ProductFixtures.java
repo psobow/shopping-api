@@ -3,7 +3,8 @@ package com.sobow.shopping.utils;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductRequest;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -72,8 +73,12 @@ public class ProductFixtures {
     }
     
     // builders for each object
-    public ProductRequest getNewRequest() {
-        return new ProductRequest(productName, brandName, price, availableQuantity, description, category.getId());
+    public ProductCreateRequest getNewCreateRequest() {
+        return new ProductCreateRequest(productName, brandName, price, availableQuantity, description, category.getId());
+    }
+    
+    public ProductUpdateRequest getNewUpdateRequest() {
+        return new ProductUpdateRequest(productName, brandName, price, availableQuantity, description, category.getId());
     }
     
     public Product getNewEntity() {

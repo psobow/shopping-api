@@ -11,7 +11,8 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
-import com.sobow.shopping.domain.requests.ProductRequest;
+import com.sobow.shopping.domain.requests.ProductCreateRequest;
+import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.Impl.ProductServiceImpl;
@@ -37,7 +38,7 @@ public class ProductServiceImplTests {
     private ProductFixtures productFixtures = ProductFixtures.defaults();
     
     @Mock
-    private Mapper<Product, ProductRequest> productRequestMapper;
+    private Mapper<Product, ProductCreateRequest> productRequestMapper;
     
     @InjectMocks
     private ProductServiceImpl underTest;
@@ -54,7 +55,7 @@ public class ProductServiceImplTests {
         public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             productFixtures.withCategoryId(CATEGORY_EXISTING_ID);
-            ProductRequest dto = productFixtures.getNewRequest();
+            ProductCreateRequest dto = productFixtures.getNewCreateRequest();
             
             Product mapped = new Product();       // what mapper returns
             Category category = new Category();   // what repo returns
@@ -74,7 +75,7 @@ public class ProductServiceImplTests {
         public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
             productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
-            ProductRequest dto = productFixtures.getNewRequest();
+            ProductCreateRequest dto = productFixtures.getNewCreateRequest();
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
             
             // When + Then
@@ -96,7 +97,7 @@ public class ProductServiceImplTests {
             
             Product product = productFixtures.getNewEntity();
             Category category = product.getCategory();
-            ProductRequest patch = productFixtures.getNewRequest();
+            ProductUpdateRequest patch = productFixtures.getNewUpdateRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_EXISTING_ID)).thenReturn(category);
@@ -121,7 +122,7 @@ public class ProductServiceImplTests {
             // Given
             productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
             Product product = productFixtures.getNewEntity();
-            ProductRequest patch = productFixtures.getNewRequest();
+            ProductUpdateRequest patch = productFixtures.getNewUpdateRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
