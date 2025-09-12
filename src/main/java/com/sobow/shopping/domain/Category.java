@@ -30,4 +30,14 @@ public class Category {
     
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
+    
+    public void addProductAndLink(Product p) {
+        products.add(p);
+        p.setCategory(this);
+    }
+    
+    public void removeProductAndUnlink(Product p) {
+        products.remove(p);
+        p.setCategory(null);
+    }
 }
