@@ -10,6 +10,10 @@ public interface ProductService {
     
     Product findById(Long id);
     
+    Product findProductWithCategoryAndImagesById(Long id);
+    
+    List<Product> findALlProductsWithCategoryAndImages();
+    
     void deleteById(Long id);
     
     boolean existsById(Long id);
