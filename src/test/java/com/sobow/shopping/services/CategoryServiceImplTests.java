@@ -31,8 +31,8 @@ public class CategoryServiceImplTests {
     @InjectMocks
     private CategoryServiceImpl underTest;
     
-    private final static long existingId = 1L;
-    private final static long nonExistingId = 999L;
+    private final static long EXISTING_ID = 1L;
+    private final static long NON_EXISTING_ID = 999L;
     
     private Category getCategory(String name) {
         Category category = new Category();
@@ -42,8 +42,8 @@ public class CategoryServiceImplTests {
     
     @Test
     void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
-        when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> underTest.findById(nonExistingId));
+        when(categoryRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> underTest.findById(NON_EXISTING_ID));
     }
     
     @Nested
@@ -90,12 +90,12 @@ public class CategoryServiceImplTests {
             Category existing = getCategory("old");
             Category patch = getCategory("new");
             
-            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
             when(categoryRepository.save(existing)).thenReturn(existing);
             
             // When
-            Category result = underTest.partialUpdateById(patch, existingId);
+            Category result = underTest.partialUpdateById(patch, EXISTING_ID);
             
             // Then
             assertEquals(patch.getName(), existing.getName());
@@ -110,11 +110,11 @@ public class CategoryServiceImplTests {
             Category existing = getCategory("old");
             Category patch = getCategory("Name Already Exists");
             
-            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(ResourceAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
+            assertThrows(ResourceAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, EXISTING_ID));
             verify(categoryRepository, never()).save(any());
         }
         
@@ -124,10 +124,10 @@ public class CategoryServiceImplTests {
             Category existing = getCategory("name");
             Category patch = getCategory("name");
             
-            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(EXISTING_ID)).thenReturn(Optional.of(existing));
             
             // When
-            Category result = underTest.partialUpdateById(patch, existingId);
+            Category result = underTest.partialUpdateById(patch, EXISTING_ID);
             
             // Then
             verify(categoryRepository, never()).save(any());

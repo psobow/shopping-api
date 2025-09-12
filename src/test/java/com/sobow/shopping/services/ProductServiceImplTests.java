@@ -15,8 +15,8 @@ import com.sobow.shopping.domain.requests.ProductRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.Impl.ProductServiceImpl;
+import com.sobow.shopping.utils.ProductFixtures;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +33,8 @@ public class ProductServiceImplTests {
     private ProductRepository productRepository;
     
     private final static long PRODUCT_EXISTING_ID = 1L;
+    
+    private ProductFixtures productFixtures = ProductFixtures.defaults();
     
     @Mock
     private Mapper<Product, ProductRequest> productRequestMapper;
@@ -51,8 +53,8 @@ public class ProductServiceImplTests {
         @Test
         public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
-            ProductRequest dto = new ProductRequest(
-                "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", CATEGORY_EXISTING_ID);
+            productFixtures.withCategoryId(CATEGORY_EXISTING_ID);
+            ProductRequest dto = productFixtures.getNewRequest();
             
             Product mapped = new Product();       // what mapper returns
             Category category = new Category();   // what repo returns
@@ -71,8 +73,8 @@ public class ProductServiceImplTests {
         @Test
         public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
-            ProductRequest dto = new ProductRequest(
-                "ProductName", "Brand", new BigDecimal("10.00"), 5, "Desc", CATEGORY_NON_EXISTING_ID);
+            productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
+            ProductRequest dto = productFixtures.getNewRequest();
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
             
             // When + Then
@@ -88,12 +90,13 @@ public class ProductServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedProduct_when_ValidInput() {
             // Given
-            Product product = new Product();
-            Category category = new Category();
-            category.setName("newCategoryName");
+            productFixtures.withCategoryName("newCategoryName")
+                           .withCategoryId(CATEGORY_EXISTING_ID)
+                           .withProductName("newProductName");
             
-            ProductRequest patch =
-                new ProductRequest("newProductName", null, null, null, null, CATEGORY_EXISTING_ID);
+            Product product = productFixtures.getNewEntity();
+            Category category = product.getCategory();
+            ProductRequest patch = productFixtures.getNewRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_EXISTING_ID)).thenReturn(category);
@@ -116,9 +119,9 @@ public class ProductServiceImplTests {
         @Test
         public void partialUpdateById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
             // Given
-            Product product = new Product();
-            ProductRequest patch =
-                new ProductRequest(null, null, null, null, null, CATEGORY_NON_EXISTING_ID);
+            productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
+            Product product = productFixtures.getNewEntity();
+            ProductRequest patch = productFixtures.getNewRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
