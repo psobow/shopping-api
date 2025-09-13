@@ -55,7 +55,7 @@ public class ProductServiceImplTests {
         public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             productFixtures.withCategoryId(CATEGORY_EXISTING_ID);
-            ProductCreateRequest dto = productFixtures.getNewCreateRequest();
+            ProductCreateRequest dto = productFixtures.createRequest();
             
             Product mapped = new Product();       // what mapper returns
             Category category = new Category();   // what repo returns
@@ -75,7 +75,7 @@ public class ProductServiceImplTests {
         public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
             productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
-            ProductCreateRequest dto = productFixtures.getNewCreateRequest();
+            ProductCreateRequest dto = productFixtures.createRequest();
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());
             
             // When + Then
@@ -95,9 +95,9 @@ public class ProductServiceImplTests {
                            .withCategoryId(CATEGORY_EXISTING_ID)
                            .withProductName("newProductName");
             
-            Product product = productFixtures.getNewEntity();
+            Product product = productFixtures.entity();
             Category category = product.getCategory();
-            ProductUpdateRequest patch = productFixtures.getNewUpdateRequest();
+            ProductUpdateRequest patch = productFixtures.updateRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_EXISTING_ID)).thenReturn(category);
@@ -121,8 +121,8 @@ public class ProductServiceImplTests {
         public void partialUpdateById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
             // Given
             productFixtures.withCategoryId(CATEGORY_NON_EXISTING_ID);
-            Product product = productFixtures.getNewEntity();
-            ProductUpdateRequest patch = productFixtures.getNewUpdateRequest();
+            Product product = productFixtures.entity();
+            ProductUpdateRequest patch = productFixtures.updateRequest();
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_NON_EXISTING_ID)).thenThrow(new EntityNotFoundException());

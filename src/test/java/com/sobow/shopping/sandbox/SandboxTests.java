@@ -37,7 +37,7 @@ public class SandboxTests {
     public void sandboxTest1() {
         var productFixtures = ProductFixtures.defaults().withAllNullIds();
         
-        Product product = productFixtures.getNewEntity();
+        Product product = productFixtures.entity();
         
         Category category = product.getCategory();
         
