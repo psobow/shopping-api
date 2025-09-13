@@ -12,13 +12,13 @@ public interface CartService {
     
     Cart findCartById(Long id);
     
-    CartItem addCartItem(Long cartId, CartItem cartItem);
+    CartItem addCartItem(Long cartId, CartItem item);
     
-    CartItem removeCartItem(Long cartId, Long cartItemId);
+    void removeCartItem(Long cartId, Long itemId);
     
-    CartItem incrementCartItemQty(Long cartId, Long cartItemId);
+    CartItem incrementCartItemQty(Long cartId, Long itemId);
     
-    CartItem decrementCartItemQty(Long cartId, Long cartItemId);
+    CartItem decrementCartItemQty(Long cartId, Long itemId);
     
     void removeAllCartItems(Long cartId);
     

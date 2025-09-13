@@ -40,59 +40,66 @@ public class CartServiceImpl implements CartService {
     // TODO: you can use CartItemDto as method argument instead of cardId, incomingCartItem
     @Transactional
     @Override
-    public CartItem addCartItem(Long cartId, CartItem incomingCartItem) {
+    public CartItem addCartItem(Long cartId, CartItem incomingItem) {
         // Load cart and aggregate product
         Cart cart = findCartById(cartId);
-        Product product = incomingCartItem.getProduct();
+        Product product = incomingItem.getProduct();
         
         // Normalize inputs (defensive coding)
-        int requestedQty = Math.max(1, incomingCartItem.getQuantity());
+        int requestedQty = Math.max(1, incomingItem.getQuantity());
         int availableQty = Math.max(0, product.getAvailableQuantity());
         
         if (availableQty == 0) throw new OutOfStockException(product.getId());
         
         // Find existing line in the cart for this product (or create new)
-        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cartId, product.getId())
-                                              .orElseGet(() -> {
-                                                  CartItem newCartItem = new CartItem();
-                                                  newCartItem.setProduct(product);
-                                                  cart.addCartItemAndLink(newCartItem);
-                                                  return newCartItem;
-                                                  // quantity and totalCartItemPrice set below
-                                              });
+        CartItem item = cartItemRepository.findByCartIdAndProductId(cartId, product.getId())
+                                          .orElseGet(() -> {
+                                              CartItem newItem = new CartItem();
+                                              newItem.setProduct(product);
+                                              cart.addCartItemAndLink(newItem);
+                                              return newItem;
+                                              // quantity and totalCartItemPrice set below
+                                          });
         
         // Calculate new quantity and throw if available stock exceeded
-        int alreadyInCartQty = Optional.ofNullable(cartItem.getQuantity()).orElse(0);
+        int alreadyInCartQty = Optional.ofNullable(item.getQuantity()).orElse(0);
         int newQty = alreadyInCartQty + requestedQty;
         if (newQty > availableQty)
             throw new InsufficientStockException(product.getId(), availableQty, requestedQty, alreadyInCartQty);
         
         // Update quantity
-        cartItem.setQuantity(newQty);
+        item.setQuantity(newQty);
         
-        // Update totalCartItemPrice
-        BigDecimal totalCartItemPrice = BigDecimal.valueOf(newQty).multiply(product.getPrice());
-        cartItem.setTotalPrice(totalCartItemPrice);
+        // Update items price
+        BigDecimal itemsPrice = BigDecimal.valueOf(newQty).multiply(product.getPrice());
+        item.setTotalPrice(itemsPrice);
         
-        // Calculate requestedPrice and Update totalCartPrice
-        BigDecimal requestedPrice = product.getPrice().multiply(BigDecimal.valueOf(requestedQty));
-        cart.setTotalPrice(cart.getTotalPrice().add(requestedPrice));
-        return cartItem;
+        // Calculate price for requested items and Update totalCartPrice
+        BigDecimal requestedItemsPrice = product.getPrice().multiply(BigDecimal.valueOf(requestedQty));
+        cart.setTotalPrice(cart.getTotalPrice().add(requestedItemsPrice));
+        return item;
     }
     
     @Transactional
     @Override
-    public CartItem removeCartItem(Long cartId, Long cartItemId) {
+    public void removeCartItem(Long cartId, Long itemId) {
+        CartItem item = cartItemRepository.findByCartIdAndId(cartId, itemId)
+                                          .orElseThrow(() -> new EntityNotFoundException(
+                                              "CartItem " + itemId + " not found in cart " + cartId));
+        BigDecimal itemsPrice = item.getTotalPrice();
+        
+        Cart cart = item.getCart();
+        cart.setTotalPrice(cart.getTotalPrice().subtract(itemsPrice).max(BigDecimal.ZERO));
+        cart.removeCartItemAndUnlink(item);
+    }
+    
+    @Override
+    public CartItem incrementCartItemQty(Long cartId, Long itemId) {
         return null;
     }
     
     @Override
-    public CartItem incrementCartItemQty(Long cartId, Long cartItemId) {
-        return null;
-    }
-    
-    @Override
-    public CartItem decrementCartItemQty(Long cartId, Long cartItemId) {
+    public CartItem decrementCartItemQty(Long cartId, Long itemId) {
         return null;
     }
     
