@@ -49,7 +49,7 @@ public class CartItem {
     @PositiveOrZero
     @Digits(integer = 17, fraction = 2)
     @Column(precision = 19, scale = 2)
-    private BigDecimal totalCartItemPrice;
+    private BigDecimal totalPrice;
     
     @ManyToOne
     @JoinColumn(name = "product_id")

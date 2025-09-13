@@ -67,16 +67,16 @@ public class CartServiceImpl implements CartService {
         if (newQty > availableQty)
             throw new InsufficientStockException(product.getId(), availableQty, requestedQty, alreadyInCartQty);
         
-        // Set new quantity
+        // Update quantity
         cartItem.setQuantity(newQty);
         
-        // Calculate and set totalCartItemPrice
+        // Update totalCartItemPrice
         BigDecimal totalCartItemPrice = BigDecimal.valueOf(newQty).multiply(product.getPrice());
-        cartItem.setTotalCartItemPrice(totalCartItemPrice);
+        cartItem.setTotalPrice(totalCartItemPrice);
         
-        // Calculate and set totalCartPrice
-        BigDecimal totalCartPrice = cart.getTotalCartPrice().add(totalCartItemPrice);
-        cart.setTotalCartPrice(totalCartPrice);
+        // Calculate requestedPrice and Update totalCartPrice
+        BigDecimal requestedPrice = product.getPrice().multiply(BigDecimal.valueOf(requestedQty));
+        cart.setTotalPrice(cart.getTotalPrice().add(requestedPrice));
         return cartItem;
     }
     

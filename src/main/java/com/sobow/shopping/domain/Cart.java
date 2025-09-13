@@ -33,7 +33,7 @@ public class Cart {
     @PositiveOrZero
     @Digits(integer = 17, fraction = 2)
     @Column(precision = 19, scale = 2)
-    private BigDecimal totalCartPrice = BigDecimal.ZERO;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
     
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();
