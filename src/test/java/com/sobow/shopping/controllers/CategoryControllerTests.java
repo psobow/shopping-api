@@ -17,7 +17,7 @@ import com.sobow.shopping.domain.responses.CategoryResponse;
 import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
-import com.sobow.shopping.utils.CategoryFixtures;
+import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ public class CategoryControllerTests {
     private static final Long EXISTING_CATEGORY_ID = 100L;
     private static final Long NON_EXISTING_CATEGORY_ID = 999L;
     private static final Long INVALID_CATEGORY_ID = -1L;
-    private CategoryFixtures categoryFixtures = CategoryFixtures.defaults();
+    private TestFixtures fixtures = new TestFixtures();
     
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -64,10 +64,10 @@ public class CategoryControllerTests {
         
         @Test
         public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
-            CategoryRequest request = categoryFixtures.request();
-            Category mapped = categoryFixtures.entity();
-            Category saved = categoryFixtures.entity();
-            CategoryResponse response = categoryFixtures.response();
+            CategoryRequest request = fixtures.categoryRequest();
+            Category mapped = fixtures.categoryEntity();
+            Category saved = fixtures.categoryEntity();
+            CategoryResponse response = fixtures.categoryResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -98,10 +98,8 @@ public class CategoryControllerTests {
         
         @Test
         public void createCategory_should_Return409_when_CategoryNameAlreadyExists() throws Exception {
-            categoryFixtures.withName(EXISTING_CATEGORY_NAME);
-            
-            CategoryRequest request = categoryFixtures.request();
-            Category mapped = categoryFixtures.entity();
+            CategoryRequest request = fixtures.categoryRequest();
+            Category mapped = fixtures.categoryEntity();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -122,10 +120,10 @@ public class CategoryControllerTests {
         
         @Test
         public void updateCategory_should_Return200WithDto_when_ValidRequest() throws Exception {
-            CategoryRequest request = categoryFixtures.request();
-            Category mapped = categoryFixtures.entity();
-            Category updated = categoryFixtures.entity();
-            CategoryResponse response = categoryFixtures.response();
+            CategoryRequest request = fixtures.categoryRequest();
+            Category mapped = fixtures.categoryEntity();
+            Category updated = fixtures.categoryEntity();
+            CategoryResponse response = fixtures.categoryResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -156,7 +154,7 @@ public class CategoryControllerTests {
         
         @Test
         public void updateCategory_should_Return400_when_CategoryIdLessThanOne() throws Exception {
-            CategoryRequest request = categoryFixtures.request();
+            CategoryRequest request = fixtures.categoryRequest();
             String json = objectMapper.writeValueAsString(request);
             
             mockMvc.perform(put(CATEGORIES_BY_ID_PATH, INVALID_CATEGORY_ID)
@@ -167,8 +165,8 @@ public class CategoryControllerTests {
         
         @Test
         public void updateCategory_should_Return404_when_CategoryIdDoestNotExist() throws Exception {
-            CategoryRequest request = categoryFixtures.request();
-            Category mapped = categoryFixtures.entity();
+            CategoryRequest request = fixtures.categoryRequest();
+            Category mapped = fixtures.categoryEntity();
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.partialUpdateById(mapped, NON_EXISTING_CATEGORY_ID))
@@ -184,10 +182,8 @@ public class CategoryControllerTests {
         
         @Test
         public void updateCategory_should_Return409_when_CategoryNameAlreadyExists() throws Exception {
-            categoryFixtures.withName(EXISTING_CATEGORY_NAME);
-            
-            CategoryRequest request = categoryFixtures.request();
-            Category mapped = categoryFixtures.entity();
+            CategoryRequest request = fixtures.categoryRequest();
+            Category mapped = fixtures.categoryEntity();
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.partialUpdateById(mapped, EXISTING_CATEGORY_ID))
@@ -208,8 +204,8 @@ public class CategoryControllerTests {
         
         @Test
         public void getAllCategories_should_Return200WithList_when_CategoriesExists() throws Exception {
-            Category category = categoryFixtures.entity();
-            CategoryResponse response = categoryFixtures.response();
+            Category category = fixtures.categoryEntity();
+            CategoryResponse response = fixtures.categoryResponse();
             
             when(categoryService.findAll()).thenReturn(List.of(category));
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
@@ -233,8 +229,9 @@ public class CategoryControllerTests {
         
         @Test
         public void getCategory_should_Return200WithDto_when_CategoryIdValid() throws Exception {
-            Category category = categoryFixtures.entity();
-            CategoryResponse response = categoryFixtures.response();
+            fixtures.withCategoryId(EXISTING_CATEGORY_ID);
+            Category category = fixtures.categoryEntity();
+            CategoryResponse response = fixtures.categoryResponse();
             
             when(categoryService.findById(EXISTING_CATEGORY_ID)).thenReturn(category);
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
@@ -261,11 +258,10 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void getCategoryByName_should_Return200WithDto_when_CategoryNameExists() throws Exception {
-            categoryFixtures.withName(EXISTING_CATEGORY_NAME);
-            
-            Category category = categoryFixtures.entity();
-            CategoryResponse response = categoryFixtures.response();
+        public void getCategoryByName_should_Return200WithDto_when_CategoryWithNameExists() throws Exception {
+            fixtures.withCategoryName(EXISTING_CATEGORY_NAME);
+            Category category = fixtures.categoryEntity();
+            CategoryResponse response = fixtures.categoryResponse();
             
             when(categoryService.findByName(EXISTING_CATEGORY_NAME)).thenReturn(category);
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
@@ -278,7 +274,7 @@ public class CategoryControllerTests {
         }
         
         @Test
-        public void getCategoryByName_should_Return404_when_CategoryNameDoesNotExist() throws Exception {
+        public void getCategoryByName_should_Return404_when_CategoryWithNameDoesNotExist() throws Exception {
             when(categoryService.findByName(NON_EXISTING_CATEGORY_NAME))
                 .thenThrow(new EntityNotFoundException());
             

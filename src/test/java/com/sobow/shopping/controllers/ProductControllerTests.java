@@ -17,7 +17,7 @@ import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
-import com.sobow.shopping.utils.ProductFixtures;
+import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -46,7 +46,7 @@ public class ProductControllerTests {
     private static final Long NON_EXISTING_PRODUCT_ID = 999L;
     private static final Long INVALID_PRODUCT_ID = -1L;
     
-    private ProductFixtures productFixtures = ProductFixtures.defaults();
+    private TestFixtures fixtures = new TestFixtures();
     
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -65,11 +65,10 @@ public class ProductControllerTests {
         
         @Test
         public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
-            productFixtures.withEmptyImages();
-            
-            ProductCreateRequest request = productFixtures.createRequest();
-            Product saved = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            fixtures.withEmptyImages();
+            ProductCreateRequest request = fixtures.productCreateRequest();
+            Product saved = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -95,8 +94,8 @@ public class ProductControllerTests {
         @Test
         public void createProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
             ProductCreateRequest invalidRequest =
-                new ProductCreateRequest("", "  ", new BigDecimal(0),
-                                         -1, null, null
+                new ProductCreateRequest(null, "  ", new BigDecimal(0),
+                                         -1, "", null
                 );
             
             String json = objectMapper.writeValueAsString(invalidRequest);
@@ -114,11 +113,9 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
-            productFixtures.withProductName("newProductName");
-            
-            ProductUpdateRequest request = productFixtures.updateRequest();
-            Product updated = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            ProductUpdateRequest request = fixtures.productUpdateRequest();
+            Product updated = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -143,7 +140,7 @@ public class ProductControllerTests {
         public void updateProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
             ProductCreateRequest invalidRequest =
                 new ProductCreateRequest("   ", "  ", new BigDecimal(0),
-                                         -1, "", null
+                                         -1, "", -1L
                 );
             String json = objectMapper.writeValueAsString(invalidRequest);
             
@@ -155,9 +152,7 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
-            productFixtures.withProductName("newProductName");
-            
-            ProductCreateRequest request = productFixtures.createRequest();
+            ProductCreateRequest request = fixtures.productCreateRequest();
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -169,9 +164,7 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            productFixtures.withProductName("newProductName");
-            
-            ProductUpdateRequest request = productFixtures.updateRequest();
+            ProductUpdateRequest request = fixtures.productUpdateRequest();
             
             when(productService.partialUpdateById(request, NON_EXISTING_PRODUCT_ID))
                 .thenThrow(new EntityNotFoundException());
@@ -191,8 +184,8 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() throws Exception {
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.findAll()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -222,8 +215,8 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() throws Exception {
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            Product product = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.findById(EXISTING_PRODUCT_ID)).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -262,10 +255,9 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
-            productFixtures.withProductName(EXISTING_PRODUCT_NAME);
-            
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            fixtures.withProductName(EXISTING_PRODUCT_NAME);
+            Product product = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(EXISTING_PRODUCT_NAME, null, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -286,10 +278,9 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
-            productFixtures.withBrandName(EXISTING_BRAND_NAME);
-            
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            fixtures.withBrandName(EXISTING_BRAND_NAME);
+            Product product = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(null, EXISTING_BRAND_NAME, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -310,10 +301,9 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
-            productFixtures.withCategoryName(EXISTING_CATEGORY_NAME);
-            
-            Product product = productFixtures.entity();
-            ProductResponse response = productFixtures.response();
+            fixtures.withCategoryName(EXISTING_CATEGORY_NAME);
+            Product product = fixtures.productEntity();
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(null, null, EXISTING_CATEGORY_NAME)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);

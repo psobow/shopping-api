@@ -6,7 +6,7 @@ import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.repositories.ProductRepository;
-import com.sobow.shopping.utils.ProductFixtures;
+import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,9 +35,9 @@ public class SandboxTests {
     
     @Test
     public void sandboxTest1() {
-        var productFixtures = ProductFixtures.defaults().withAllNullIds();
+        var productFixtures = new TestFixtures().withAllNullIds();
         
-        Product product = productFixtures.entity();
+        Product product = productFixtures.productEntity();
         
         Category category = product.getCategory();
         
