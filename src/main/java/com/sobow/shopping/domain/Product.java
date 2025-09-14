@@ -41,6 +41,7 @@ public class Product {
     @Column(precision = 19, scale = 2)
     private BigDecimal price;
     
+    @NotNull
     @PositiveOrZero
     private Integer availableQuantity;
     

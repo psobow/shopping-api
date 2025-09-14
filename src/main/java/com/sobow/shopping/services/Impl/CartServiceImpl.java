@@ -36,7 +36,11 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
     
-    // TODO: you can use CartItemDto as method argument instead of incomingCartItem
+    // TODO: create tests for other methods in CartService
+    
+    // TODO: create DTOs for methods
+    // TODO: decide how to use @Transactional consistently
+    
     @Transactional
     @Override
     public CartItem addCartItem(Long cartId, CartItem incomingItem) {

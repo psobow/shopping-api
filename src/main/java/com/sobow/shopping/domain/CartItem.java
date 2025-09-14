@@ -13,6 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,6 +52,9 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
+    
+    private static final int MONEY_SCALE = 2;
+    private static final RoundingMode MONEY_ROUNDING = RoundingMode.HALF_UP;
     
     public int incrementQuantity(int deltaQty) {
         if (product == null) {
@@ -91,13 +95,12 @@ public class CartItem {
     }
     
     public BigDecimal unitPrice() {
-        return product.getPrice();
+        return product.getPrice().setScale(MONEY_SCALE, MONEY_ROUNDING);
     }
     
     public BigDecimal getTotalPrice() {
         return unitPrice()
-            .multiply(BigDecimal.valueOf(quantity))
-            .setScale(2);
+            .multiply(BigDecimal.valueOf(quantity));
     }
     
     @Override
