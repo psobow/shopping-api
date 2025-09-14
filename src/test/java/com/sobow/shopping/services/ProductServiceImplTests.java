@@ -1,18 +1,19 @@
 package com.sobow.shopping.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.Impl.ProductServiceImpl;
@@ -80,6 +81,15 @@ public class ProductServiceImplTests {
             assertThrows(EntityNotFoundException.class, () -> underTest.save(request));
             verify(productRepository, never()).save(any());
         }
+        
+        @Test
+        public void save_should_ThrowAlreadyExists_when_Duplicate() {
+            ProductCreateRequest request = fixtures.productCreateRequest();
+            when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
+            // When + Then
+            assertThrows(ProductAlreadyExistsException.class, () -> underTest.save(request));
+            verify(productRepository, never()).save(any());
+        }
     }
     
     @Nested
@@ -89,15 +99,14 @@ public class ProductServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedProduct_when_ValidInput() {
             // Given
-            fixtures.withCategoryId(CATEGORY_EXISTING_ID)
-                    .withCategoryName("old category name")
-                    .withProductId(PRODUCT_EXISTING_ID)
-                    .withProductName("old product name");
+            fixtures.withProductId(PRODUCT_EXISTING_ID)
+                    .withCategoryId(CATEGORY_EXISTING_ID);
             
             Product product = fixtures.productEntity();
+            String oldName = "old name - to be updated";
+            product.setName(oldName);
             Category category = fixtures.categoryEntity();
             ProductUpdateRequest patch = fixtures.productUpdateRequest();
-  
             
             when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
             when(categoryService.findById(CATEGORY_EXISTING_ID)).thenReturn(category);
@@ -110,12 +119,8 @@ public class ProductServiceImplTests {
             assertSame(product, result);
             
             assertEquals(patch.name(), result.getName());
+            assertNotEquals(oldName, product.getName());
             assertEquals(category.getName(), result.getCategory().getName());
-            
-            // Interactions with mock
-            verify(productRepository).findById(PRODUCT_EXISTING_ID);
-            verify(productRepository).save(product);
-            verifyNoMoreInteractions(productRepository);
         }
         
         @Test
@@ -133,6 +138,20 @@ public class ProductServiceImplTests {
             // When + Then
             assertThrows(EntityNotFoundException.class,
                          () -> underTest.partialUpdateById(patch, PRODUCT_EXISTING_ID));
+            verify(productRepository, never()).save(any());
+        }
+        
+        @Test
+        public void partialUpdateById_should_ThrowAlreadyExists_when_Duplicate() {
+            fixtures.withProductId(PRODUCT_EXISTING_ID);
+            
+            Product product = fixtures.productEntity();
+            ProductUpdateRequest request = fixtures.productUpdateRequest();
+            
+            when(productRepository.findById(PRODUCT_EXISTING_ID)).thenReturn(Optional.of(product));
+            when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
+            // When + Then
+            assertThrows(ProductAlreadyExistsException.class, () -> underTest.partialUpdateById(request, PRODUCT_EXISTING_ID));
             verify(productRepository, never()).save(any());
         }
     }

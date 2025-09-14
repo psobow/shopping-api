@@ -4,6 +4,7 @@ import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
@@ -27,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public Product save(ProductCreateRequest productCreateRequest) {
+        assertProductUnique(productCreateRequest.name(), productCreateRequest.brandName());
         Product product = productCreateRequestMapper.mapToEntity(productCreateRequest);
         Category category = categoryService.findById(productCreateRequest.categoryId());
         category.addProductAndLink(product);
@@ -36,10 +38,16 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public Product partialUpdateById(ProductUpdateRequest patch, Long id) {
+        
         Product existingProduct = findById(id);
         
         if (patch.name() != null) existingProduct.setName(patch.name());
         if (patch.brandName() != null) existingProduct.setBrandName(patch.brandName());
+        
+        if (patch.name() != null || patch.brandName() != null) {
+            assertProductUnique(existingProduct.getName(), existingProduct.getBrandName());
+        }
+        
         if (patch.price() != null) existingProduct.setPrice(patch.price());
         if (patch.availableQuantity() != null) existingProduct.setAvailableQuantity(patch.availableQuantity());
         if (patch.description() != null) existingProduct.setDescription(patch.description());
@@ -118,5 +126,11 @@ public class ProductServiceImpl implements ProductService {
     
     private static Specification<Product> categoryNameEquals(String categoryName) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
+    }
+    
+    private void assertProductUnique(String name, String brandName) {
+        if (productRepository.existsByNameAndBrandName(name, brandName)) {
+            throw new ProductAlreadyExistsException(name, brandName);
+        }
     }
 }
