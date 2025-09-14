@@ -83,7 +83,7 @@ public class ProductServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_Duplicate() {
+        public void save_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
             ProductCreateRequest request = fixtures.productCreateRequest();
             when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
             // When + Then
@@ -142,7 +142,7 @@ public class ProductServiceImplTests {
         }
         
         @Test
-        public void partialUpdateById_should_ThrowAlreadyExists_when_Duplicate() {
+        public void partialUpdateById_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
             fixtures.withProductId(PRODUCT_EXISTING_ID);
             
             Product product = fixtures.productEntity();

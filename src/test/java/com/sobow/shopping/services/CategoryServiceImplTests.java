@@ -65,7 +65,7 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_Duplicate() {
+        public void save_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
             fixtures.withCategoryName("name already exists");
             Category category = fixtures.categoryEntity();
@@ -105,7 +105,7 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void partialUpdateById_should_ThrowAlreadyExists_when_Duplicate() {
+        public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
             fixtures.withCategoryName("Old name");
             Category existing = fixtures.categoryEntity();
