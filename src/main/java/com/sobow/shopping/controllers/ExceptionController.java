@@ -1,9 +1,11 @@
 package com.sobow.shopping.controllers;
 
+import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
+import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
-import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
+import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -45,10 +47,28 @@ public class ExceptionController {
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
     
-    @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleResourceConflict(ResourceAlreadyExistsException e, HttpServletRequest request) {
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleCategoryConflict(CategoryAlreadyExistsException e, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        pd.setTitle("Resource already exists");
+        pd.setTitle("Category already exists");
+        pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleProductConflict(CategoryAlreadyExistsException e, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Product already exists");
+        pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(CartItemAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleCartItemConflict(CategoryAlreadyExistsException e, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Product already exists in the cart");
         pd.setDetail(e.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
@@ -62,7 +82,6 @@ public class ExceptionController {
         pd.setProperty("productId", ex.getProductId());
         pd.setProperty("available", ex.getAvailable());
         pd.setProperty("requested", ex.getRequested());
-        pd.setProperty("alreadyInCart", ex.getAlreadyInCart());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
