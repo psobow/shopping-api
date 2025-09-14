@@ -8,21 +8,21 @@ import java.math.BigDecimal;
 
 public interface CartService {
     
-    Cart createCartForUser(Long userId);
+    Cart createCartForUser(long userId);
     
-    void removeCartForUser(Long userId);
+    void removeCartForUser(long userId);
     
-    Cart findCartById(Long id);
+    Cart findCartById(long id);
     
-    CartItem createCartItem(Long cartId, CartItemCreateRequest dto);
+    CartItem createCartItem(long cartId, CartItemCreateRequest dto);
     
-    void updateCartItemQty(Long cartId, CartItemUpdateRequest dto);
+    void updateCartItemQty(long cartId, CartItemUpdateRequest dto);
     
-    void removeCartItem(Long cartId, Long itemId);
+    void removeCartItem(long cartId, long itemId);
     
-    void removeAllCartItems(Long cartId);
+    void removeAllCartItems(long cartId);
     
-    BigDecimal getCartTotalPrice(Long cartId);
+    BigDecimal getCartTotalPrice(long cartId);
     
-    BigDecimal getCartItemTotalPrice(Long cartId, Long itemId);
+    BigDecimal getCartItemTotalPrice(long cartId, long itemId);
 }

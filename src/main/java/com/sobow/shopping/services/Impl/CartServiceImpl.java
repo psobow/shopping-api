@@ -25,29 +25,24 @@ public class CartServiceImpl implements CartService {
     private final ProductService productService;
     
     @Override
-    public Cart createCartForUser(Long userId) {
+    public Cart createCartForUser(long userId) {
         throw new UnsupportedOperationException("createCartForUser is not implemented yet");
     }
     
     @Override
-    public void removeCartForUser(Long userId) {
+    public void removeCartForUser(long userId) {
         throw new UnsupportedOperationException("removeCartForUser is not implemented yet");
     }
     
     @Override
-    public Cart findCartById(Long id) {
+    public Cart findCartById(long id) {
         return cartRepository.findById(id).orElseThrow(
             () -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
     
-    // TODO: create test cases for other methods in CartService
-    
-    // TODO: create DTOs for methods
-    // TODO: decide how to use @Transactional consistently
-    
     @Transactional
     @Override
-    public CartItem createCartItem(Long cartId, CartItemCreateRequest dto) {
+    public CartItem createCartItem(long cartId, CartItemCreateRequest dto) {
         Cart cart = findCartById(cartId);
         Product product = productService.findById(dto.productId());
         
@@ -63,7 +58,7 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public void updateCartItemQty(Long cartId, CartItemUpdateRequest dto) {
+    public void updateCartItemQty(long cartId, CartItemUpdateRequest dto) {
         CartItem item = findItemByCartIdAndId(cartId, dto.cartItemId());
         int resultQuantity = item.setQuantity(dto.requestedQty());
         if (resultQuantity == 0) removeCartItem(cartId, dto.cartItemId());
@@ -71,7 +66,7 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public void removeCartItem(Long cartId, Long itemId) {
+    public void removeCartItem(long cartId, long itemId) {
         CartItem item = findItemByCartIdAndId(cartId, itemId);
         Cart cart = item.getCart();
         cart.removeCartItemAndUnlink(item);
@@ -79,24 +74,24 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public void removeAllCartItems(Long cartId) {
+    public void removeAllCartItems(long cartId) {
         Cart cart = findCartById(cartId);
         cart.removeAllCartItems();
     }
     
     @Override
-    public BigDecimal getCartTotalPrice(Long cartId) {
+    public BigDecimal getCartTotalPrice(long cartId) {
         Cart cart = findCartById(cartId);
         return cart.getTotalPrice();
     }
     
     @Override
-    public BigDecimal getCartItemTotalPrice(Long cartId, Long itemId) {
+    public BigDecimal getCartItemTotalPrice(long cartId, long itemId) {
         CartItem item = findItemByCartIdAndId(cartId, itemId);
         return item.getTotalPrice();
     }
     
-    private CartItem findItemByCartIdAndId(Long cartId, Long itemId) {
+    private CartItem findItemByCartIdAndId(long cartId, long itemId) {
         return cartItemRepository.findByCartIdAndId(cartId, itemId)
                                  .orElseThrow(() -> new EntityNotFoundException(
                                      "CartItem " + itemId + " not found in cart " + cartId));

@@ -7,13 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageService {
     
-    List<Image> saveImages(List<MultipartFile> files, Long productId);
+    List<Image> saveImages(List<MultipartFile> files, long productId);
     
-    Image updateById(MultipartFile patch, Long id);
+    Image updateById(MultipartFile patch, long id);
     
-    Image findById(Long id);
+    Image findById(long id);
     
-    void deleteById(Long id);
+    void deleteById(long id);
     
-    FileContent getImageContent(Long id);
+    FileContent getImageContent(long id);
 }

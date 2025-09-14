@@ -26,7 +26,7 @@ public class ImageServiceImpl implements ImageService {
     
     @Transactional
     @Override
-    public List<Image> saveImages(List<MultipartFile> files, Long productId) {
+    public List<Image> saveImages(List<MultipartFile> files, long productId) {
         Product product = productService.findById(productId);
         List<Image> images = new ArrayList<>();
         
@@ -47,7 +47,7 @@ public class ImageServiceImpl implements ImageService {
     
     @Transactional
     @Override
-    public Image updateById(MultipartFile patch, Long id) {
+    public Image updateById(MultipartFile patch, long id) {
         Image image = findById(id);
         image.setFileName(patch.getOriginalFilename());
         image.setFileType(patch.getContentType());
@@ -60,19 +60,19 @@ public class ImageServiceImpl implements ImageService {
     }
     
     @Override
-    public Image findById(Long id) {
+    public Image findById(long id) {
         return imageRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
             "Image with id " + id + " not found"));
     }
     
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         imageRepository.deleteById(id);
     }
     
     @Transactional(readOnly = true)
     @Override
-    public FileContent getImageContent(Long id) {
+    public FileContent getImageContent(long id) {
         Image img = findById(id);
         try {
             return new FileContent(

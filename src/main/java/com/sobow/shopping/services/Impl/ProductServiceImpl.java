@@ -37,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product partialUpdateById(ProductUpdateRequest patch, Long id) {
+    public Product partialUpdateById(ProductUpdateRequest patch, long id) {
         
         Product existingProduct = findById(id);
         
@@ -65,13 +65,13 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Product findById(Long id) {
+    public Product findById(long id) {
         return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
             "Product with id " + id + " not found"));
     }
     
     @Override
-    public Product findProductWithCategoryAndImagesById(Long id) {
+    public Product findProductWithCategoryAndImagesById(long id) {
         return productRepository.findProductWithCategoryAndImagesById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
     }
@@ -82,12 +82,12 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         productRepository.deleteById(id);
     }
     
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(long id) {
         return productRepository.existsById(id);
     }
     

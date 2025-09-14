@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         LEFT JOIN FETCH p.images
         WHERE p.id = :id
         """)
-    Optional<Product> findProductWithCategoryAndImagesById(Long id);
+    Optional<Product> findProductWithCategoryAndImagesById(long id);
     
     @Query("""
         SELECT DISTINCT p

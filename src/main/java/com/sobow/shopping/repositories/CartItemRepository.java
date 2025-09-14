@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     
-    boolean existsByCartIdAndProductId(Long cartId, Long productId);
+    boolean existsByCartIdAndProductId(long cartId, long productId);
     
-    Optional<CartItem> findByCartIdAndId(Long cartId, Long id);
+    Optional<CartItem> findByCartIdAndId(long cartId, long id);
 }

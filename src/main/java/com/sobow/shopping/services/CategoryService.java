@@ -7,17 +7,17 @@ public interface CategoryService {
     
     Category save(Category category);
     
-    Category findById(Long id);
+    Category findById(long id);
     
     Category findByName(String name);
     
     List<Category> findAll();
     
-    void deleteById(Long id);
+    void deleteById(long id);
     
-    boolean existsById(Long id);
+    boolean existsById(long id);
     
     boolean existsByName(String name);
     
-    Category partialUpdateById(Category patch, Long id);
+    Category partialUpdateById(Category patch, long id);
 }

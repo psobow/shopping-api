@@ -9,17 +9,17 @@ public interface ProductService {
     
     Product save(ProductCreateRequest productCreateRequest);
     
-    Product findById(Long id);
+    Product findById(long id);
     
-    Product findProductWithCategoryAndImagesById(Long id);
+    Product findProductWithCategoryAndImagesById(long id);
     
     List<Product> findAllProductsWithCategoryAndImages();
     
-    void deleteById(Long id);
+    void deleteById(long id);
     
-    boolean existsById(Long id);
+    boolean existsById(long id);
     
-    Product partialUpdateById(ProductUpdateRequest patch, Long id);
+    Product partialUpdateById(ProductUpdateRequest patch, long id);
     
     List<Product> findAll();
     

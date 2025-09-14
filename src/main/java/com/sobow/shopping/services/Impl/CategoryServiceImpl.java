@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Transactional
     @Override
-    public Category partialUpdateById(Category patch, Long id) {
+    public Category partialUpdateById(Category patch, long id) {
         Category existingCategory = findById(id);
         
         if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public Category findById(Long id) {
+    public Category findById(long id) {
         return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
             "Category with " + id + " not found"));
     }
@@ -54,12 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         categoryRepository.deleteById(id);
     }
     
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(long id) {
         return categoryRepository.existsById(id);
     }
     
