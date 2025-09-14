@@ -16,6 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CartServiceImplTests {
     
+    public static final long EXISTING_CART_ID = 1L;
+    public static final long EXISTING_PRODUCT_ID = 2L;
+    public static final long NON_EXISTING_CART_ID = 999L;
     @Mock
     private CartRepository cartRepository;
     
@@ -33,6 +36,17 @@ public class CartServiceImplTests {
     class createCartItem {
         
         @Test
+        public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
+            // Given
+            //CartItemCreateRequest request = cartItemCreateRequest();
+            
+            // When
+            //CartItem result = underTest.createCartItem(EXISTING_CART_ID, request);
+            
+            // Then
+        }
+        
+        @Test
         public void createCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
             fail("Implement me");
         }
@@ -46,11 +60,6 @@ public class CartServiceImplTests {
         public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
             fail("Implement me");
         }
-        
-        @Test
-        public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
-            fail("Implement me");
-        }
     }
     
     @Nested
@@ -58,12 +67,12 @@ public class CartServiceImplTests {
     class updateCartItemQty {
         
         @Test
-        public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+        public void updateCartItemQty_should_UpdateItemQty_when_NewQtyWithinZero_and_AvailableStock() {
             fail("Implement me");
         }
         
         @Test
-        public void updateCartItemQty_should_UpdateItemQty_when_NewQtyWithinZero_and_AvailableStock() {
+        public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
             fail("Implement me");
         }
     }
@@ -73,12 +82,12 @@ public class CartServiceImplTests {
     class removeCartItem {
         
         @Test
-        public void removeCartItem_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+        public void removeCartItem_should_RemoveItem_when_ItemExistsInCart() {
             fail("Implement me");
         }
         
         @Test
-        public void removeCartItem_should_RemoveItem_when_ItemExistsInCart() {
+        public void removeCartItem_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
             fail("Implement me");
         }
         
@@ -93,12 +102,12 @@ public class CartServiceImplTests {
     class removeAllCartItems {
         
         @Test
-        public void removeAllCartItems_should_ThrowNotFound_when_CartDoesNotExist() {
+        public void removeAllCartItems_should_RemoveAllCartItems_when_CartExists() {
             fail("Implement me");
         }
         
         @Test
-        public void removeAllCartItems_should_RemoveAllCartItems_when_CartExists() {
+        public void removeAllCartItems_should_ThrowNotFound_when_CartDoesNotExist() {
             fail("Implement me");
         }
     }

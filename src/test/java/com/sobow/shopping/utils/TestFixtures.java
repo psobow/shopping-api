@@ -1,8 +1,12 @@
 package com.sobow.shopping.utils;
 
+import com.sobow.shopping.domain.Cart;
+import com.sobow.shopping.domain.CartItem;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.requests.CartItemCreateRequest;
+import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.domain.requests.CategoryRequest;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
@@ -12,27 +16,34 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
 
 public class TestFixtures {
     
+    public long nonExistingId = 999L;
+    
     private Long categoryId = 10L;
-    private String categoryName = "categoryName";
+    private String categoryName = "category name";
+    private boolean includeProductsInCategory = true;
     
     private Long productId = 20L;
-    private String productName = "productName";
-    private String brandName = "brandName";
+    private String productName = "product name";
+    private String brandName = "brand name";
     private BigDecimal price = new BigDecimal("10.00");
-    private Integer availableQuantity = 5;
-    private String description = "productDescription";
-    private boolean includeImages = true;
+    private Integer availableQuantity = 10;
+    private String description = "product description";
+    private boolean includeImagesInProduct = true;
     
     private Long imageId = 30L;
     private String fileName = "photo.png";
     private String fileType = "image/png";
     private Blob blob;
     private String downloadUrl = "/api/images/" + imageId;
+    
+    private Long cartId = 40L;
+    private Long cartItemId = 50L;
     
     public TestFixtures() {
         try {
@@ -42,13 +53,33 @@ public class TestFixtures {
         }
     }
     
+    public Cart cart() {
+        Cart cart = new Cart(cartId, new HashSet<>());
+        CartItem cartItem = cartItem();
+        cart.addCartItemAndLink(cartItem);
+        return cart;
+    }
+    
+    public CartItem cartItem() {
+        Product p = productEntity();
+        return new CartItem(cartItemId, 1, p, null);
+    }
+    
+    public CartItemCreateRequest cartItemCreateRequest() {
+        return new CartItemCreateRequest(productId, 1);
+    }
+    
+    public CartItemUpdateRequest cartItemUpdateRequest() {
+        return new CartItemUpdateRequest(cartItemId, 2);
+    }
+    
     public Product productEntity() {
         Category category = new Category(categoryId, categoryName, new ArrayList<>());
         Product product = new Product(productId, productName, brandName, price,
                                       availableQuantity, description, null, new ArrayList<>());
         category.addProductAndLink(product);
         
-        if (includeImages) {
+        if (includeImagesInProduct) {
             Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
             product.addImageAndLink(image);
         }
@@ -67,14 +98,26 @@ public class TestFixtures {
     public ProductResponse productResponse() {
         List<Long> imageIds = new ArrayList<>();
         
-        if (includeImages) imageIds.add(60L);
+        if (includeImagesInProduct) imageIds.add(imageId);
         
         return new ProductResponse(productId, productName, brandName, price, availableQuantity, description,
                                    categoryId, imageIds);
     }
     
     public Category categoryEntity() {
-        return new Category(categoryId, categoryName, new ArrayList<>());
+        Category category = new Category(categoryId, categoryName, new ArrayList<>());
+        
+        if (includeProductsInCategory) {
+            Product product = new Product(productId, productName, brandName, price,
+                                          availableQuantity, description, null, new ArrayList<>());
+            category.addProductAndLink(product);
+            
+            if (includeImagesInProduct) {
+                Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
+                product.addImageAndLink(image);
+            }
+        }
+        return category;
     }
     
     public CategoryRequest categoryRequest() {
@@ -85,7 +128,26 @@ public class TestFixtures {
         return new CategoryResponse(categoryId, categoryName);
     }
     
-    public TestFixtures withAllNullIds() {
+    // getters
+    
+    public Long getNonExistingId() {
+        return nonExistingId;
+    }
+    
+    public Long getCategoryId() {
+        return categoryId;
+    }
+    
+    public Long getProductId() {
+        return productId;
+    }
+    
+    public Long getImageId() {
+        return imageId;
+    }
+    
+    // setters
+    public TestFixtures withCategoryAndProductAndImageNullIds() {
         withProductId(null);
         withCategoryId(null);
         withImageId(null);
@@ -122,8 +184,13 @@ public class TestFixtures {
         return this;
     }
     
-    public TestFixtures withEmptyImages() {
-        includeImages = false;
+    public TestFixtures withCategoryEmptyProducts() {
+        includeProductsInCategory = false;
+        return this;
+    }
+    
+    public TestFixtures withProductEmptyImages() {
+        includeImagesInProduct = false;
         return this;
     }
 }

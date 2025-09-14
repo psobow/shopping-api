@@ -59,15 +59,22 @@ public class CartServiceImpl implements CartService {
     @Transactional
     @Override
     public void updateCartItemQty(long cartId, CartItemUpdateRequest dto) {
-        CartItem item = findItemByCartIdAndId(cartId, dto.cartItemId());
+        CartItem item = findCartItemByCartIdAndId(cartId, dto.cartItemId());
         int resultQuantity = item.setQuantity(dto.requestedQty());
         if (resultQuantity == 0) removeCartItem(cartId, dto.cartItemId());
+    }
+    
+    @Override
+    public CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
+        return cartItemRepository.findByCartIdAndId(cartId, itemId)
+                                 .orElseThrow(() -> new EntityNotFoundException(
+                                     "CartItem " + itemId + " not found in cart " + cartId));
     }
     
     @Transactional
     @Override
     public void removeCartItem(long cartId, long itemId) {
-        CartItem item = findItemByCartIdAndId(cartId, itemId);
+        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
         Cart cart = item.getCart();
         cart.removeCartItemAndUnlink(item);
     }
@@ -87,14 +94,8 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public BigDecimal getCartItemTotalPrice(long cartId, long itemId) {
-        CartItem item = findItemByCartIdAndId(cartId, itemId);
+        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
         return item.getTotalPrice();
-    }
-    
-    private CartItem findItemByCartIdAndId(long cartId, long itemId) {
-        return cartItemRepository.findByCartIdAndId(cartId, itemId)
-                                 .orElseThrow(() -> new EntityNotFoundException(
-                                     "CartItem " + itemId + " not found in cart " + cartId));
     }
 }
 

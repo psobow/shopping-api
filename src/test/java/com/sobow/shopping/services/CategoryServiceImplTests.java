@@ -32,15 +32,12 @@ public class CategoryServiceImplTests {
     @InjectMocks
     private CategoryServiceImpl underTest;
     
-    private final static long EXISTING_CATEGORY_ID = 1L;
-    private final static long NON_EXISTING_CATEGORY_ID = 999L;
-    
-    private TestFixtures fixtures = new TestFixtures();
+    private final TestFixtures fixtures = new TestFixtures();
     
     @Test
     void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
-        when(categoryRepository.findById(NON_EXISTING_CATEGORY_ID)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> underTest.findById(NON_EXISTING_CATEGORY_ID));
+        when(categoryRepository.findById(fixtures.getNonExistingId())).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> underTest.findById(fixtures.getNonExistingId()));
     }
     
     @Nested
@@ -50,16 +47,24 @@ public class CategoryServiceImplTests {
         @Test
         public void save_should_ReturnSavedCategory_when_ValidInput() {
             // Given
-            Category category = fixtures.categoryEntity();
+            Category category = fixtures.withCategoryId(null)
+                                        .withCategoryEmptyProducts()
+                                        .categoryEntity();
             
             when(categoryRepository.existsByName(category.getName())).thenReturn(false);
-            when(categoryRepository.save(category)).thenReturn(category);
+            when(categoryRepository.save(category)).thenAnswer(inv -> {
+                Category c = inv.getArgument(0);
+                c.setId(1L);
+                return c;
+            });
             
             // When
-            Category saved = underTest.save(category);
+            Category result = underTest.save(category);
             
             // Then
-            assertSame(category, saved);
+            assertSame(category, result);
+            assertEquals(1L, result.getId());
+            
             verify(categoryRepository).existsByName(category.getName());
             verify(categoryRepository).save(category);
         }
@@ -67,8 +72,10 @@ public class CategoryServiceImplTests {
         @Test
         public void save_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            fixtures.withCategoryName("name already exists");
-            Category category = fixtures.categoryEntity();
+            Category category = fixtures.withCategoryId(null)
+                                        .withCategoryName("name already exists")
+                                        .withCategoryEmptyProducts()
+                                        .categoryEntity();
             
             when(categoryRepository.existsByName(category.getName())).thenReturn(true);
             
@@ -77,7 +84,7 @@ public class CategoryServiceImplTests {
             verify(categoryRepository, never()).save(any());
         }
     }
-
+    
     @Nested
     @DisplayName("partialUpdateById")
     class partialUpdateById {
@@ -85,17 +92,25 @@ public class CategoryServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedCategory_when_ValidInput() {
             // Given
-            fixtures.withCategoryName("Old name");
-            Category existing = fixtures.categoryEntity();
-            Category patch = fixtures.categoryEntity();
-            patch.setName("New name");
+            Category existing = fixtures.withCategoryName("old name")
+                                        .categoryEntity();
+            Long existingId = existing.getId();
             
-            when(categoryRepository.findById(EXISTING_CATEGORY_ID)).thenReturn(Optional.of(existing));
+            Category patch = fixtures.withCategoryId(null)
+                                     .withCategoryName("new name")
+                                     .withCategoryEmptyProducts()
+                                     .categoryEntity();
+            
+            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
-            when(categoryRepository.save(existing)).thenReturn(existing);
+            when(categoryRepository.save(existing)).thenAnswer(inv -> {
+                Category c = inv.getArgument(0);
+                c.setName(patch.getName());
+                return c;
+            });
             
             // When
-            Category result = underTest.partialUpdateById(patch, EXISTING_CATEGORY_ID);
+            Category result = underTest.partialUpdateById(patch, existingId);
             
             // Then
             assertEquals(patch.getName(), existing.getName());
@@ -107,16 +122,20 @@ public class CategoryServiceImplTests {
         @Test
         public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            fixtures.withCategoryName("Old name");
-            Category existing = fixtures.categoryEntity();
-            Category patch = new Category();
-            patch.setName("Name Already Exists");
+            Category existing = fixtures.withCategoryName("old name")
+                                        .categoryEntity();
+            Long existingId = existing.getId();
             
-            when(categoryRepository.findById(EXISTING_CATEGORY_ID)).thenReturn(Optional.of(existing));
+            Category patch = fixtures.withCategoryId(null)
+                                     .withCategoryName("name already exists")
+                                     .withCategoryEmptyProducts()
+                                     .categoryEntity();
+            
+            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, EXISTING_CATEGORY_ID));
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
             verify(categoryRepository, never()).save(any());
         }
         
@@ -124,17 +143,19 @@ public class CategoryServiceImplTests {
         public void partialUpdateById_should_NotPersist_when_NoChangesDetected() {
             // Given
             Category existing = fixtures.categoryEntity();
-            Category patchWithSameValues = fixtures.categoryEntity();
+            Long existingId = existing.getId();
+            Category patchWithSameName = fixtures.withCategoryId(null)
+                                                 .withCategoryEmptyProducts()
+                                                 .categoryEntity();
             
-            when(categoryRepository.findById(EXISTING_CATEGORY_ID)).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
             
             // When
-            Category result = underTest.partialUpdateById(patchWithSameValues, EXISTING_CATEGORY_ID);
+            Category result = underTest.partialUpdateById(patchWithSameName, existingId);
             
             // Then
-            verify(categoryRepository, never()).save(any());
             assertSame(existing, result);
+            verify(categoryRepository, never()).save(any());
         }
     }
-    
 }

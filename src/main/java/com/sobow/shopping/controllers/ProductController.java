@@ -54,7 +54,7 @@ public class ProductController {
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {
-        List<ProductResponse> responseList = productService.findAllProductsWithCategoryAndImages()
+        List<ProductResponse> responseList = productService.findAllWithCategoryAndImages()
                                                                   .stream()
                                                                   .map(productResponseMapper::mapToDto)
                                                                   .toList();
@@ -64,7 +64,7 @@ public class ProductController {
     
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive Long id) {
-        Product product = productService.findProductWithCategoryAndImagesById(id);
+        Product product = productService.findWithCategoryAndImagesById(id);
         ProductResponse response = productResponseMapper.mapToDto(product);
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }

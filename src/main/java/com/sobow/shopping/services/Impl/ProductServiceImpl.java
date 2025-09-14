@@ -71,14 +71,14 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Product findProductWithCategoryAndImagesById(long id) {
-        return productRepository.findProductWithCategoryAndImagesById(id)
+    public Product findWithCategoryAndImagesById(long id) {
+        return productRepository.findWithCategoryAndImagesById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
     }
     
     @Override
-    public List<Product> findAllProductsWithCategoryAndImages() {
-        return productRepository.findAllProductsWithCategoryAndImages();
+    public List<Product> findAllWithCategoryAndImages() {
+        return productRepository.findAllWithCategoryAndImages();
     }
     
     @Override

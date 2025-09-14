@@ -11,9 +11,9 @@ public interface ProductService {
     
     Product findById(long id);
     
-    Product findProductWithCategoryAndImagesById(long id);
+    Product findWithCategoryAndImagesById(long id);
     
-    List<Product> findAllProductsWithCategoryAndImages();
+    List<Product> findAllWithCategoryAndImages();
     
     void deleteById(long id);
     

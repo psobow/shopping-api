@@ -18,6 +18,8 @@ public interface CartService {
     
     void updateCartItemQty(long cartId, CartItemUpdateRequest dto);
     
+    CartItem findCartItemByCartIdAndId(long cartId, long itemId);
+    
     void removeCartItem(long cartId, long itemId);
     
     void removeAllCartItems(long cartId);
