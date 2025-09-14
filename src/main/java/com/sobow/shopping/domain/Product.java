@@ -9,7 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -28,11 +31,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(
+    name = "products",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uc_products_name_brand",
+            columnNames = {"name", "brand_name"}
+        )
+    }
+)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotBlank
     private String name;
+    @NotBlank
     private String brandName;
     
     @NotNull

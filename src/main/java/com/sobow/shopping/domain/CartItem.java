@@ -56,46 +56,22 @@ public class CartItem {
     private static final int MONEY_SCALE = 2;
     private static final RoundingMode MONEY_ROUNDING = RoundingMode.HALF_UP;
     
-    public int incrementQuantity(int deltaQty) {
-        requireLinkedProduct();
-        requirePositiveDelta(deltaQty, "increment");
-        return changeQuantity(deltaQty);          // +delta
-    }
-    
-    public int decrementQuantity(int deltaQty) {
-        requireLinkedProduct();
-        requirePositiveDelta(deltaQty, "decrement");
-        return changeQuantity(-deltaQty);         // -delta
-    }
-    
-    private void requireLinkedProduct() {
+    public int setQuantity(int requestedQty) {
         if (product == null) {
             throw new IllegalStateException("CartItem has no product linked.");
         }
-    }
-    
-    private void requirePositiveDelta(int deltaQty, String action) {
-        if (deltaQty <= 0) {
-            throw new IllegalArgumentException("Quantity " + action + " must be a positive value.");
-        }
-    }
-    
-    private int changeQuantity(int delta) {
-        int newQty = quantity + delta;
         
-        if (delta > 0) { // increment branch
-            int available = product.getAvailableQuantity();
-            if (newQty > available) {
-                throw new InsufficientStockException(product.getId(), available, delta, quantity);
-            }
-        } else {         // decrement branch
-            if (newQty < 0) {
-                throw new OverDecrementException(product.getId(), quantity, delta);
-            }
+        int available = product.getAvailableQuantity();
+        if (requestedQty > available) {
+            throw new InsufficientStockException(product.getId(), available, requestedQty);
         }
         
-        quantity = newQty;
-        return newQty;
+        if (requestedQty < 0) {
+            throw new OverDecrementException(product.getId(), quantity, requestedQty);
+        }
+        quantity = requestedQty;
+        
+        return requestedQty;
     }
     
     public BigDecimal unitPrice() {

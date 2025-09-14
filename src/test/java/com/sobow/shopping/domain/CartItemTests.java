@@ -14,6 +14,7 @@ public class CartItemTests {
     
     private CartItem itemWith(String unitPrice, int qty) {
         Product p = new Product();
+        p.setAvailableQuantity(10);
         p.setPrice(new BigDecimal(unitPrice));
         CartItem ci = new CartItem();
         ci.setProduct(p);
@@ -22,9 +23,7 @@ public class CartItemTests {
     }
     
     private CartItem itemWith(Product p, Integer qty) {
-        CartItem ci = new CartItem();
-        ci.setProduct(p);
-        ci.setQuantity(qty);
+        CartItem ci = new CartItem(1L, qty, p, null);
         return ci;
     }
     
@@ -66,101 +65,62 @@ public class CartItemTests {
     }
     
     @Nested
-    @DisplayName("incrementQuantity")
-    class incrementQuantity {
+    @DisplayName("setQuantity")
+    class setQuantity {
         
         @Test
-        public void incrementQuantity_should_ThrowIllegalState_when_ProductIsNull() {
+        public void setQuantity_should_ThrowIllegalState_when_ProductIsNull() {
             Product p = null;
             CartItem item = itemWith(p, 0);
-            assertThrows(IllegalStateException.class, () -> item.incrementQuantity(5));
+            assertThrows(IllegalStateException.class, () -> item.setQuantity(5));
         }
         
         @Test
-        public void incrementQuantity_should_ThrowIllegalArgument_when_DeltaNotPositive() {
-            Product p = productWithAvailableQty(10);
-            CartItem item = itemWith(p, 1);
-            assertThrows(IllegalArgumentException.class, () -> item.incrementQuantity(0));
-            assertThrows(IllegalArgumentException.class, () -> item.incrementQuantity(-1));
-        }
-        
-        @Test
-        public void incrementQuantity_should_ThrowInsufficientStock_when_NewQtyExceedsAvailable() {
+        public void setQuantity_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
             Product p = productWithAvailableQty(4);
             CartItem item = itemWith(p, 3);
             
-            assertThrows(InsufficientStockException.class, () -> item.incrementQuantity(2)); // 3+2 > 4
+            assertThrows(InsufficientStockException.class, () -> item.setQuantity(6));
         }
         
         @Test
-        public void incrementQuantity_should_SetNewQuantity_when_NewQtyWithinAvailable() {
+        public void setQuantity_should_ThrowOverDecrement_when_NewQtyBelowZero() {
+            Product p = productWithAvailableQty(4);
+            CartItem item = itemWith(p, 3);
+            
+            assertThrows(OverDecrementException.class, () -> item.setQuantity(-5));
+        }
+        
+        @Test
+        public void setQuantity_should_SetNewQuantity_when_RequestedQtyWithinAvailable() {
             Product p = productWithAvailableQty(10);
             CartItem item = itemWith(p, 2);
             
-            int result = item.incrementQuantity(5);
+            int result = item.setQuantity(5);
             
-            assertEquals(7, result);
-            assertEquals(7, item.getQuantity());
+            assertEquals(5, result);
+            assertEquals(5, item.getQuantity());
         }
         
         @Test
-        public void incrementQuantity_should_AllowBoundary_when_NewQtyEqualsAvailable() {
+        public void setQuantity_should_AllowBoundary_when_requestedQtyEqualsAvailable() {
             
             Product p = productWithAvailableQty(5);
             CartItem item = itemWith(p, 2);
             
-            int result = item.incrementQuantity(3);
+            int result = item.setQuantity(5);
             
             assertEquals(5, result);
             
             assertEquals(5, item.getQuantity());
         }
-    }
-    
-    @Nested
-    @DisplayName("decrementQuantity")
-    class decrementQuantity {
         
         @Test
-        public void decrementQuantity_should_ThrowIllegalState_when_ProductIsNull() {
-            Product p = null;
-            CartItem item = itemWith(p, 0);
-            assertThrows(IllegalStateException.class, () -> item.decrementQuantity(5));
-        }
-        
-        @Test
-        public void decrementQuantity_should_ThrowIllegalArgument_when_DeltaNotPositive() {
-            Product p = productWithAvailableQty(10);
-            CartItem item = itemWith(p, 1);
-            assertThrows(IllegalArgumentException.class, () -> item.decrementQuantity(0));
-            assertThrows(IllegalArgumentException.class, () -> item.decrementQuantity(-1));
-        }
-        
-        @Test
-        public void decrementQuantity_should_ThrowOverDecrement_when_NewQtyBelowZero() {
+        public void setQuantity_should_AllowBoundary_when_RequestedQtyEqualsZero() {
             Product p = productWithAvailableQty(4);
             CartItem item = itemWith(p, 3);
             
-            assertThrows(OverDecrementException.class, () -> item.decrementQuantity(5));
-        }
-        
-        @Test
-        public void decrementQuantity_should_SetNewQuantity_when_NewQtyPositive() {
-            Product p = productWithAvailableQty(4);
-            CartItem item = itemWith(p, 3);
-            
-            int result = item.decrementQuantity(1);
-            
-            assertEquals(2, result);
-            assertEquals(2, item.getQuantity());
-        }
-        
-        @Test
-        public void decrementQuantity_should_AllowBoundary_when_NewQtyEqualsZero() {
-            Product p = productWithAvailableQty(4);
-            CartItem item = itemWith(p, 3);
-            
-            int result = item.decrementQuantity(3);
+            int result = item.setQuantity(0);
             
             assertEquals(0, result);
             assertEquals(0, item.getQuantity());
