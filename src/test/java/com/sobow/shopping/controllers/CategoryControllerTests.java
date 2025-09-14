@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.requests.CategoryRequest;
 import com.sobow.shopping.domain.responses.CategoryResponse;
-import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
+import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.utils.TestFixtures;
@@ -105,7 +105,7 @@ public class CategoryControllerTests {
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.save(mapped)).thenThrow(
-                new ResourceAlreadyExistsException("Category", "name", mapped.getName()));
+                new CategoryAlreadyExistsException(mapped.getName()));
             
             mockMvc.perform(post(CATEGORIES_PATH)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -187,7 +187,7 @@ public class CategoryControllerTests {
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.partialUpdateById(mapped, EXISTING_CATEGORY_ID))
-                .thenThrow(new ResourceAlreadyExistsException("Category", "name", mapped.getName()));
+                .thenThrow(new CategoryAlreadyExistsException(mapped.getName()));
             
             String json = objectMapper.writeValueAsString(request);
             

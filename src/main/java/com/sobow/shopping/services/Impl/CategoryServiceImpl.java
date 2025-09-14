@@ -1,7 +1,7 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
+import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -70,7 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     private void assertCategoryUnique(String name) {
         if (categoryRepository.existsByName(name)) {
-            throw new ResourceAlreadyExistsException("Category", "name", name);
+            throw new CategoryAlreadyExistsException(name);
         }
     }
 }

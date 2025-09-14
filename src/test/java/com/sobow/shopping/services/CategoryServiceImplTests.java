@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
+import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
@@ -65,7 +65,7 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
+        public void save_should_ThrowAlreadyExists_when_Duplicate() {
             // Given
             fixtures.withCategoryName("name already exists");
             Category category = fixtures.categoryEntity();
@@ -73,7 +73,7 @@ public class CategoryServiceImplTests {
             when(categoryRepository.existsByName(category.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(ResourceAlreadyExistsException.class, () -> underTest.save(category));
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.save(category));
             verify(categoryRepository, never()).save(any());
         }
     }
@@ -105,7 +105,7 @@ public class CategoryServiceImplTests {
         }
         
         @Test
-        public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
+        public void partialUpdateById_should_ThrowAlreadyExists_when_Duplicate() {
             // Given
             fixtures.withCategoryName("Old name");
             Category existing = fixtures.categoryEntity();
@@ -116,7 +116,7 @@ public class CategoryServiceImplTests {
             when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(ResourceAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, EXISTING_CATEGORY_ID));
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, EXISTING_CATEGORY_ID));
             verify(categoryRepository, never()).save(any());
         }
         
