@@ -187,7 +187,7 @@ public class ProductControllerTests {
             Product product = fixtures.productEntity();
             ProductResponse response = fixtures.productResponse();
             
-            when(productService.findAll()).thenReturn(List.of(product));
+            when(productService.findAllProductsWithCategoryAndImages()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
             mockMvc.perform(get(PRODUCTS_PATH))
@@ -218,7 +218,7 @@ public class ProductControllerTests {
             Product product = fixtures.productEntity();
             ProductResponse response = fixtures.productResponse();
             
-            when(productService.findById(EXISTING_PRODUCT_ID)).thenReturn(product);
+            when(productService.findProductWithCategoryAndImagesById(EXISTING_PRODUCT_ID)).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, EXISTING_PRODUCT_ID))
@@ -242,7 +242,7 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
-            when(productService.findById(NON_EXISTING_PRODUCT_ID)).thenThrow(new EntityNotFoundException());
+            when(productService.findProductWithCategoryAndImagesById(NON_EXISTING_PRODUCT_ID)).thenThrow(new EntityNotFoundException());
             
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, NON_EXISTING_PRODUCT_ID))
                    .andExpect(status().isNotFound());
