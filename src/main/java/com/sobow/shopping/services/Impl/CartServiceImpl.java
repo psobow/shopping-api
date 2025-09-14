@@ -3,13 +3,15 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.Cart;
 import com.sobow.shopping.domain.CartItem;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.requests.CartItemCreateRequest;
+import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
+import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
 import com.sobow.shopping.services.CartService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +36,8 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public Cart findCartById(Long id) {
-        return cartRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cart with " + id + " not found"));
+        return cartRepository.findById(id).orElseThrow(
+            () -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
     
     // TODO: create test cases for other methods in CartService
@@ -44,24 +47,26 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem addCartItem(Long cartId, CartItem incomingItem) {
+    public CartItem createCartItem(Long cartId, CartItemCreateRequest dto) {
         Cart cart = findCartById(cartId);
-        Product product = productService.findById(incomingItem.getProduct().getId());
+        Product product = productService.findById(dto.productId());
         
-        Optional<CartItem> optionalItem = cartItemRepository.findByCartIdAndProductId(cartId, product.getId());
+        boolean itemExists = cartItemRepository.existsByCartIdAndProductId(cartId, product.getId());
+        if (itemExists) throw new CartItemAlreadyExistsException(cartId, product.getId());
         
-        if (optionalItem.isPresent()) {
-            CartItem item = optionalItem.get();
-            item.incrementQuantity(incomingItem.getQuantity());
-            return item;
-        } else {
-            CartItem newItem = new CartItem();
-            newItem.setProduct(product);
-            newItem.setQuantity(0);
-            newItem.incrementQuantity(incomingItem.getQuantity());
-            cart.addCartItemAndLink(newItem);
-            return newItem;
-        }
+        CartItem newItem = new CartItem();
+        newItem.setProduct(product);
+        newItem.setQuantity(dto.requestedQty());
+        cart.addCartItemAndLink(newItem);
+        return newItem;
+    }
+    
+    @Transactional
+    @Override
+    public void updateCartItemQty(Long cartId, CartItemUpdateRequest dto) {
+        CartItem item = findItemByCartIdAndId(cartId, dto.cartItemId());
+        int resultQuantity = item.setQuantity(dto.requestedQty());
+        if (resultQuantity == 0) removeCartItem(cartId, dto.cartItemId());
     }
     
     @Transactional
@@ -70,21 +75,6 @@ public class CartServiceImpl implements CartService {
         CartItem item = findItemByCartIdAndId(cartId, itemId);
         Cart cart = item.getCart();
         cart.removeCartItemAndUnlink(item);
-    }
-    
-    @Transactional
-    @Override
-    public void incrementCartItemQty(Long cartId, Long itemId, Integer deltaQty) {
-        CartItem item = findItemByCartIdAndId(cartId, itemId);
-        item.incrementQuantity(deltaQty);
-    }
-    
-    @Transactional
-    @Override
-    public void decrementCartItemQty(Long cartId, Long itemId, Integer deltaQty) {
-        CartItem item = findItemByCartIdAndId(cartId, itemId);
-        int resultQuantity = item.decrementQuantity(deltaQty);
-        if (resultQuantity == 0) removeCartItem(cartId, itemId);
     }
     
     @Transactional

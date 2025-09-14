@@ -29,57 +29,42 @@ public class CartServiceImplTests {
     private CartServiceImpl underTest;
     
     @Nested
-    @DisplayName("addCartItem")
-    class addCartItem {
+    @DisplayName("createCartItem")
+    class createCartItem {
         
-        @Nested
-        @DisplayName("addCartItem_ErrorsPath")
-        class addCartItem_ErrorsPath {
-            
-            @Test
-            public void addCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_NotMutateCart_when_ExceptionIsThrown() {
-                fail("Implement me");
-            }
+        @Test
+        public void createCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
+            fail("Implement me");
         }
         
-        @Nested
-        @DisplayName("addCartItem_CreatePath")
-        class addCartItem_CreatePath {
-            
-            @Test
-            public void addCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemNotInCart() {
-                fail("Implement me");
-            }
+        @Test
+        public void createCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
+            fail("Implement me");
         }
         
-        @Nested
-        @DisplayName("addCartItem_UpdatePath")
-        class addCartItem_UpdatePath {
-            
-            @Test
-            public void addCartItem_should_UpdateCartItemQty_when_CartItemAlreadyInCart() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_NotDuplicateCartItem_when_CartItemAlreadyInCart() {
-                fail("Implement me");
-            }
+        @Test
+        public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
+            fail("Implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("updateCartItemQty")
+    class updateCartItemQty {
+        
+        @Test
+        public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void updateCartItemQty_should_UpdateItemQty_when_NewQtyWithinZero_and_AvailableStock() {
+            fail("Implement me");
         }
     }
     
@@ -99,36 +84,6 @@ public class CartServiceImplTests {
         
         @Test
         public void removeCartItem_should_BeIdempotent_when_CalledTwice_SecondCallThrowsNotFound() {
-            fail("Implement me");
-        }
-    }
-    
-    @Nested
-    @DisplayName("incrementCartItemQty")
-    class incrementCartItemQty {
-        
-        @Test
-        public void incrementCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
-            fail("Implement me");
-        }
-        
-        @Test
-        public void incrementCartItemQty_should_IncrementItemQty_when_NewQtyWithinAvailableStock() {
-            fail("Implement me");
-        }
-    }
-    
-    @Nested
-    @DisplayName("decrementCartItemQty")
-    class decrementCartItemQty {
-        
-        @Test
-        public void decrementCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
-            fail("Implement me");
-        }
-        
-        @Test
-        public void decrementCartItemQty_should_DecrementItemQty_when_NewQtyPositiveOrZero() {
             fail("Implement me");
         }
     }

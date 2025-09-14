@@ -2,6 +2,8 @@ package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.Cart;
 import com.sobow.shopping.domain.CartItem;
+import com.sobow.shopping.domain.requests.CartItemCreateRequest;
+import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import java.math.BigDecimal;
 
 public interface CartService {
@@ -12,13 +14,11 @@ public interface CartService {
     
     Cart findCartById(Long id);
     
-    CartItem addCartItem(Long cartId, CartItem item);
+    CartItem createCartItem(Long cartId, CartItemCreateRequest dto);
+    
+    void updateCartItemQty(Long cartId, CartItemUpdateRequest dto);
     
     void removeCartItem(Long cartId, Long itemId);
-    
-    void incrementCartItemQty(Long cartId, Long itemId, Integer deltaQty);
-    
-    void decrementCartItemQty(Long cartId, Long itemId, Integer deltaQty);
     
     void removeAllCartItems(Long cartId);
     
