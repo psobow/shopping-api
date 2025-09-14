@@ -22,6 +22,9 @@ public class CartServiceImplTests {
     @Mock
     private CartItemRepository cartItemRepository;
     
+    @Mock
+    private ProductService productService;
+    
     @InjectMocks
     private CartServiceImpl underTest;
     
@@ -39,17 +42,12 @@ public class CartServiceImplTests {
             }
             
             @Test
-            public void addCartItem_should_ThrowOutOfStock_when_AvailableIsZero() {
+            public void addCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
                 fail("Implement me");
             }
             
             @Test
-            public void addCartItem_should_ThrowInsufficientStock_when_RequestExceedsAvailable() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_ThrowInsufficientStock_when_RequestExceedsAvailableConsideringAlreadyInCart() {
+            public void addCartItem_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
                 fail("Implement me");
             }
             
@@ -64,7 +62,7 @@ public class CartServiceImplTests {
         class addCartItem_CreatePath {
             
             @Test
-            public void addCartItem_should_CreateNewCartItem_and_AddToCart_when_ProductNotInCart() {
+            public void addCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemNotInCart() {
                 fail("Implement me");
             }
         }
@@ -83,36 +81,70 @@ public class CartServiceImplTests {
                 fail("Implement me");
             }
         }
+    }
+    
+    @Nested
+    @DisplayName("removeCartItem")
+    class removeCartItem {
         
-        @Nested
-        @DisplayName("addCartItem_Pricing")
-        class addCartItem_Pricing {
-            
-            @Test
-            public void addCartItem_should_CalculateTotalCartItemPrice_asNewQtyTimesProductPrice() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_SetPrice_with_TwoFractionDigits() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_IncreaseCartTotalPrice_ByRequestedProductsPrice_when_CartItemAlreadyInCart() {
-                fail(
-                    "Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_IncreaseCartTotalPrice_ByRequestedProductsPrice_when_CartItemIsNew() {
-                fail("Implement me");
-            }
-            
-            @Test
-            public void addCartItem_should_NotChangeCartTotalPrice_when_ExceptionIsThrown() {
-                fail("Implement me");
-            }
+        @Test
+        public void removeCartItem_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void removeCartItem_should_RemoveItem_when_ItemExistsInCart() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void removeCartItem_should_BeIdempotent_when_CalledTwice_SecondCallThrowsNotFound() {
+            fail("Implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("incrementCartItemQty")
+    class incrementCartItemQty {
+        
+        @Test
+        public void incrementCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void incrementCartItemQty_should_IncrementItemQty_when_NewQtyWithinAvailableStock() {
+            fail("Implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("decrementCartItemQty")
+    class decrementCartItemQty {
+        
+        @Test
+        public void decrementCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void decrementCartItemQty_should_DecrementItemQty_when_NewQtyPositiveOrZero() {
+            fail("Implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("removeAllCartItems")
+    class removeAllCartItems {
+        
+        @Test
+        public void removeAllCartItems_should_ThrowNotFound_when_CartDoesNotExist() {
+            fail("Implement me");
+        }
+        
+        @Test
+        public void removeAllCartItems_should_RemoveAllCartItems_when_CartExists() {
+            fail("Implement me");
         }
     }
 }

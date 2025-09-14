@@ -43,7 +43,7 @@ public class CartItem {
     
     @NotNull
     @PositiveOrZero
-    private Integer quantity;
+    private Integer quantity = 0;
     
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -57,41 +57,45 @@ public class CartItem {
     private static final RoundingMode MONEY_ROUNDING = RoundingMode.HALF_UP;
     
     public int incrementQuantity(int deltaQty) {
-        if (product == null) {
-            throw new IllegalStateException("CartItem has no product linked.");
-        }
-        if (deltaQty <= 0) {
-            throw new IllegalArgumentException("Quantity increment must be positive value.");
-        }
-        
-        int availableQty = product.getAvailableQuantity();
-        int newQty = quantity + deltaQty;
-        
-        if (newQty > availableQty) {
-            throw new InsufficientStockException(
-                product.getId(), availableQty, deltaQty, quantity
-            );
-        }
-        quantity = newQty;
-        return quantity;
+        requireLinkedProduct();
+        requirePositiveDelta(deltaQty, "increment");
+        return changeQuantity(deltaQty);          // +delta
     }
     
     public int decrementQuantity(int deltaQty) {
+        requireLinkedProduct();
+        requirePositiveDelta(deltaQty, "decrement");
+        return changeQuantity(-deltaQty);         // -delta
+    }
+    
+    private void requireLinkedProduct() {
         if (product == null) {
             throw new IllegalStateException("CartItem has no product linked.");
         }
+    }
+    
+    private void requirePositiveDelta(int deltaQty, String action) {
         if (deltaQty <= 0) {
-            throw new IllegalArgumentException("Quantity decrement must be positive value.");
+            throw new IllegalArgumentException("Quantity " + action + " must be a positive value.");
         }
+    }
+    
+    private int changeQuantity(int delta) {
+        int newQty = quantity + delta;
         
-        int newQty = quantity - deltaQty;
-        
-        if (newQty < 0) {
-            throw new OverDecrementException(product.getId(), quantity, deltaQty);
+        if (delta > 0) { // increment branch
+            int available = product.getAvailableQuantity();
+            if (newQty > available) {
+                throw new InsufficientStockException(product.getId(), available, delta, quantity);
+            }
+        } else {         // decrement branch
+            if (newQty < 0) {
+                throw new OverDecrementException(product.getId(), quantity, delta);
+            }
         }
         
         quantity = newQty;
-        return quantity;
+        return newQty;
     }
     
     public BigDecimal unitPrice() {
