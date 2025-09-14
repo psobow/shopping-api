@@ -16,11 +16,13 @@ public interface CartService {
     
     void removeCartItem(Long cartId, Long itemId);
     
-    CartItem incrementCartItemQty(Long cartId, Long itemId);
+    void incrementCartItemQty(Long cartId, Long itemId);
     
-    CartItem decrementCartItemQty(Long cartId, Long itemId);
+    void decrementCartItemQty(Long cartId, Long itemId);
     
     void removeAllCartItems(Long cartId);
     
     BigDecimal getCartTotalPrice(Long cartId);
+    
+    BigDecimal getCartItemTotalPrice(Long cartId, Long itemId);
 }

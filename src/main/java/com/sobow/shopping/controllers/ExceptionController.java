@@ -2,7 +2,7 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
-import com.sobow.shopping.exceptions.OutOfStockException;
+import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ResourceAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,16 +54,6 @@ public class ExceptionController {
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
     
-    @ExceptionHandler(OutOfStockException.class)
-    public ResponseEntity<ProblemDetail> handleOutOfStock(OutOfStockException ex, HttpServletRequest request) {
-        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        pd.setTitle("Out of stock");
-        pd.setDetail(ex.getMessage());
-        pd.setProperty("productId", ex.getProductId());
-        pd.setProperty("path", request.getRequestURI());
-        return ResponseEntity.status(pd.getStatus()).body(pd);
-    }
-    
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ProblemDetail> handleInsufficient(InsufficientStockException ex, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
@@ -73,6 +63,16 @@ public class ExceptionController {
         pd.setProperty("available", ex.getAvailable());
         pd.setProperty("requested", ex.getRequested());
         pd.setProperty("alreadyInCart", ex.getAlreadyInCart());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(OverDecrementException.class)
+    public ResponseEntity<ProblemDetail> handleOverDecrement(OverDecrementException ex, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Requested removal exceeds product quantity");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("productId", ex.getProductId());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }

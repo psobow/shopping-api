@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain;
 
-import jakarta.persistence.Column;
+import com.sobow.shopping.exceptions.InsufficientStockException;
+import com.sobow.shopping.exceptions.OverDecrementException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,9 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -42,14 +41,8 @@ public class CartItem {
     private Long id;
     
     @NotNull
-    @Positive
-    private Integer quantity;
-    
-    @NotNull
     @PositiveOrZero
-    @Digits(integer = 17, fraction = 2)
-    @Column(precision = 19, scale = 2)
-    private BigDecimal totalPrice;
+    private Integer quantity;
     
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -58,6 +51,54 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
+    
+    public int incrementQuantity(int deltaQty) {
+        if (product == null) {
+            throw new IllegalStateException("CartItem has no product linked.");
+        }
+        if (deltaQty <= 0) {
+            throw new IllegalArgumentException("Quantity increment must be positive value.");
+        }
+        
+        int availableQty = product.getAvailableQuantity();
+        int newQty = quantity + deltaQty;
+        
+        if (newQty > availableQty) {
+            throw new InsufficientStockException(
+                product.getId(), availableQty, deltaQty, quantity
+            );
+        }
+        quantity = newQty;
+        return quantity;
+    }
+    
+    public int decrementQuantity(int deltaQty) {
+        if (product == null) {
+            throw new IllegalStateException("CartItem has no product linked.");
+        }
+        if (deltaQty <= 0) {
+            throw new IllegalArgumentException("Quantity decrement must be positive value.");
+        }
+        
+        int newQty = quantity - deltaQty;
+        
+        if (newQty < 0) {
+            throw new OverDecrementException(product.getId(), quantity, deltaQty);
+        }
+        
+        quantity = newQty;
+        return quantity;
+    }
+    
+    public BigDecimal unitPrice() {
+        return product.getPrice();
+    }
+    
+    public BigDecimal getTotalPrice() {
+        return unitPrice()
+            .multiply(BigDecimal.valueOf(quantity))
+            .setScale(2);
+    }
     
     @Override
     public final boolean equals(Object o) {

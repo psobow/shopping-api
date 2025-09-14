@@ -1,15 +1,11 @@
 package com.sobow.shopping.domain;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,14 +25,20 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull
-    @PositiveOrZero
-    @Digits(integer = 17, fraction = 2)
-    @Column(precision = 19, scale = 2)
-    private BigDecimal totalPrice = BigDecimal.ZERO;
-    
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();
+    
+    public BigDecimal getTotalPrice() {
+        return cartItems.stream()
+                        .map(CartItem::getTotalPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public void removeAllCartItems() {
+        for (CartItem item : new HashSet<>(cartItems)) {
+            removeCartItemAndUnlink(item);
+        }
+    }
     
     public void addCartItemAndLink(CartItem item) {
         cartItems.add(item);
