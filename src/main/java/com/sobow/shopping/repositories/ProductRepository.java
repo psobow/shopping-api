@@ -28,4 +28,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         """)
     List<Product> findAllProductsWithCategoryAndImages();
     
+    boolean existsByNameAndBrandName(String name, String brandName);
 }
