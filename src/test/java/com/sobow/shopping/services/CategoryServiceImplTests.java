@@ -36,8 +36,8 @@ public class CategoryServiceImplTests {
     
     @Test
     void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
-        when(categoryRepository.findById(fixtures.getNonExistingId())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> underTest.findById(fixtures.getNonExistingId()));
+        when(categoryRepository.findById(fixtures.nonExistingId())).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> underTest.findById(fixtures.nonExistingId()));
     }
     
     @Nested

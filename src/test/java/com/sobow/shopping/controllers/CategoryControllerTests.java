@@ -33,19 +33,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(CategoryController.class)
 public class CategoryControllerTests {
     
-    public static final String CATEGORY_NAME_BLANK = "   ";
-    private static final String CATEGORIES_PATH = "/api/categories";
-    private static final String CATEGORIES_BY_ID_PATH = "/api/categories/{id}";
-    
-    private static final String EXISTING_CATEGORY_NAME = "existing name";
-    private static final String NON_EXISTING_CATEGORY_NAME = "non existing name";
-    private static final Long EXISTING_CATEGORY_ID = 100L;
-    private static final Long NON_EXISTING_CATEGORY_ID = 999L;
-    private static final Long INVALID_CATEGORY_ID = -1L;
-    private TestFixtures fixtures = new TestFixtures();
-    
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    
     @Autowired
     private MockMvc mockMvc;
     
@@ -58,6 +45,12 @@ public class CategoryControllerTests {
     @MockitoBean
     private Mapper<Category, CategoryRequest> categoryRequestMapper;
     
+    private static final String CATEGORIES_PATH = "/api/categories";
+    private static final String CATEGORIES_BY_ID_PATH = "/api/categories/{id}";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    
+    private final TestFixtures fixtures = new TestFixtures();
+    
     @Nested
     @DisplayName("createCategory")
     class createCategory {
@@ -65,7 +58,7 @@ public class CategoryControllerTests {
         @Test
         public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
+            Category mapped = fixtures.withCategoryEmptyProducts().categoryEntity();
             Category saved = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             
@@ -128,10 +121,10 @@ public class CategoryControllerTests {
             String json = objectMapper.writeValueAsString(request);
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, EXISTING_CATEGORY_ID)).thenReturn(updated);
+            when(categoryService.partialUpdateById(mapped, fixtures.categoryId())).thenReturn(updated);
             when(categoryResponseMapper.mapToDto(updated)).thenReturn(response);
             
-            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, EXISTING_CATEGORY_ID)
+            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, fixtures.categoryId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isOk())
@@ -146,7 +139,7 @@ public class CategoryControllerTests {
             
             String json = objectMapper.writeValueAsString(invalidRequest);
             
-            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, EXISTING_CATEGORY_ID)
+            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, fixtures.categoryId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isBadRequest());
@@ -157,7 +150,7 @@ public class CategoryControllerTests {
             CategoryRequest request = fixtures.categoryRequest();
             String json = objectMapper.writeValueAsString(request);
             
-            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, INVALID_CATEGORY_ID)
+            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, fixtures.invalidId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isBadRequest());
@@ -169,12 +162,12 @@ public class CategoryControllerTests {
             Category mapped = fixtures.categoryEntity();
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, NON_EXISTING_CATEGORY_ID))
+            when(categoryService.partialUpdateById(mapped, fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
             String json = objectMapper.writeValueAsString(request);
             
-            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, NON_EXISTING_CATEGORY_ID)
+            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, fixtures.nonExistingId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isNotFound());
@@ -186,12 +179,12 @@ public class CategoryControllerTests {
             Category mapped = fixtures.categoryEntity();
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, EXISTING_CATEGORY_ID))
+            when(categoryService.partialUpdateById(mapped, fixtures.categoryId()))
                 .thenThrow(new CategoryAlreadyExistsException(mapped.getName()));
             
             String json = objectMapper.writeValueAsString(request);
             
-            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, EXISTING_CATEGORY_ID)
+            mockMvc.perform(put(CATEGORIES_BY_ID_PATH, fixtures.categoryId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isConflict());
@@ -229,14 +222,13 @@ public class CategoryControllerTests {
         
         @Test
         public void getCategory_should_Return200WithDto_when_CategoryIdValid() throws Exception {
-            fixtures.withCategoryId(EXISTING_CATEGORY_ID);
             Category category = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             
-            when(categoryService.findById(EXISTING_CATEGORY_ID)).thenReturn(category);
+            when(categoryService.findById(fixtures.categoryId())).thenReturn(category);
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
             
-            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, EXISTING_CATEGORY_ID))
+            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, fixtures.categoryId()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.data.id").value(response.id()))
                    .andExpect(jsonPath("$.data.name").value(response.name()));
@@ -244,30 +236,29 @@ public class CategoryControllerTests {
         
         @Test
         public void getCategory_should_Return400_when_CategoryIdLessThanOne() throws Exception {
-            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, INVALID_CATEGORY_ID))
+            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }
         
         @Test
         public void getCategory_should_Return404_when_CategoryIdDoesNotExist() throws Exception {
-            when(categoryService.findById(NON_EXISTING_CATEGORY_ID))
+            when(categoryService.findById(fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
-            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, NON_EXISTING_CATEGORY_ID))
+            mockMvc.perform(get(CATEGORIES_BY_ID_PATH, fixtures.nonExistingId()))
                    .andExpect(status().isNotFound());
         }
         
         @Test
         public void getCategoryByName_should_Return200WithDto_when_CategoryWithNameExists() throws Exception {
-            fixtures.withCategoryName(EXISTING_CATEGORY_NAME);
             Category category = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             
-            when(categoryService.findByName(EXISTING_CATEGORY_NAME)).thenReturn(category);
+            when(categoryService.findByName(category.getName())).thenReturn(category);
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
             
             mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", EXISTING_CATEGORY_NAME))
+                                .param("name", category.getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.data.id").value(response.id()))
                    .andExpect(jsonPath("$.data.name").value(response.name()));
@@ -275,18 +266,18 @@ public class CategoryControllerTests {
         
         @Test
         public void getCategoryByName_should_Return404_when_CategoryWithNameDoesNotExist() throws Exception {
-            when(categoryService.findByName(NON_EXISTING_CATEGORY_NAME))
+            when(categoryService.findByName("non existing category name"))
                 .thenThrow(new EntityNotFoundException());
             
             mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", NON_EXISTING_CATEGORY_NAME))
+                                .param("name", "non existing category name"))
                    .andExpect(status().isNotFound());
         }
         
         @Test
         public void getCategoryByName_should_Return400_when_RequestParamBlank() throws Exception {
             mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", CATEGORY_NAME_BLANK))
+                                .param("name", "  "))
                    .andExpect(status().isBadRequest());
         }
     }
@@ -297,13 +288,13 @@ public class CategoryControllerTests {
         
         @Test
         public void deleteCategory_should_Return204_when_Deleted() throws Exception {
-            mockMvc.perform(delete(CATEGORIES_BY_ID_PATH, EXISTING_CATEGORY_ID))
+            mockMvc.perform(delete(CATEGORIES_BY_ID_PATH, fixtures.categoryId()))
                    .andExpect(status().isNoContent());
         }
         
         @Test
         public void deleteCategory_should_Return400_when_CategoryIdLessThanOne() throws Exception {
-            mockMvc.perform(delete(CATEGORIES_BY_ID_PATH, INVALID_CATEGORY_ID))
+            mockMvc.perform(delete(CATEGORIES_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }
     }

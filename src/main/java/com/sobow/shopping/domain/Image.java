@@ -26,7 +26,7 @@ public class Image {
     private String fileName;
     private String fileType;
     @Lob
-    private Blob image;
+    private Blob file;
     private String downloadUrl;
     
     @ManyToOne

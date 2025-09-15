@@ -33,7 +33,7 @@ public class ImageServiceImpl implements ImageService {
         for (MultipartFile file : files) {
             Image image = new Image();
             try {
-                image.setImage(new SerialBlob(file.getBytes()));
+                image.setFile(new SerialBlob(file.getBytes()));
             } catch (Exception e) {
                 throw new ImageProcessingException("Failed to process image file: " + file.getOriginalFilename(), e);
             }
@@ -52,7 +52,7 @@ public class ImageServiceImpl implements ImageService {
         image.setFileName(patch.getOriginalFilename());
         image.setFileType(patch.getContentType());
         try {
-            image.setImage(new SerialBlob(patch.getBytes()));
+            image.setFile(new SerialBlob(patch.getBytes()));
         } catch (Exception e) {
             throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
         }
@@ -78,8 +78,8 @@ public class ImageServiceImpl implements ImageService {
             return new FileContent(
                 img.getFileName(),
                 img.getFileType(),
-                img.getImage().length(),
-                img.getImage().getBytes(1, (int) img.getImage().length())
+                img.getFile().length(),
+                img.getFile().getBytes(1, (int) img.getFile().length())
             );
         } catch (SQLException e) {
             throw new ImageProcessingException(

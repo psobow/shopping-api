@@ -68,7 +68,7 @@ public class SandboxTests {
         Image image = new Image();
         image.setFileName("doge.png");
         image.setFileType("image/png");
-        image.setImage(blob);
+        image.setFile(blob);
         
         // Image saved = imageRepository.save(image);
     }

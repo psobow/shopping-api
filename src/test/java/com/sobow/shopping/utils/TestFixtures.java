@@ -5,12 +5,14 @@ import com.sobow.shopping.domain.CartItem;
 import com.sobow.shopping.domain.Category;
 import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.dto.FileContent;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.domain.requests.CategoryRequest;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.CategoryResponse;
+import com.sobow.shopping.domain.responses.ImageResponse;
 import com.sobow.shopping.domain.responses.ProductResponse;
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -19,10 +21,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
+import org.springframework.mock.web.MockMultipartFile;
 
 public class TestFixtures {
     
-    public long nonExistingId = 999L;
+    private Long nonExistingId = 999L;
+    private Long invalidId = -1L;
     
     private Long categoryId = 10L;
     private String categoryName = "category name";
@@ -39,6 +43,7 @@ public class TestFixtures {
     private Long imageId = 30L;
     private String fileName = "photo.png";
     private String fileType = "image/png";
+    private byte[] byteArray = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
     private Blob blob;
     private String downloadUrl = "/api/images/" + imageId;
     
@@ -47,7 +52,7 @@ public class TestFixtures {
     
     public TestFixtures() {
         try {
-            this.blob = new SerialBlob(new byte[]{1, 2, 3});
+            this.blob = new SerialBlob(byteArray);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -74,9 +79,10 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Category category = new Category(categoryId, categoryName, new ArrayList<>());
         Product product = new Product(productId, productName, brandName, price,
                                       availableQuantity, description, null, new ArrayList<>());
+        
+        Category category = new Category(categoryId, categoryName, new ArrayList<>());
         category.addProductAndLink(product);
         
         if (includeImagesInProduct) {
@@ -128,21 +134,49 @@ public class TestFixtures {
         return new CategoryResponse(categoryId, categoryName);
     }
     
-    // getters
+    public Image imageEntity() {
+        Product product = new Product(productId, productName, brandName, price,
+                                      availableQuantity, description, null, new ArrayList<>());
+        
+        Category category = new Category(categoryId, categoryName, new ArrayList<>());
+        category.addProductAndLink(product);
+        
+        Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
+        product.addImageAndLink(image);
+        
+        return image;
+    }
     
-    public Long getNonExistingId() {
+    public ImageResponse imageResponse() {
+        return new ImageResponse(imageId, fileName, downloadUrl);
+    }
+    
+    public MockMultipartFile multipartFile() {
+        return new MockMultipartFile("file", fileName, fileType, byteArray);
+    }
+    
+    public FileContent fileContent() {
+        return new FileContent(fileName, fileType, byteArray.length, byteArray);
+    }
+    
+    // getters
+    public Long nonExistingId() {
         return nonExistingId;
     }
     
-    public Long getCategoryId() {
+    public Long invalidId() {
+        return invalidId;
+    }
+    
+    public Long categoryId() {
         return categoryId;
     }
     
-    public Long getProductId() {
+    public Long productId() {
         return productId;
     }
     
-    public Long getImageId() {
+    public Long imageId() {
         return imageId;
     }
     
@@ -166,6 +200,7 @@ public class TestFixtures {
     
     public TestFixtures withImageId(Long newId) {
         imageId = newId;
+        downloadUrl = "/api/images/" + imageId;
         return this;
     }
     
@@ -174,7 +209,7 @@ public class TestFixtures {
         return this;
     }
     
-    public TestFixtures withBrandName(String newBrandName) {
+    public TestFixtures withProductBrandName(String newBrandName) {
         brandName = newBrandName;
         return this;
     }
@@ -191,6 +226,16 @@ public class TestFixtures {
     
     public TestFixtures withProductEmptyImages() {
         includeImagesInProduct = false;
+        return this;
+    }
+    
+    public TestFixtures withImageFile(Blob newBlob) {
+        blob = newBlob;
+        return this;
+    }
+    
+    public TestFixtures withMultipartByteArray(byte[] newByteArray) {
+        byteArray = newByteArray;
         return this;
     }
 }

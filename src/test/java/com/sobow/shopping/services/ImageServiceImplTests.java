@@ -16,6 +16,7 @@ import com.sobow.shopping.domain.dto.FileContent;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.services.Impl.ImageServiceImpl;
+import com.sobow.shopping.utils.TestFixtures;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -44,13 +45,7 @@ public class ImageServiceImplTests {
     @InjectMocks
     private ImageServiceImpl underTest;
     
-    private final static long IMAGE_EXISTING_ID = 1L;
-    private final static long PRODUCT_EXISTING_ID = 2L;
-    
-    private static MockMultipartFile getMultipartFile() {
-        return new MockMultipartFile(
-            "file", "photo.png", "image/png", new byte[]{1, 2, 3});
-    }
+    private final TestFixtures fixtures = new TestFixtures();
     
     @Nested
     @DisplayName("saveImages")
@@ -59,37 +54,42 @@ public class ImageServiceImplTests {
         @Test
         public void saveImages_should_PersistAndReturnEntities_when_ValidInput() throws Exception {
             // Given
-            Product product = new Product();
-            MockMultipartFile f1 = getMultipartFile();
+            Product product = fixtures.withProductEmptyImages()
+                                      .productEntity();
             
-            when(productService.findById(PRODUCT_EXISTING_ID)).thenReturn(product);
+            MockMultipartFile file = fixtures.multipartFile();
+            
+            when(productService.findById(fixtures.productId())).thenReturn(product);
             
             // When
-            List<Image> result = underTest.saveImages(List.of(f1), PRODUCT_EXISTING_ID);
+            List<Image> result = underTest.saveImages(List.of(file), fixtures.productId());
             
             // Then
             assertEquals(1, result.size());
-            Image resultImage = result.get(0);
+            assertEquals(1, product.getImages().size());
             
-            byte[] resultBytes = resultImage.getImage().getBytes(1, (int) resultImage.getImage().length());
-            assertArrayEquals(f1.getBytes(), resultBytes);
-            assertEquals(f1.getOriginalFilename(), resultImage.getFileName());
-            assertEquals(f1.getContentType(), resultImage.getFileType());
+            Image resultImage = result.get(0);
+            byte[] resultBytes = resultImage.getFile().getBytes(1, (int) resultImage.getFile().length());
+            assertArrayEquals(file.getBytes(), resultBytes);
+            assertEquals(file.getOriginalFilename(), resultImage.getFileName());
+            assertEquals(file.getContentType(), resultImage.getFileType());
             assertSame(product, resultImage.getProduct());
         }
         
         @Test
         public void saveImages_should_ThrowImageProcessingException_when_GetBytesFails() throws Exception {
             // Given
-            Product product = new Product();
-            when(productService.findById(PRODUCT_EXISTING_ID)).thenReturn(product);
+            Product product = fixtures.withProductEmptyImages()
+                                      .productEntity();
+            
+            when(productService.findById(fixtures.productId())).thenReturn(product);
             
             MultipartFile bad = mock(MultipartFile.class);
             when(bad.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
             assertThrows(ImageProcessingException.class,
-                         () -> underTest.saveImages(List.of(bad), PRODUCT_EXISTING_ID));
+                         () -> underTest.saveImages(List.of(bad), fixtures.productId()));
             verify(imageRepository, never()).save(any());
         }
     }
@@ -101,19 +101,31 @@ public class ImageServiceImplTests {
         @Test
         public void updateById_should_ReturnUpdatedImage_when_ValidInput() throws Exception {
             // Given
-            Image image = new Image();
+            Image image = fixtures.imageEntity();
+            MockMultipartFile patch = fixtures.withMultipartByteArray(new byte[]{1, 2, 3})
+                                              .multipartFile();
             
-            MockMultipartFile patch = getMultipartFile();
-            
-            when(imageRepository.findById(IMAGE_EXISTING_ID)).thenReturn(Optional.of(image));
-            when(imageRepository.save(image)).thenReturn(image);
+            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
+            when(imageRepository.save(image)).thenAnswer(inv -> {
+                Image img = inv.getArgument(0);
+                try {
+                    img.setFile(new SerialBlob(patch.getBytes()));
+                } catch (Exception e) {
+                    throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
+                }
+                return img;
+            });
             
             // When
-            Image result = underTest.updateById(patch, IMAGE_EXISTING_ID);
+            Image result = underTest.updateById(patch, fixtures.imageId());
             
             // Then
-            byte[] resultBytes = result.getImage().getBytes(1, (int) result.getImage().length());
+            byte[] imageBytes = image.getFile().getBytes(1, (int) image.getFile().length());
+            byte[] resultBytes = result.getFile().getBytes(1, (int) result.getFile().length());
+            assertSame(image, result);
+            assertArrayEquals(patch.getBytes(), imageBytes);
             assertArrayEquals(patch.getBytes(), resultBytes);
+            
             assertEquals(patch.getOriginalFilename(), result.getFileName());
             assertEquals(patch.getContentType(), result.getFileType());
         }
@@ -121,14 +133,14 @@ public class ImageServiceImplTests {
         @Test
         public void updateById_should_ThrowImageProcessingException_when_GetBytesFails() throws Exception {
             // Given
-            Image existing = new Image();
-            when(imageRepository.findById(IMAGE_EXISTING_ID)).thenReturn(Optional.of(existing));
+            Image existing = fixtures.imageEntity();
+            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(existing));
             
-            MultipartFile bad = mock(MultipartFile.class);
-            when(bad.getBytes()).thenThrow(new IOException("Boom!"));
+            MultipartFile badPatch = mock(MultipartFile.class);
+            when(badPatch.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
-            assertThrows(ImageProcessingException.class, () -> underTest.updateById(bad, IMAGE_EXISTING_ID));
+            assertThrows(ImageProcessingException.class, () -> underTest.updateById(badPatch, fixtures.imageId()));
             verify(imageRepository, never()).save(any());
         }
     }
@@ -140,20 +152,17 @@ public class ImageServiceImplTests {
         @Test
         void getImageContent_should_ReturnFileContent_when_ImageIdValid() throws SQLException {
             // Given
-            Image image = new Image();
-            image.setFileName("photo.png");
-            image.setFileType("image/png");
-            byte[] bytes = new byte[]{1, 2, 3};
-            image.setImage(new SerialBlob(bytes));
+            Image image = fixtures.imageEntity();
             
-            when(imageRepository.findById(IMAGE_EXISTING_ID)).thenReturn(Optional.of(image));
+            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When
-            FileContent result = underTest.getImageContent(IMAGE_EXISTING_ID);
+            FileContent result = underTest.getImageContent(fixtures.imageId());
             
             // Then
             byte[] resultBytes = result.bytes();
-            assertArrayEquals(bytes, resultBytes);
+            byte[] imageBytes = image.getFile().getBytes(1, (int) image.getFile().length());
+            assertArrayEquals(imageBytes, resultBytes);
             assertEquals(image.getFileName(), result.fileName());
             assertEquals(image.getFileType(), result.fileType());
         }
@@ -166,13 +175,13 @@ public class ImageServiceImplTests {
             when(bad.length()).thenReturn(bytesArrayLength);
             when(bad.getBytes(1, (int) bytesArrayLength)).thenThrow(new SQLException());
             
-            Image image = new Image();
-            image.setImage(bad);
+            Image image = fixtures.withImageFile(bad)
+                                  .imageEntity();
             
-            when(imageRepository.findById(IMAGE_EXISTING_ID)).thenReturn(Optional.of(image));
+            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When + Then
-            assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(IMAGE_EXISTING_ID));
+            assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(fixtures.imageId()));
         }
     }
 }

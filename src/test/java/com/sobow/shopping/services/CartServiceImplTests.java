@@ -16,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CartServiceImplTests {
     
-    public static final long EXISTING_CART_ID = 1L;
-    public static final long EXISTING_PRODUCT_ID = 2L;
-    public static final long NON_EXISTING_CART_ID = 999L;
     @Mock
     private CartRepository cartRepository;
     
@@ -38,10 +35,8 @@ public class CartServiceImplTests {
         @Test
         public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
             // Given
-            //CartItemCreateRequest request = cartItemCreateRequest();
             
             // When
-            //CartItem result = underTest.createCartItem(EXISTING_CART_ID, request);
             
             // Then
         }
