@@ -1,7 +1,6 @@
 package com.sobow.shopping.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -52,7 +51,7 @@ public class ProductServiceImplTests {
             ProductCreateRequest request = fixtures.productCreateRequest();
             Product mapped = fixtures.withProductId(null)
                                      .productEntity();
-            Category category = mapped.getCategory();
+            Category category = fixtures.categoryEntity();
             
             when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(request.categoryId())).thenReturn(category);
@@ -68,7 +67,8 @@ public class ProductServiceImplTests {
         @Test
         public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
-            ProductCreateRequest request = fixtures.withCategoryId(fixtures.nonExistingId()).productCreateRequest();
+            ProductCreateRequest request = fixtures.withCategoryId(fixtures.nonExistingId())
+                                                   .productCreateRequest();
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When + Then
@@ -91,22 +91,29 @@ public class ProductServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedProduct_when_ValidInput() {
             // Given
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            String oldProductName = product.getName();
+            category.addProductAndLink(product);
             
-            ProductUpdateRequest patch = fixtures.withCategoryId(null)
+            Long differentCategoryId = 15L;
+            Category differentCategory = fixtures.withCategoryId(differentCategoryId)
+                                                 .categoryEntity();
+            
+            ProductUpdateRequest patch = fixtures.withCategoryId(differentCategoryId)
                                                  .withProductName("new product name")
                                                  .productUpdateRequest();
             
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
+            when(categoryService.findById(differentCategoryId)).thenReturn(differentCategory);
             
             // When
             Product result = underTest.partialUpdateById(patch, fixtures.productId());
             
             // Then
             assertSame(product, result);
-            assertEquals(patch.name(), result.getName());
-            assertNotEquals(oldProductName, product.getName());
+            
+            assertThat(product.getCategory().getId()).isEqualTo(differentCategoryId);
+            assertThat(product.getName()).isEqualTo("new product name");
         }
         
         @Test

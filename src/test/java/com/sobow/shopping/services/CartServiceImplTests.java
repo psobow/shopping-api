@@ -9,6 +9,7 @@ import com.sobow.shopping.domain.Cart;
 import com.sobow.shopping.domain.CartItem;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
+import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
@@ -49,7 +50,7 @@ public class CartServiceImplTests {
         @Test
         public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
             // Given
-            Cart cart = fixtures.withCartEmptyItems().cart();
+            Cart cart = fixtures.cart();
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
@@ -69,7 +70,7 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
-            Cart cart = fixtures.withCartEmptyItems().cart();
+            Cart cart = fixtures.cart();
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
@@ -81,7 +82,7 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
-            Cart cart = fixtures.withCartEmptyItems().cart();
+            Cart cart = fixtures.cart();
             CartItemCreateRequest request = fixtures.withProductId(fixtures.nonExistingId())
                                                     .cartItemCreateRequest();
             
@@ -95,7 +96,7 @@ public class CartServiceImplTests {
         @Test
         public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
             Cart cart = fixtures.cart();
-            var before = List.copyOf(cart.getCartItems());
+            var itemsBefore = List.copyOf(cart.getCartItems());
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
@@ -105,7 +106,7 @@ public class CartServiceImplTests {
                 .thenThrow(new CartItemAlreadyExistsException(cart.getId(), product.getId()));
             
             assertThrows(CartItemAlreadyExistsException.class, () -> underTest.createCartItem(cart.getId(), request));
-            assertThat(cart.getCartItems()).hasSize(before.size());
+            assertThat(cart.getCartItems()).hasSize(itemsBefore.size());
         }
     }
     
@@ -115,6 +116,24 @@ public class CartServiceImplTests {
         
         @Test
         public void updateCartItemQty_should_UpdateItemQty_when_NewQtyWithinZero_and_AvailableStock() {
+            // Given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId())).thenReturn(Optional.of(item));
+            
+            // When
+            CartItem result = underTest.updateCartItemQty(cart.getId(), request);
+            
+            // Then
+            assertThat(result).isSameAs(item);
+            assertThat(result.getQuantity()).isEqualTo(request.requestedQty());
+            assertThat(cart.getCartItems()).contains(item);
+        }
+        
+        @Test
+        public void updateCartItemQty_should_RemoveItemFromCart_when_NewQtyEqualsZero() {
             fail("Implement me");
         }
         

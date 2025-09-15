@@ -58,10 +58,11 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public void updateCartItemQty(long cartId, CartItemUpdateRequest request) {
+    public CartItem updateCartItemQty(long cartId, CartItemUpdateRequest request) {
         CartItem item = findCartItemByCartIdAndId(cartId, request.cartItemId());
         int resultQuantity = item.setQuantity(request.requestedQty());
         if (resultQuantity == 0) removeCartItem(cartId, request.cartItemId());
+        return item;
     }
     
     @Override

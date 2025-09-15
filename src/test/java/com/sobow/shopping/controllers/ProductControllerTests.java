@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
@@ -60,8 +62,12 @@ public class ProductControllerTests {
         @Test
         public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
             ProductCreateRequest request = fixtures.productCreateRequest();
-            Product saved = fixtures.withProductEmptyImages().productEntity();
-            ProductResponse response = fixtures.productResponse();
+            
+            Category category = fixtures.categoryEntity();
+            Product saved = fixtures.productEntity();
+            category.addProductAndLink(saved);
+            
+            ProductResponse response = fixtures.productResponseOf(saved);
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -107,8 +113,12 @@ public class ProductControllerTests {
         @Test
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
             ProductUpdateRequest request = fixtures.productUpdateRequest();
+            
+            Category category = fixtures.categoryEntity();
             Product updated = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            category.addProductAndLink(updated);
+            
+            ProductResponse response = fixtures.productResponseOf(updated);
             
             String json = objectMapper.writeValueAsString(request);
             
@@ -177,8 +187,14 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() throws Exception {
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            Image image = fixtures.imageEntity();
+            
+            category.addProductAndLink(product);
+            product.addImageAndLink(image);
+            
+            ProductResponse response = fixtures.productResponseOf(product);
             
             when(productService.findAllWithCategoryAndImages()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -208,8 +224,14 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() throws Exception {
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            Image image = fixtures.imageEntity();
+            
+            category.addProductAndLink(product);
+            product.addImageAndLink(image);
+            
+            ProductResponse response = fixtures.productResponseOf(product);
             
             when(productService.findWithCategoryAndImagesById(fixtures.productId())).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -248,8 +270,14 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            Image image = fixtures.imageEntity();
+            
+            category.addProductAndLink(product);
+            product.addImageAndLink(image);
+            
+            ProductResponse response = fixtures.productResponseOf(product);
             
             when(productService.search(product.getName(), null, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -270,8 +298,14 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            Image image = fixtures.imageEntity();
+            
+            category.addProductAndLink(product);
+            product.addImageAndLink(image);
+            
+            ProductResponse response = fixtures.productResponseOf(product);
             
             when(productService.search(null, product.getBrandName(), null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
@@ -292,8 +326,14 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
+            Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponse();
+            Image image = fixtures.imageEntity();
+            
+            category.addProductAndLink(product);
+            product.addImageAndLink(image);
+            
+            ProductResponse response = fixtures.productResponseOf(product);
             
             when(productService.search(null, null, product.getCategory().getName())).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);

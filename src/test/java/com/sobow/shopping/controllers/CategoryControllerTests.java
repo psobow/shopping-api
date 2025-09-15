@@ -58,7 +58,7 @@ public class CategoryControllerTests {
         @Test
         public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.withCategoryEmptyProducts().categoryEntity();
+            Category mapped = fixtures.categoryEntity();
             Category saved = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             

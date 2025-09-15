@@ -16,7 +16,7 @@ public interface CartService {
     
     CartItem createCartItem(long cartId, CartItemCreateRequest dto);
     
-    void updateCartItemQty(long cartId, CartItemUpdateRequest dto);
+    CartItem updateCartItemQty(long cartId, CartItemUpdateRequest dto);
     
     CartItem findCartItemByCartIdAndId(long cartId, long itemId);
     

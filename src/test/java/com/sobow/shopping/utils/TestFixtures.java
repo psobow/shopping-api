@@ -19,18 +19,17 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.mock.web.MockMultipartFile;
 
 public class TestFixtures {
     
+    public static final String MULTIPART_FORM_FIELD_NAME = "file";
     private Long nonExistingId = 999L;
     private Long invalidId = -1L;
     
     private Long categoryId = 10L;
     private String categoryName = "category name";
-    private boolean includeProductsInCategory = true;
     
     private Long productId = 20L;
     private String productName = "product name";
@@ -38,7 +37,6 @@ public class TestFixtures {
     private BigDecimal price = new BigDecimal("10.00");
     private Integer availableQuantity = 10;
     private String description = "product description";
-    private boolean includeImagesInProduct = true;
     
     private Long imageId = 30L;
     private String fileName = "photo.png";
@@ -48,7 +46,6 @@ public class TestFixtures {
     private String downloadUrl = "/api/images/" + imageId;
     
     private Long cartId = 40L;
-    private boolean includeItemsInCart = true;
     
     private Long cartItemId = 50L;
     private Integer cartItemQuantity = 1;
@@ -63,17 +60,15 @@ public class TestFixtures {
     
     public Cart cart() {
         Cart cart = new Cart(cartId, new HashSet<>());
-        
-        if (includeItemsInCart) {
-            CartItem item = cartItem();
-            cart.addCartItemAndLink(item);
-        }
-        
         return cart;
     }
     
     public CartItem cartItem() {
+        Category c = categoryEntity();
         Product p = productEntity();
+        Image i = imageEntity();
+        c.addProductAndLink(p);
+        p.addImageAndLink(i);
         return new CartItem(cartItemId, cartItemQuantity, p, null);
     }
     
@@ -88,15 +83,6 @@ public class TestFixtures {
     public Product productEntity() {
         Product product = new Product(productId, productName, brandName, price,
                                       availableQuantity, description, null, new ArrayList<>());
-        
-        Category category = new Category(categoryId, categoryName, new ArrayList<>());
-        category.addProductAndLink(product);
-        
-        if (includeImagesInProduct) {
-            Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
-            product.addImageAndLink(image);
-        }
-        
         return product;
     }
     
@@ -108,28 +94,14 @@ public class TestFixtures {
         return new ProductUpdateRequest(productName, brandName, price, availableQuantity, description, categoryId);
     }
     
-    public ProductResponse productResponse() {
-        List<Long> imageIds = new ArrayList<>();
-        
-        if (includeImagesInProduct) imageIds.add(imageId);
-        
-        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description,
-                                   categoryId, imageIds);
+    public ProductResponse productResponseOf(Product p) {
+        return new ProductResponse(p.getId(), p.getName(), p.getBrandName(), p.getPrice(), p.getAvailableQuantity(), p.getDescription(),
+                                   p.getCategory().getId(),
+                                   p.getImages().stream().map(Image::getId).toList());
     }
     
     public Category categoryEntity() {
         Category category = new Category(categoryId, categoryName, new ArrayList<>());
-        
-        if (includeProductsInCategory) {
-            Product product = new Product(productId, productName, brandName, price,
-                                          availableQuantity, description, null, new ArrayList<>());
-            category.addProductAndLink(product);
-            
-            if (includeImagesInProduct) {
-                Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
-                product.addImageAndLink(image);
-            }
-        }
         return category;
     }
     
@@ -142,15 +114,7 @@ public class TestFixtures {
     }
     
     public Image imageEntity() {
-        Product product = new Product(productId, productName, brandName, price,
-                                      availableQuantity, description, null, new ArrayList<>());
-        
-        Category category = new Category(categoryId, categoryName, new ArrayList<>());
-        category.addProductAndLink(product);
-        
         Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
-        product.addImageAndLink(image);
-        
         return image;
     }
     
@@ -159,7 +123,7 @@ public class TestFixtures {
     }
     
     public MockMultipartFile multipartFile() {
-        return new MockMultipartFile("file", fileName, fileType, byteArray);
+        return new MockMultipartFile(MULTIPART_FORM_FIELD_NAME, fileName, fileType, byteArray);
     }
     
     public FileContent fileContent() {
@@ -223,21 +187,6 @@ public class TestFixtures {
     
     public TestFixtures withCategoryName(String newCategoryName) {
         categoryName = newCategoryName;
-        return this;
-    }
-    
-    public TestFixtures withCategoryEmptyProducts() {
-        includeProductsInCategory = false;
-        return this;
-    }
-    
-    public TestFixtures withProductEmptyImages() {
-        includeImagesInProduct = false;
-        return this;
-    }
-    
-    public TestFixtures withCartEmptyItems() {
-        includeItemsInCart = false;
         return this;
     }
     

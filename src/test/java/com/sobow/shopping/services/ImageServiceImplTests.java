@@ -50,33 +50,28 @@ public class ImageServiceImplTests {
         @Test
         public void saveImages_should_PersistAndReturnEntities_when_ValidInput() throws Exception {
             // Given
-            Product product = fixtures.withProductEmptyImages()
-                                      .productEntity();
-            
+            Product product = fixtures.productEntity();
             MockMultipartFile file = fixtures.multipartFile();
             
             when(productService.findById(fixtures.productId())).thenReturn(product);
             
             // When
-            List<Image> result = underTest.saveImages(List.of(file), fixtures.productId());
+            List<Image> resultList = underTest.saveImages(List.of(file), fixtures.productId());
             
             // Then
-            assertEquals(1, result.size());
-            assertEquals(1, product.getImages().size());
+            Image resultImage = resultList.get(0);
+            assertSame(product, resultImage.getProduct());
             
-            Image resultImage = result.get(0);
             byte[] resultBytes = resultImage.getFile().getBytes(1, (int) resultImage.getFile().length());
             assertArrayEquals(file.getBytes(), resultBytes);
             assertEquals(file.getOriginalFilename(), resultImage.getFileName());
             assertEquals(file.getContentType(), resultImage.getFileType());
-            assertSame(product, resultImage.getProduct());
         }
         
         @Test
         public void saveImages_should_ThrowImageProcessingException_when_GetBytesFails() throws Exception {
             // Given
-            Product product = fixtures.withProductEmptyImages()
-                                      .productEntity();
+            Product product = fixtures.productEntity();
             
             when(productService.findById(fixtures.productId())).thenReturn(product);
             
@@ -97,6 +92,7 @@ public class ImageServiceImplTests {
         public void updateById_should_ReturnUpdatedImage_when_ValidInput() throws Exception {
             // Given
             Image image = fixtures.imageEntity();
+            
             MockMultipartFile patch = fixtures.withMultipartByteArray(new byte[]{1, 2, 3})
                                               .multipartFile();
             
@@ -106,8 +102,9 @@ public class ImageServiceImplTests {
             Image result = underTest.updateById(patch, fixtures.imageId());
             
             // Then
-            byte[] resultBytes = result.getFile().getBytes(1, (int) result.getFile().length());
             assertSame(image, result);
+            
+            byte[] resultBytes = result.getFile().getBytes(1, (int) result.getFile().length());
             assertArrayEquals(patch.getBytes(), resultBytes);
             assertEquals(patch.getOriginalFilename(), result.getFileName());
             assertEquals(patch.getContentType(), result.getFileType());
@@ -116,8 +113,8 @@ public class ImageServiceImplTests {
         @Test
         public void updateById_should_ThrowImageProcessingException_when_GetBytesFails() throws Exception {
             // Given
-            Image existing = fixtures.imageEntity();
-            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(existing));
+            Image image = fixtures.imageEntity();
+            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             MultipartFile badPatch = mock(MultipartFile.class);
             when(badPatch.getBytes()).thenThrow(new IOException("Boom!"));
