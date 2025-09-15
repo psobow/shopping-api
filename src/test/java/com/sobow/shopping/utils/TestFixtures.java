@@ -48,7 +48,10 @@ public class TestFixtures {
     private String downloadUrl = "/api/images/" + imageId;
     
     private Long cartId = 40L;
+    private boolean includeItemsInCart = true;
+    
     private Long cartItemId = 50L;
+    private Integer cartItemQuantity = 1;
     
     public TestFixtures() {
         try {
@@ -60,14 +63,18 @@ public class TestFixtures {
     
     public Cart cart() {
         Cart cart = new Cart(cartId, new HashSet<>());
-        CartItem cartItem = cartItem();
-        cart.addCartItemAndLink(cartItem);
+        
+        if (includeItemsInCart) {
+            CartItem item = cartItem();
+            cart.addCartItemAndLink(item);
+        }
+        
         return cart;
     }
     
     public CartItem cartItem() {
         Product p = productEntity();
-        return new CartItem(cartItemId, 1, p, null);
+        return new CartItem(cartItemId, cartItemQuantity, p, null);
     }
     
     public CartItemCreateRequest cartItemCreateRequest() {
@@ -226,6 +233,11 @@ public class TestFixtures {
     
     public TestFixtures withProductEmptyImages() {
         includeImagesInProduct = false;
+        return this;
+    }
+    
+    public TestFixtures withCartEmptyItems() {
+        includeItemsInCart = false;
         return this;
     }
     

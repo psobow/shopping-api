@@ -42,26 +42,26 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem createCartItem(long cartId, CartItemCreateRequest dto) {
+    public CartItem createCartItem(long cartId, CartItemCreateRequest request) {
         Cart cart = findCartById(cartId);
-        Product product = productService.findById(dto.productId());
+        Product product = productService.findById(request.productId());
         
-        boolean itemExists = cartItemRepository.existsByCartIdAndProductId(cartId, product.getId());
-        if (itemExists) throw new CartItemAlreadyExistsException(cartId, product.getId());
+        boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, product.getId());
+        if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, product.getId());
         
         CartItem newItem = new CartItem();
         newItem.setProduct(product);
-        newItem.setQuantity(dto.requestedQty());
+        newItem.setQuantity(request.requestedQty());
         cart.addCartItemAndLink(newItem);
         return newItem;
     }
     
     @Transactional
     @Override
-    public void updateCartItemQty(long cartId, CartItemUpdateRequest dto) {
-        CartItem item = findCartItemByCartIdAndId(cartId, dto.cartItemId());
-        int resultQuantity = item.setQuantity(dto.requestedQty());
-        if (resultQuantity == 0) removeCartItem(cartId, dto.cartItemId());
+    public void updateCartItemQty(long cartId, CartItemUpdateRequest request) {
+        CartItem item = findCartItemByCartIdAndId(cartId, request.cartItemId());
+        int resultQuantity = item.setQuantity(request.requestedQty());
+        if (resultQuantity == 0) removeCartItem(cartId, request.cartItemId());
     }
     
     @Override
