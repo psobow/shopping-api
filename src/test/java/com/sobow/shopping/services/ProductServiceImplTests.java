@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Category;
@@ -53,25 +50,19 @@ public class ProductServiceImplTests {
         public void save_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
-            
             Product mapped = fixtures.withProductId(null)
                                      .productEntity();
-            
             Category category = mapped.getCategory();
             
             when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(request.categoryId())).thenReturn(category);
-            when(productRepository.save(mapped)).thenAnswer(inv -> {
-                Product p = inv.getArgument(0);
-                p.setId(1L);
-                return p;
-            });
+            
             // When
             Product result = underTest.save(request);
             
             // Then
             assertSame(mapped, result);
-            assertEquals(1L, result.getId());
+            assertSame(category, result.getCategory());
         }
         
         @Test
@@ -82,7 +73,6 @@ public class ProductServiceImplTests {
             
             // When + Then
             assertThrows(EntityNotFoundException.class, () -> underTest.save(request));
-            verify(productRepository, never()).save(any());
         }
         
         @Test
@@ -91,7 +81,6 @@ public class ProductServiceImplTests {
             when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
             // When + Then
             assertThrows(ProductAlreadyExistsException.class, () -> underTest.save(request));
-            verify(productRepository, never()).save(any());
         }
     }
     
@@ -110,7 +99,6 @@ public class ProductServiceImplTests {
                                                  .productUpdateRequest();
             
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
-            when(productRepository.save(product)).thenReturn(product);
             
             // When
             Product result = underTest.partialUpdateById(patch, fixtures.productId());
@@ -134,7 +122,6 @@ public class ProductServiceImplTests {
             // When + Then
             assertThrows(EntityNotFoundException.class,
                          () -> underTest.partialUpdateById(patch, fixtures.productId()));
-            verify(productRepository, never()).save(any());
         }
         
         @Test
@@ -147,7 +134,6 @@ public class ProductServiceImplTests {
             // When + Then
             assertThrows(ProductAlreadyExistsException.class,
                          () -> underTest.partialUpdateById(patch, fixtures.productId()));
-            verify(productRepository, never()).save(any());
         }
     }
 }

@@ -64,9 +64,6 @@ public class CategoryServiceImplTests {
             // Then
             assertSame(category, result);
             assertEquals(1L, result.getId());
-            
-            verify(categoryRepository).existsByName(category.getName());
-            verify(categoryRepository).save(category);
         }
         
         @Test
@@ -103,20 +100,13 @@ public class CategoryServiceImplTests {
             
             when(categoryRepository.findById(existingId)).thenReturn(Optional.of(existing));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
-            when(categoryRepository.save(existing)).thenAnswer(inv -> {
-                Category c = inv.getArgument(0);
-                c.setName(patch.getName());
-                return c;
-            });
             
             // When
             Category result = underTest.partialUpdateById(patch, existingId);
             
             // Then
-            assertEquals(patch.getName(), existing.getName());
             assertSame(existing, result);
-            verify(categoryRepository).existsByName(patch.getName());
-            verify(categoryRepository).save(existing);
+            assertEquals(patch.getName(), existing.getName());
         }
         
         @Test
@@ -136,7 +126,6 @@ public class CategoryServiceImplTests {
             
             // When & Then
             assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existingId));
-            verify(categoryRepository, never()).save(any());
         }
         
         @Test
@@ -155,7 +144,6 @@ public class CategoryServiceImplTests {
             
             // Then
             assertSame(existing, result);
-            verify(categoryRepository, never()).save(any());
         }
     }
 }

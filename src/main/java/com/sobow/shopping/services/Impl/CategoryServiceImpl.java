@@ -31,7 +31,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
             assertCategoryUnique(patch.getName());
             existingCategory.setName(patch.getName());
-            categoryRepository.save(existingCategory);
         }
         return existingCategory;
     }

@@ -56,7 +56,7 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
         }
-        return imageRepository.save(image);
+        return image;
     }
     
     @Override

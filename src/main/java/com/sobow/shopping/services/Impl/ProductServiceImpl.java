@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productCreateRequestMapper.mapToEntity(productCreateRequest);
         Category category = categoryService.findById(productCreateRequest.categoryId());
         category.addProductAndLink(product);
-        return productRepository.save(product);
+        return product;
     }
     
     @Transactional
@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setCategory(category);
         }
         
-        return productRepository.save(existingProduct);
+        return existingProduct;
     }
     
     @Override

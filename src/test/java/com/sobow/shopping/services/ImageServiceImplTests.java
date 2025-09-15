@@ -4,10 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Image;
@@ -22,7 +19,6 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -90,7 +86,6 @@ public class ImageServiceImplTests {
             // When & Then
             assertThrows(ImageProcessingException.class,
                          () -> underTest.saveImages(List.of(bad), fixtures.productId()));
-            verify(imageRepository, never()).save(any());
         }
     }
     
@@ -106,26 +101,14 @@ public class ImageServiceImplTests {
                                               .multipartFile();
             
             when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
-            when(imageRepository.save(image)).thenAnswer(inv -> {
-                Image img = inv.getArgument(0);
-                try {
-                    img.setFile(new SerialBlob(patch.getBytes()));
-                } catch (Exception e) {
-                    throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
-                }
-                return img;
-            });
             
             // When
             Image result = underTest.updateById(patch, fixtures.imageId());
             
             // Then
-            byte[] imageBytes = image.getFile().getBytes(1, (int) image.getFile().length());
             byte[] resultBytes = result.getFile().getBytes(1, (int) result.getFile().length());
             assertSame(image, result);
-            assertArrayEquals(patch.getBytes(), imageBytes);
             assertArrayEquals(patch.getBytes(), resultBytes);
-            
             assertEquals(patch.getOriginalFilename(), result.getFileName());
             assertEquals(patch.getContentType(), result.getFileType());
         }
@@ -141,7 +124,6 @@ public class ImageServiceImplTests {
             
             // When & Then
             assertThrows(ImageProcessingException.class, () -> underTest.updateById(badPatch, fixtures.imageId()));
-            verify(imageRepository, never()).save(any());
         }
     }
     
