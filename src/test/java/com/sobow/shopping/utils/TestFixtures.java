@@ -48,6 +48,7 @@ public class TestFixtures {
     private Long cartId = 40L;
     
     private Long cartItemId = 50L;
+    private Integer requestedQty = 1;
     private Integer cartItemQuantity = 1;
     
     public TestFixtures() {
@@ -73,11 +74,11 @@ public class TestFixtures {
     }
     
     public CartItemCreateRequest cartItemCreateRequest() {
-        return new CartItemCreateRequest(productId, 1);
+        return new CartItemCreateRequest(productId, requestedQty);
     }
     
     public CartItemUpdateRequest cartItemUpdateRequest() {
-        return new CartItemUpdateRequest(cartItemId, 2);
+        return new CartItemUpdateRequest(cartItemId, requestedQty);
     }
     
     public Product productEntity() {
@@ -197,6 +198,11 @@ public class TestFixtures {
     
     public TestFixtures withMultipartByteArray(byte[] newByteArray) {
         byteArray = newByteArray;
+        return this;
+    }
+    
+    public TestFixtures withRequestedQty(Integer newRequestedQty) {
+        requestedQty = newRequestedQty;
         return this;
     }
 }

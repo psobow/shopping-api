@@ -2,7 +2,6 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.Cart;
@@ -119,7 +118,10 @@ public class CartServiceImplTests {
             // Given
             Cart cart = fixtures.cart();
             CartItem item = fixtures.cartItem();
-            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            cart.addCartItemAndLink(item);
+            
+            CartItemUpdateRequest request = fixtures.withRequestedQty(2)
+                                                    .cartItemUpdateRequest();
             
             when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId())).thenReturn(Optional.of(item));
             
@@ -134,12 +136,37 @@ public class CartServiceImplTests {
         
         @Test
         public void updateCartItemQty_should_RemoveItemFromCart_when_NewQtyEqualsZero() {
-            fail("Implement me");
+            // given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            cart.addCartItemAndLink(item);
+            
+            CartItemUpdateRequest request = fixtures.withRequestedQty(0)
+                                                    .cartItemUpdateRequest();
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId())).thenReturn(Optional.of(item));
+            
+            // when
+            CartItem result = underTest.updateCartItemQty(cart.getId(), request);
+            
+            // then
+            assertThat(result).isSameAs(item);
+            assertThat(result.getQuantity()).isZero();
+            
+            assertThat(cart.getCartItems()).doesNotContain(result);
+            assertThat(result.getCart()).isNull();
         }
         
         @Test
         public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
-            fail("Implement me");
+            Cart cart = fixtures.cart();
+            
+            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId()))
+                .thenThrow(new EntityNotFoundException());
+            
+            assertThrows(EntityNotFoundException.class, () -> underTest.updateCartItemQty(cart.getId(), request));
         }
     }
     
@@ -149,17 +176,62 @@ public class CartServiceImplTests {
         
         @Test
         public void removeCartItem_should_RemoveItem_when_ItemExistsInCart() {
-            fail("Implement me");
+            // Given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            cart.addCartItemAndLink(item);
+            
+            // Precondition: they were related
+            assertThat(item.getCart()).isSameAs(cart);
+            assertThat(cart.getCartItems()).contains(item);
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), item.getId())).thenReturn(Optional.of(item));
+            
+            // When
+            underTest.removeCartItem(cart.getId(), item.getId());
+            
+            // Then
+            assertThat(cart.getCartItems()).doesNotContain(item);
+            assertThat(item.getCart()).isNull();
         }
         
         @Test
         public void removeCartItem_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
-            fail("Implement me");
+            // Given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            
+            assertThat(cart.getCartItems()).doesNotContain(item);
+            assertThat(item.getCart()).isNull();
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), item.getId()))
+                .thenThrow(new EntityNotFoundException());
+            
+            // When
+            assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(cart.getId(), item.getId()));
         }
         
         @Test
         public void removeCartItem_should_BeIdempotent_when_CalledTwice_SecondCallThrowsNotFound() {
-            fail("Implement me");
+            // Given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            cart.addCartItemAndLink(item);
+            
+            assertThat(item.getCart()).isSameAs(cart);
+            assertThat(cart.getCartItems()).contains(item);
+            
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), item.getId()))
+                .thenReturn(Optional.of(item))
+                .thenThrow(new EntityNotFoundException());
+            
+            underTest.removeCartItem(cart.getId(), item.getId());
+            
+            assertThat(cart.getCartItems()).doesNotContain(item);
+            assertThat(item.getCart()).isNull();
+            
+            // When & Then
+            assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(cart.getId(), item.getId()));
         }
     }
     
@@ -169,12 +241,29 @@ public class CartServiceImplTests {
         
         @Test
         public void removeAllCartItems_should_RemoveAllCartItems_when_CartExists() {
-            fail("Implement me");
+            // Given
+            Cart cart = fixtures.cart();
+            CartItem item = fixtures.cartItem();
+            cart.addCartItemAndLink(item);
+            
+            assertThat(item.getCart()).isSameAs(cart);
+            assertThat(cart.getCartItems()).contains(item);
+            
+            when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
+            
+            // When
+            underTest.removeAllCartItems(cart.getId());
+            
+            // Then
+            assertThat(cart.getCartItems()).doesNotContain(item);
+            assertThat(item.getCart()).isNull();
         }
         
         @Test
         public void removeAllCartItems_should_ThrowNotFound_when_CartDoesNotExist() {
-            fail("Implement me");
+            when(cartRepository.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
+            
+            assertThrows(EntityNotFoundException.class, () -> underTest.removeAllCartItems(fixtures.nonExistingId()));
         }
     }
 }
