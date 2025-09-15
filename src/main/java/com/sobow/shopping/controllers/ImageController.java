@@ -41,11 +41,11 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
-        @PathVariable @Positive Long productId) {
+        @PathVariable @Positive long productId) {
         List<ImageResponse> responseList = imageService.saveImages(files, productId)
-                                                            .stream()
+                                                       .stream()
                                                        .map(imageResponseMapper::mapToDto)
-                                                            .toList();
+                                                       .toList();
         
         return new ResponseEntity<>(
             new ApiResponse("Upload success", responseList),
@@ -59,14 +59,14 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
         @RequestPart("file") @NotNull MultipartFile file,
-        @PathVariable @Positive Long id) {
+        @PathVariable @Positive long id) {
         Image updatedImage = imageService.updateById(file, id);
         ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
     @GetMapping("/images/{id}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive Long id) {
+    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive long id) {
         FileContent fileContent = imageService.getImageContent(id);
         ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
         return ResponseEntity.ok()
@@ -77,7 +77,7 @@ public class ImageController {
     }
     
     @DeleteMapping("/images/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable @Positive Long id) {
+    public ResponseEntity<Void> deleteImage(@PathVariable @Positive long id) {
         imageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

@@ -46,7 +46,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateCategory(
         @RequestBody @Valid CategoryRequest request,
-        @PathVariable @Positive Long id) {
+        @PathVariable @Positive long id) {
         Category mapped = categoryRequestMapper.mapToEntity(request);
         Category updated = categoryService.partialUpdateById(mapped, id);
         CategoryResponse response = categoryResponseMapper.mapToDto(updated);
@@ -58,15 +58,15 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<ApiResponse> getAllCategories() {
         List<CategoryResponse> responseList = categoryService.findAll()
-                                                                     .stream()
-                                                                     .map(categoryResponseMapper::mapToDto)
-                                                                     .toList();
+                                                             .stream()
+                                                             .map(categoryResponseMapper::mapToDto)
+                                                             .toList();
         
         return ResponseEntity.ok(new ApiResponse("Found", responseList));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Positive Long id) {
+    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Positive long id) {
         Category category = categoryService.findById(id);
         CategoryResponse response = categoryResponseMapper.mapToDto(category);
         return ResponseEntity.ok(new ApiResponse("Found", response));
@@ -80,7 +80,7 @@ public class CategoryController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable @Positive Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable @Positive long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

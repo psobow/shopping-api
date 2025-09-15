@@ -44,33 +44,31 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateProduct(
         @RequestBody @Valid ProductUpdateRequest request,
-        @PathVariable @Positive Long id) {
+        @PathVariable @Positive long id) {
         Product updated = productService.partialUpdateById(request, id);
         ProductResponse response = productResponseMapper.mapToDto(updated);
-        return ResponseEntity.ok(
-            new ApiResponse("Updated", response)
-        );
+        return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {
         List<ProductResponse> responseList = productService.findAllWithCategoryAndImages()
-                                                                  .stream()
-                                                                  .map(productResponseMapper::mapToDto)
-                                                                  .toList();
+                                                           .stream()
+                                                           .map(productResponseMapper::mapToDto)
+                                                           .toList();
         
         return ResponseEntity.ok(new ApiResponse("Found", responseList));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive Long id) {
+    public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive long id) {
         Product product = productService.findWithCategoryAndImagesById(id);
         ProductResponse response = productResponseMapper.mapToDto(product);
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable @Positive Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable @Positive long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -84,8 +82,8 @@ public class ProductController {
         List<Product> foundProducts = productService.search(name, brandName, categoryName);
         
         List<ProductResponse> responseList = foundProducts.stream()
-                                                      .map(productResponseMapper::mapToDto)
-                                                      .toList();
+                                                          .map(productResponseMapper::mapToDto)
+                                                          .toList();
         
         HttpStatus status = responseList.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
         String message = responseList.isEmpty() ? "Not found" : "Found";
