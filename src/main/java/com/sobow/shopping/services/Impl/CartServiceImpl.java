@@ -11,7 +11,6 @@ import com.sobow.shopping.repositories.CartRepository;
 import com.sobow.shopping.services.CartService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,7 @@ public class CartServiceImpl implements CartService {
     private final ProductService productService;
     
     @Override
-    public Cart createCartForUser(long userId) {
+    public Cart createOrGetCartForUser(long userId) {
         throw new UnsupportedOperationException("createCartForUser is not implemented yet");
     }
     
@@ -46,6 +45,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = findCartById(cartId);
         Product product = productService.findById(request.productId());
         
+        // I could update existing CartItem when already in the Cart
         boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, product.getId());
         if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, product.getId());
         
@@ -58,15 +58,14 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem updateCartItemQty(long cartId, CartItemUpdateRequest request) {
-        CartItem item = findCartItemByCartIdAndId(cartId, request.cartItemId());
+    public CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest request) {
+        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
         int resultQuantity = item.setQuantity(request.requestedQty());
-        if (resultQuantity == 0) removeCartItem(cartId, request.cartItemId());
+        if (resultQuantity == 0) removeCartItem(cartId, itemId);
         return item;
     }
     
-    @Override
-    public CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
+    private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
         return cartItemRepository.findByCartIdAndId(cartId, itemId)
                                  .orElseThrow(() -> new EntityNotFoundException(
                                      "CartItem " + itemId + " not found in cart " + cartId));
@@ -87,16 +86,5 @@ public class CartServiceImpl implements CartService {
         cart.removeAllCartItems();
     }
     
-    @Override
-    public BigDecimal getCartTotalPrice(long cartId) {
-        Cart cart = findCartById(cartId);
-        return cart.getTotalPrice();
-    }
-    
-    @Override
-    public BigDecimal getCartItemTotalPrice(long cartId, long itemId) {
-        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
-        return item.getTotalPrice();
-    }
 }
 

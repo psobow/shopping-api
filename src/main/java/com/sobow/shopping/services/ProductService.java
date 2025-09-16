@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ProductService {
     
-    Product save(ProductCreateRequest productCreateRequest);
+    Product create(ProductCreateRequest productCreateRequest);
     
     Product findById(long id);
     
@@ -23,7 +23,7 @@ public interface ProductService {
     
     List<Product> findAll();
     
-    List<Product> search(String name,
+    List<Product> search(String nameLike,
                          String brandName,
                          String categoryName);
 }

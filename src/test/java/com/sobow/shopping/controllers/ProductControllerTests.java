@@ -71,7 +71,7 @@ public class ProductControllerTests {
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(productService.save(request)).thenReturn(saved);
+            when(productService.create(request)).thenReturn(saved);
             when(productResponseMapper.mapToDto(saved)).thenReturn(response);
             
             mockMvc.perform(post(PRODUCTS_PATH)

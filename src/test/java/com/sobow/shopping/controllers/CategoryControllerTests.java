@@ -65,7 +65,7 @@ public class CategoryControllerTests {
             String json = objectMapper.writeValueAsString(request);
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.save(mapped)).thenReturn(saved);
+            when(categoryService.create(mapped)).thenReturn(saved);
             when(categoryResponseMapper.mapToDto(saved)).thenReturn(response);
             
             mockMvc.perform(post(CATEGORIES_PATH)
@@ -97,7 +97,7 @@ public class CategoryControllerTests {
             String json = objectMapper.writeValueAsString(request);
             
             when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.save(mapped)).thenThrow(
+            when(categoryService.create(mapped)).thenThrow(
                 new CategoryAlreadyExistsException(mapped.getName()));
             
             mockMvc.perform(post(CATEGORIES_PATH)

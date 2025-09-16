@@ -2,10 +2,17 @@ package com.sobow.shopping.mappers.Impl;
 
 import com.sobow.shopping.domain.Cart;
 import com.sobow.shopping.domain.CartItem;
+import com.sobow.shopping.domain.responses.CartItemResponse;
 import com.sobow.shopping.domain.responses.CartResponse;
 import com.sobow.shopping.mappers.Mapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
+@Component
 public class CartResponseMapper implements Mapper<Cart, CartResponse> {
+    
+    private final Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
     
     @Override
     public Cart mapToEntity(CartResponse cartResponse) {
@@ -16,8 +23,8 @@ public class CartResponseMapper implements Mapper<Cart, CartResponse> {
     public CartResponse mapToDto(Cart cart) {
         return new CartResponse(
             cart.getId(),
-            cart.getCartItems().stream().map(CartItem::getId).toList(),
-            cart.getTotalPrice()
+            cart.getTotalPrice(),
+            cart.getCartItems().stream().map(cartItemResponseMapper::mapToDto).toList()
         );
     }
 }

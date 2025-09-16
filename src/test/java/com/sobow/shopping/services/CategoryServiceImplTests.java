@@ -41,11 +41,11 @@ public class CategoryServiceImplTests {
     }
     
     @Nested
-    @DisplayName("save")
-    class save {
+    @DisplayName("create")
+    class create {
         
         @Test
-        public void save_should_ReturnSavedCategory_when_ValidInput() {
+        public void create_should_ReturnSavedCategory_when_ValidInput() {
             // Given
             Category category = fixtures.withCategoryId(null)
                                         .categoryEntity();
@@ -54,14 +54,14 @@ public class CategoryServiceImplTests {
             when(categoryRepository.save(category)).thenReturn(category);
             
             // When
-            Category result = underTest.save(category);
+            Category result = underTest.create(category);
             
             // Then
             assertSame(category, result);
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
+        public void create_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
             Category category = fixtures.withCategoryId(null)
                                         .withCategoryName("name already exists")
@@ -70,7 +70,7 @@ public class CategoryServiceImplTests {
             when(categoryRepository.existsByName(category.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.save(category));
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.create(category));
             verify(categoryRepository, never()).save(any());
         }
     }

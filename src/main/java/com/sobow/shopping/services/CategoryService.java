@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface CategoryService {
     
-    Category save(Category category);
+    Category create(Category category);
     
     Category findById(long id);
     

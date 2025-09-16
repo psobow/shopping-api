@@ -42,11 +42,11 @@ public class ProductServiceImplTests {
     private final TestFixtures fixtures = new TestFixtures();
     
     @Nested
-    @DisplayName("save")
-    class save {
+    @DisplayName("create")
+    class create {
         
         @Test
-        public void save_should_ReturnSavedProduct_when_ValidInput() {
+        public void create_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
             Product mapped = fixtures.withProductId(null)
@@ -57,7 +57,7 @@ public class ProductServiceImplTests {
             when(categoryService.findById(request.categoryId())).thenReturn(category);
             
             // When
-            Product result = underTest.save(request);
+            Product result = underTest.create(request);
             
             // Then
             assertSame(mapped, result);
@@ -65,22 +65,22 @@ public class ProductServiceImplTests {
         }
         
         @Test
-        public void save_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
+        public void create_should_ThrowNotFound_when_CategoryIdDoesNotExists() {
             // Given
             ProductCreateRequest request = fixtures.withCategoryId(fixtures.nonExistingId())
                                                    .productCreateRequest();
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When + Then
-            assertThrows(EntityNotFoundException.class, () -> underTest.save(request));
+            assertThrows(EntityNotFoundException.class, () -> underTest.create(request));
         }
         
         @Test
-        public void save_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
+        public void create_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
             ProductCreateRequest request = fixtures.productCreateRequest();
             when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
             // When + Then
-            assertThrows(ProductAlreadyExistsException.class, () -> underTest.save(request));
+            assertThrows(ProductAlreadyExistsException.class, () -> underTest.create(request));
         }
     }
     

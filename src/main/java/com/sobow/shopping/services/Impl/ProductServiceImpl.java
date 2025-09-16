@@ -27,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product save(ProductCreateRequest productCreateRequest) {
+    public Product create(ProductCreateRequest productCreateRequest) {
         assertProductUnique(productCreateRequest.name(), productCreateRequest.brandName());
         Product product = productCreateRequestMapper.mapToEntity(productCreateRequest);
         Category category = categoryService.findById(productCreateRequest.categoryId());
@@ -93,17 +93,17 @@ public class ProductServiceImpl implements ProductService {
     
     
     @Override
-    public List<Product> search(String name,
+    public List<Product> search(String nameLike,
                                 String brandName,
                                 String categoryName) {
         
         // normalize blanks to nulls
-        name = trimToNull(name);
+        nameLike = trimToNull(nameLike);
         brandName = trimToNull(brandName);
         categoryName = trimToNull(categoryName);
         
         var spec = Specification.allOf(
-            Optional.of(name).map(ProductServiceImpl::nameLike).orElse(null),
+            Optional.of(nameLike).map(ProductServiceImpl::nameLike).orElse(null),
             Optional.of(brandName).map(ProductServiceImpl::brandNameEquals).orElse(null),
             Optional.of(categoryName).map(ProductServiceImpl::categoryNameEquals).orElse(null)
         );

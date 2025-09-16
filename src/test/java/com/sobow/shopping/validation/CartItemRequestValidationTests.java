@@ -31,11 +31,7 @@ public class CartItemRequestValidationTests {
     
     private static Stream<Arguments> invalidCasesOnUpdate() {
         return Stream.of(
-            arguments(new CartItemUpdateRequest(0L, 1),
-                      "cartItemId",
-                      "is not positive"
-            ),
-            arguments(new CartItemUpdateRequest(1L, 0),
+            arguments(new CartItemUpdateRequest(0),
                       "requestedQty",
                       "is not positive"
             )

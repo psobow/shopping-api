@@ -78,7 +78,7 @@ public class TestFixtures {
     }
     
     public CartItemUpdateRequest cartItemUpdateRequest() {
-        return new CartItemUpdateRequest(cartItemId, requestedQty);
+        return new CartItemUpdateRequest(requestedQty);
     }
     
     public Product productEntity() {

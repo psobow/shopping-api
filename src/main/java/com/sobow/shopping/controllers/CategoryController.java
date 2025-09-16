@@ -35,9 +35,10 @@ public class CategoryController {
     
     @PostMapping
     public ResponseEntity<ApiResponse> createCategory(
-        @RequestBody @Valid CategoryRequest request) {
+        @RequestBody @Valid CategoryRequest request
+    ) {
         Category mapped = categoryRequestMapper.mapToEntity(request);
-        Category saved = categoryService.save(mapped);
+        Category saved = categoryService.create(mapped);
         CategoryResponse response = categoryResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
                              .body(new ApiResponse("Created", response));
@@ -46,7 +47,8 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateCategory(
         @RequestBody @Valid CategoryRequest request,
-        @PathVariable @Positive long id) {
+        @PathVariable @Positive long id
+    ) {
         Category mapped = categoryRequestMapper.mapToEntity(request);
         Category updated = categoryService.partialUpdateById(mapped, id);
         CategoryResponse response = categoryResponseMapper.mapToDto(updated);

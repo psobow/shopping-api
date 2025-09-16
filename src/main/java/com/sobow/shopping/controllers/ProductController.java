@@ -34,8 +34,9 @@ public class ProductController {
     
     @PostMapping
     public ResponseEntity<ApiResponse> createProduct(
-        @RequestBody @Valid ProductCreateRequest request) {
-        Product saved = productService.save(request);
+        @RequestBody @Valid ProductCreateRequest request
+    ) {
+        Product saved = productService.create(request);
         ProductResponse response = productResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/products/" + saved.getId()))
                              .body(new ApiResponse("Created", response));
@@ -44,7 +45,8 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateProduct(
         @RequestBody @Valid ProductUpdateRequest request,
-        @PathVariable @Positive long id) {
+        @PathVariable @Positive long id
+    ) {
         Product updated = productService.partialUpdateById(request, id);
         ProductResponse response = productResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(new ApiResponse("Updated", response));

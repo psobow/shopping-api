@@ -41,7 +41,8 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
-        @PathVariable @Positive long productId) {
+        @PathVariable @Positive long productId
+    ) {
         List<ImageResponse> responseList = imageService.saveImages(files, productId)
                                                        .stream()
                                                        .map(imageResponseMapper::mapToDto)
@@ -59,7 +60,8 @@ public class ImageController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
         @RequestPart("file") @NotNull MultipartFile file,
-        @PathVariable @Positive long id) {
+        @PathVariable @Positive long id
+    ) {
         Image updatedImage = imageService.updateById(file, id);
         ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
         return ResponseEntity.ok(new ApiResponse("Updated", response));

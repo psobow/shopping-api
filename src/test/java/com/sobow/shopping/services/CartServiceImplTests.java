@@ -123,10 +123,10 @@ public class CartServiceImplTests {
             CartItemUpdateRequest request = fixtures.withRequestedQty(2)
                                                     .cartItemUpdateRequest();
             
-            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId())).thenReturn(Optional.of(item));
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), item.getId())).thenReturn(Optional.of(item));
             
             // When
-            CartItem result = underTest.updateCartItemQty(cart.getId(), request);
+            CartItem result = underTest.updateCartItemQty(cart.getId(), item.getId(), request);
             
             // Then
             assertThat(result).isSameAs(item);
@@ -144,10 +144,10 @@ public class CartServiceImplTests {
             CartItemUpdateRequest request = fixtures.withRequestedQty(0)
                                                     .cartItemUpdateRequest();
             
-            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId())).thenReturn(Optional.of(item));
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), item.getId())).thenReturn(Optional.of(item));
             
             // when
-            CartItem result = underTest.updateCartItemQty(cart.getId(), request);
+            CartItem result = underTest.updateCartItemQty(cart.getId(), item.getId(), request);
             
             // then
             assertThat(result).isSameAs(item);
@@ -163,10 +163,11 @@ public class CartServiceImplTests {
             
             CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
             
-            when(cartItemRepository.findByCartIdAndId(cart.getId(), request.cartItemId()))
+            when(cartItemRepository.findByCartIdAndId(cart.getId(), fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
-            assertThrows(EntityNotFoundException.class, () -> underTest.updateCartItemQty(cart.getId(), request));
+            assertThrows(EntityNotFoundException.class,
+                         () -> underTest.updateCartItemQty(cart.getId(), fixtures.nonExistingId(), request));
         }
     }
     

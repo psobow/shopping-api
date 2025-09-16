@@ -18,7 +18,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Transactional
     @Override
-    public Category save(Category category) {
+    public Category create(Category category) {
         assertCategoryUnique(category.getName());
         return categoryRepository.save(category);
     }
