@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.ApiResponse;

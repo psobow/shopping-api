@@ -1,7 +1,7 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.Image;
 import com.sobow.shopping.domain.dto.FileContent;
+import com.sobow.shopping.domain.entities.Image;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 

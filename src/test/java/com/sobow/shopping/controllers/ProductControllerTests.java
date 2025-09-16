@@ -11,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.domain.Image;
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.entities.Image;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.domain.responses.ProductResponse;

@@ -1,6 +1,6 @@
 package com.sobow.shopping.repositories;
 
-import com.sobow.shopping.domain.Cart;
+import com.sobow.shopping.domain.entities.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

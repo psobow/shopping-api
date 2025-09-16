@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.Cart;
-import com.sobow.shopping.domain.CartItem;
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Cart;
+import com.sobow.shopping.domain.entities.CartItem;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;

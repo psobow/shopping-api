@@ -1,8 +1,8 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.Cart;
-import com.sobow.shopping.domain.CartItem;
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Cart;
+import com.sobow.shopping.domain.entities.CartItem;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;

@@ -1,6 +1,6 @@
 package com.sobow.shopping.repositories;
 
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Product;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

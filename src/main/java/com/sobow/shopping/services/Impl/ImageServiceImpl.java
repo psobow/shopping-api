@@ -1,8 +1,8 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.Image;
-import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.FileContent;
+import com.sobow.shopping.domain.entities.Image;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.services.ImageService;

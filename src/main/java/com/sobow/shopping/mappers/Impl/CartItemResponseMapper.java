@@ -1,6 +1,6 @@
 package com.sobow.shopping.mappers.Impl;
 
-import com.sobow.shopping.domain.CartItem;
+import com.sobow.shopping.domain.entities.CartItem;
 import com.sobow.shopping.domain.responses.CartItemResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;

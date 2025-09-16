@@ -1,6 +1,6 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.Order;
+import com.sobow.shopping.domain.entities.Order;
 import com.sobow.shopping.repositories.OrderRepository;
 import com.sobow.shopping.services.OrderService;
 import jakarta.persistence.EntityNotFoundException;

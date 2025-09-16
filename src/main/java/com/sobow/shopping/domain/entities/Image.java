@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain;
+package com.sobow.shopping.domain.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

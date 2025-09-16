@@ -1,7 +1,7 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.Cart;
-import com.sobow.shopping.domain.CartItem;
+import com.sobow.shopping.domain.entities.Cart;
+import com.sobow.shopping.domain.entities.CartItem;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.domain.responses.ApiResponse;

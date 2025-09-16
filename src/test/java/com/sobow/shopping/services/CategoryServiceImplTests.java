@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.entities.Category;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;

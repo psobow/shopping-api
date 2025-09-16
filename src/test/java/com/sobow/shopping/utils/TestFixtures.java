@@ -1,11 +1,11 @@
 package com.sobow.shopping.utils;
 
-import com.sobow.shopping.domain.Cart;
-import com.sobow.shopping.domain.CartItem;
-import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.domain.Image;
-import com.sobow.shopping.domain.Product;
 import com.sobow.shopping.domain.dto.FileContent;
+import com.sobow.shopping.domain.entities.Cart;
+import com.sobow.shopping.domain.entities.CartItem;
+import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.entities.Image;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.domain.requests.CategoryRequest;

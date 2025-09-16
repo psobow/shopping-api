@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.entities.Category;
 import com.sobow.shopping.domain.requests.CategoryRequest;
 import com.sobow.shopping.domain.responses.CategoryResponse;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;

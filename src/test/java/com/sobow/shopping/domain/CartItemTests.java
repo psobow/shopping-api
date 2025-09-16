@@ -3,6 +3,8 @@ package com.sobow.shopping.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.sobow.shopping.domain.entities.CartItem;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import java.math.BigDecimal;

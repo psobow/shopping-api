@@ -1,6 +1,6 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import java.util.List;

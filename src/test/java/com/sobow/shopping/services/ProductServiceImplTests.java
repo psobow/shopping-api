@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;

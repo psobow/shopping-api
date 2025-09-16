@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain;
+package com.sobow.shopping.domain.entities;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

@@ -1,6 +1,6 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.entities.Category;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;

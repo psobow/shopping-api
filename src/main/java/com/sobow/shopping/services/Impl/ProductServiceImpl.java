@@ -1,7 +1,7 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.Category;
-import com.sobow.shopping.domain.Product;
+import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.entities.Product;
 import com.sobow.shopping.domain.requests.ProductCreateRequest;
 import com.sobow.shopping.domain.requests.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;

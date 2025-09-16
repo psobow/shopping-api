@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.Category;
+import com.sobow.shopping.domain.entities.Category;
 import com.sobow.shopping.domain.requests.CategoryRequest;
 import com.sobow.shopping.domain.responses.ApiResponse;
 import com.sobow.shopping.domain.responses.CategoryResponse;
