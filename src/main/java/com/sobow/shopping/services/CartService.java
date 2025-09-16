@@ -11,7 +11,7 @@ public interface CartService {
     
     void removeCartForUser(long userId);
     
-    Cart findCartById(long id);
+    Cart findById(long id);
     
     CartItem createCartItem(long cartId, CartItemCreateRequest dto);
     

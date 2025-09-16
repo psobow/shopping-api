@@ -52,7 +52,7 @@ public class CartController {
     
     @GetMapping("/carts/{id}")
     public ResponseEntity<ApiResponse> getCart(@PathVariable @Positive long id) {
-        Cart cart = cartService.findCartById(id);
+        Cart cart = cartService.findById(id);
         CartResponse response = cartResponseMapper.mapToDto(cart);
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }

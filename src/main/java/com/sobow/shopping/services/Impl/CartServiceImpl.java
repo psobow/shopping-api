@@ -45,7 +45,7 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
-    public Cart findCartById(long id) {
+    public Cart findById(long id) {
         return cartRepository.findById(id).orElseThrow(
             () -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
@@ -53,7 +53,7 @@ public class CartServiceImpl implements CartService {
     @Transactional
     @Override
     public CartItem createCartItem(long cartId, CartItemCreateRequest request) {
-        Cart cart = findCartById(cartId);
+        Cart cart = findById(cartId);
         Product product = productService.findById(request.productId());
         
         // I could update existing CartItem when already in the Cart
@@ -76,12 +76,6 @@ public class CartServiceImpl implements CartService {
         return item;
     }
     
-    private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
-        return cartItemRepository.findByCartIdAndId(cartId, itemId)
-                                 .orElseThrow(() -> new EntityNotFoundException(
-                                     "CartItem " + itemId + " not found in cart " + cartId));
-    }
-    
     @Transactional
     @Override
     public void removeCartItem(long cartId, long itemId) {
@@ -93,9 +87,14 @@ public class CartServiceImpl implements CartService {
     @Transactional
     @Override
     public void removeAllCartItems(long cartId) {
-        Cart cart = findCartById(cartId);
+        Cart cart = findById(cartId);
         cart.removeAllCartItems();
     }
     
+    private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
+        return cartItemRepository.findByCartIdAndId(cartId, itemId)
+                                 .orElseThrow(() -> new EntityNotFoundException(
+                                     "CartItem with id " + itemId + " not found in cart with id" + cartId));
+    }
 }
 
