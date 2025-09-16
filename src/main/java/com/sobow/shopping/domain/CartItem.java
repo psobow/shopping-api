@@ -45,12 +45,12 @@ public class CartItem {
     @PositiveOrZero
     private Integer quantity = 0;
     
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
     
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
     
     private static final int MONEY_SCALE = 2;

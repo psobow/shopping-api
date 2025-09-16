@@ -29,8 +29,8 @@ public class Image {
     private Blob file;
     private String downloadUrl;
     
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
     
     @PostPersist
