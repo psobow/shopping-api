@@ -15,7 +15,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public Order createOrder(long userId) {
-        return null;
+        throw new UnsupportedOperationException("createOrder is not implemented yet");
     }
     
     @Override

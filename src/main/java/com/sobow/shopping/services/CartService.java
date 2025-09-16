@@ -7,9 +7,9 @@ import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 
 public interface CartService {
     
-    Cart createOrGetCartForUser(long userId);
+    Cart createOrGetCart(long userId);
     
-    void removeCartForUser(long userId);
+    void removeCart(long userId);
     
     Cart findById(long id);
     
