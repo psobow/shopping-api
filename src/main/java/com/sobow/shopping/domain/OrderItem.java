@@ -1,16 +1,13 @@
 package com.sobow.shopping.domain;
 
 import com.sobow.shopping.config.MoneyConfig;
-import com.sobow.shopping.exceptions.InsufficientStockException;
-import com.sobow.shopping.exceptions.OverDecrementException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
@@ -26,16 +23,7 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(
-    name = "cart_item",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uc_cart_item_cart_product",
-            columnNames = {"cart_id", "product_id"}
-        )
-    }
-)
-public class CartItem {
+public class OrderItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,39 +33,23 @@ public class CartItem {
     @PositiveOrZero
     private Integer quantity;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @NotBlank
+    private String productName;
+    
+    @NotBlank
+    private String productBrandName;
+    
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal productPrice;
     
     @ManyToOne(optional = false)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
-    
-    public int setQuantity(int requestedQty) {
-        if (product == null) {
-            throw new IllegalStateException("CartItem has no product linked.");
-        }
-        
-        int available = product.getAvailableQuantity();
-        if (requestedQty > available) {
-            throw new InsufficientStockException(product.getId(), available, requestedQty);
-        }
-        
-        if (requestedQty < 0) {
-            throw new OverDecrementException(product.getId(), quantity, requestedQty);
-        }
-        quantity = requestedQty;
-        
-        return requestedQty;
-    }
-    
-    public BigDecimal unitPrice() {
-        return product.getPrice().setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
-    }
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
     
     public BigDecimal getTotalPrice() {
-        return unitPrice()
-            .multiply(BigDecimal.valueOf(quantity));
+        return productPrice.multiply(BigDecimal.valueOf(quantity))
+                           .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
     }
     
     @Override
@@ -91,8 +63,8 @@ public class CartItem {
                                       ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
                                       : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        CartItem cartItem = (CartItem) o;
-        return getId() != null && Objects.equals(getId(), cartItem.getId());
+        OrderItem orderItem = (OrderItem) o;
+        return getId() != null && Objects.equals(getId(), orderItem.getId());
     }
     
     @Override
