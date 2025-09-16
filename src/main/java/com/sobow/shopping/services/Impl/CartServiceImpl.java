@@ -25,12 +25,23 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public Cart createOrGetCartForUser(long userId) {
-        throw new UnsupportedOperationException("createCartForUser is not implemented yet");
+        // check if cart exists by userId
+        boolean cartExists = false;
+        if (cartExists) {
+            // find it and return
+            return null;
+        } else {
+            Cart newCart = new Cart();
+            return cartRepository.save(newCart);
+        }
+        
     }
     
     @Override
     public void removeCartForUser(long userId) {
         throw new UnsupportedOperationException("removeCartForUser is not implemented yet");
+        // find cart by user id
+        // delete it by id
     }
     
     @Override

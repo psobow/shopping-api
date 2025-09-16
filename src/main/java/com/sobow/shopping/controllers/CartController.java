@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,11 @@ public class CartController {
     public ResponseEntity<ApiResponse> createOrGetCartForUser(@PathVariable @Positive long userId) {
         // 201 when created
         // 200 when already exists and return existing
-        return null;
+        Cart cart = cartService.createOrGetCartForUser(1L);
+        CartResponse response = cartResponseMapper.mapToDto(cart);
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(new ApiResponse("Created", response));
     }
     
     @DeleteMapping("/users/{userId}/cart")
