@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
         }
         
         if (patch.price() != null) existingProduct.setPrice(patch.price());
-        if (patch.availableQuantity() != null) existingProduct.setAvailableQuantity(patch.availableQuantity());
+        if (patch.availableQuantity() != null) existingProduct.setAvailableQty(patch.availableQuantity());
         if (patch.description() != null) existingProduct.setDescription(patch.description());
         if (patch.categoryId() != null) {
             Category category = categoryService.findById(patch.categoryId());
@@ -62,6 +62,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
+    }
+    
+    @Override
+    public List<Product> lockForOrder(List<Long> ids) {
+        return productRepository.findAllForUpdate(ids);
+    }
+    
+    @Override
+    public void decrementAvailableQty(long id, int decrementQty) {
+        Product p = findById(id);
+        int availableQty = p.getAvailableQty();
+        int newQty = availableQty - decrementQty;
+        p.setAvailableQty(newQty);
     }
     
     @Override
@@ -90,7 +103,6 @@ public class ProductServiceImpl implements ProductService {
     public boolean existsById(long id) {
         return productRepository.existsById(id);
     }
-    
     
     @Override
     public List<Product> search(String nameLike,

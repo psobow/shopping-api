@@ -50,6 +50,12 @@ public class CartServiceImpl implements CartService {
             () -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
     
+    @Override
+    public Cart findByIdWithItems(long id) {
+        return cartRepository.findByIdWithItems(id)
+                             .orElseThrow(() -> new EntityNotFoundException("Cart with " + id + " not found"));
+    }
+    
     @Transactional
     @Override
     public CartItem createCartItem(long cartId, CartItemCreateRequest request) {
@@ -62,7 +68,7 @@ public class CartServiceImpl implements CartService {
         
         CartItem newItem = new CartItem();
         newItem.setProduct(product);
-        newItem.setQuantity(request.requestedQty());
+        newItem.setRequestedQty(request.requestedQty());
         cart.addCartItemAndLink(newItem);
         return newItem;
     }
@@ -71,7 +77,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest request) {
         CartItem item = findCartItemByCartIdAndId(cartId, itemId);
-        int resultQuantity = item.setQuantity(request.requestedQty());
+        int resultQuantity = item.setRequestedQty(request.requestedQty());
         if (resultQuantity == 0) removeCartItem(cartId, itemId);
         return item;
     }

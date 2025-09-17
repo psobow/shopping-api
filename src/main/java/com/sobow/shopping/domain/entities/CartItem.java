@@ -3,6 +3,7 @@ package com.sobow.shopping.domain.entities;
 import com.sobow.shopping.config.MoneyConfig;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,10 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Objects;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,9 +41,9 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull
-    @PositiveOrZero
-    private Integer quantity;
+    @Setter(AccessLevel.NONE)
+    @Column(nullable = false)
+    private Integer requestedQty;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
@@ -53,31 +53,25 @@ public class CartItem {
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
     
-    public int setQuantity(int requestedQty) {
-        if (product == null) {
-            throw new IllegalStateException("CartItem has no product linked.");
+    public int setRequestedQty(int requestedQty) {
+        int availableQty = product.getAvailableQty();
+        if (requestedQty > availableQty) {
+            throw new InsufficientStockException(product.getId(), availableQty, requestedQty);
         }
-        
-        int available = product.getAvailableQuantity();
-        if (requestedQty > available) {
-            throw new InsufficientStockException(product.getId(), available, requestedQty);
-        }
-        
         if (requestedQty < 0) {
-            throw new OverDecrementException(product.getId(), quantity, requestedQty);
+            throw new OverDecrementException(product.getId(), requestedQty);
         }
-        quantity = requestedQty;
-        
+        this.requestedQty = requestedQty;
         return requestedQty;
     }
     
     public BigDecimal unitPrice() {
-        return product.getPrice().setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
+        return product.getPrice()
+                      .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
     }
     
     public BigDecimal getTotalPrice() {
-        return unitPrice()
-            .multiply(BigDecimal.valueOf(quantity));
+        return unitPrice().multiply(BigDecimal.valueOf(requestedQty));
     }
     
     @Override

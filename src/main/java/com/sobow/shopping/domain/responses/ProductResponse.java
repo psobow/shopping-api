@@ -7,7 +7,7 @@ public record ProductResponse(Long id,
                               String name,
                               String brandName,
                               BigDecimal price,
-                              Integer availableQuantity,
+                              Integer availableQty,
                               String description,
                               Long categoryId,
                               List<Long> imagesId) {

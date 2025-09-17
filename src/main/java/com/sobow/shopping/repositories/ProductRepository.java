@@ -1,11 +1,14 @@
 package com.sobow.shopping.repositories;
 
 import com.sobow.shopping.domain.entities.Product;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -29,4 +32,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findAllWithCategoryAndImages();
     
     boolean existsByNameAndBrandName(String name, String brandName);
+    
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        SELECT p
+        FROM Product p
+        WHERE p.id IN :ids
+        """)
+    List<Product> findAllForUpdate(@Param("ids") List<Long> ids);
 }

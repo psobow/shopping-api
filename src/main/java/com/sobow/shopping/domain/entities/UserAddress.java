@@ -1,5 +1,6 @@
 package com.sobow.shopping.domain.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,16 +22,16 @@ public class UserAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+    @Column(nullable = false)
     private String city;
-    
+    @Column(nullable = false)
     private String streetName;
-    
+    @Column(nullable = false)
     private String streetNumber;
-    
+    @Column(nullable = false)
     private String postCode;
     
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "user_profile_id", nullable = false, unique = true)
     private UserProfile userProfile;
 }

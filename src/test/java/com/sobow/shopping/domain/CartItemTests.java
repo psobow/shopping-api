@@ -16,11 +16,11 @@ public class CartItemTests {
     
     private CartItem itemWith(String unitPrice, int qty) {
         Product p = new Product();
-        p.setAvailableQuantity(10);
+        p.setAvailableQty(10);
         p.setPrice(new BigDecimal(unitPrice));
         CartItem ci = new CartItem();
         ci.setProduct(p);
-        ci.setQuantity(qty);
+        ci.setRequestedQty(qty);
         return ci;
     }
     
@@ -32,7 +32,7 @@ public class CartItemTests {
     private Product productWithAvailableQty(int availableQty) {
         Product p = new Product();
         p.setId(1L);
-        p.setAvailableQuantity(availableQty);
+        p.setAvailableQty(availableQty);
         p.setPrice(new BigDecimal("1.23"));
         return p;
     }
@@ -71,18 +71,11 @@ public class CartItemTests {
     class setQuantity {
         
         @Test
-        public void setQuantity_should_ThrowIllegalState_when_ProductIsNull() {
-            Product p = null;
-            CartItem item = itemWith(p, 0);
-            assertThrows(IllegalStateException.class, () -> item.setQuantity(5));
-        }
-        
-        @Test
         public void setQuantity_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
             Product p = productWithAvailableQty(4);
             CartItem item = itemWith(p, 3);
             
-            assertThrows(InsufficientStockException.class, () -> item.setQuantity(6));
+            assertThrows(InsufficientStockException.class, () -> item.setRequestedQty(6));
         }
         
         @Test
@@ -90,7 +83,7 @@ public class CartItemTests {
             Product p = productWithAvailableQty(4);
             CartItem item = itemWith(p, 3);
             
-            assertThrows(OverDecrementException.class, () -> item.setQuantity(-5));
+            assertThrows(OverDecrementException.class, () -> item.setRequestedQty(-5));
         }
         
         @Test
@@ -98,23 +91,21 @@ public class CartItemTests {
             Product p = productWithAvailableQty(10);
             CartItem item = itemWith(p, 2);
             
-            int result = item.setQuantity(5);
+            int result = item.setRequestedQty(5);
             
             assertEquals(5, result);
-            assertEquals(5, item.getQuantity());
+            assertEquals(5, item.getRequestedQty());
         }
         
         @Test
         public void setQuantity_should_AllowBoundary_when_requestedQtyEqualsAvailable() {
-            
             Product p = productWithAvailableQty(5);
             CartItem item = itemWith(p, 2);
             
-            int result = item.setQuantity(5);
+            int result = item.setRequestedQty(5);
             
             assertEquals(5, result);
-            
-            assertEquals(5, item.getQuantity());
+            assertEquals(5, item.getRequestedQty());
         }
         
         @Test
@@ -122,10 +113,10 @@ public class CartItemTests {
             Product p = productWithAvailableQty(4);
             CartItem item = itemWith(p, 3);
             
-            int result = item.setQuantity(0);
+            int result = item.setRequestedQty(0);
             
             assertEquals(0, result);
-            assertEquals(0, item.getQuantity());
+            assertEquals(0, item.getRequestedQty());
         }
     }
 }

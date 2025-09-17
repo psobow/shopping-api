@@ -43,6 +43,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAuthority> authorities = new HashSet<>();
     
+    public void addProfileAndLink(UserProfile userProfile) {
+        this.profile = userProfile;
+        userProfile.setUser(this);
+    }
+    
+    public void removeProfileAndUnlink() {
+        this.profile = null;
+    }
+    
     public void addAuthorityAndLink(UserAuthority userAuthority) {
         authorities.add(userAuthority);
         userAuthority.setUser(this);

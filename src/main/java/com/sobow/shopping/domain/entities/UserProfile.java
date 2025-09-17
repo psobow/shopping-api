@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain.entities;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,14 +29,16 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable = false)
     private String firstName;
     
+    @Column(nullable = false)
     private String lastName;
     
     @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserAddress address;
     
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
     
@@ -45,13 +48,32 @@ public class UserProfile {
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders = new HashSet<>();
     
+    public void addAddressAndLink(UserAddress address) {
+        this.address = address;
+        address.setUserProfile(this);
+    }
+    
+    public void removeAddressAndUnlink() {
+        this.address = null;
+    }
+    
     public void addCartAndLink(Cart cart) {
         this.cart = cart;
         cart.setUserProfile(this);
     }
     
     public void removeCartAndUnlink() {
+        cart.removeAllCartItems();
         this.cart = null;
+    }
+    
+    public void addOrderAndLink(Order order) {
+        orders.add(order);
+        order.setUserProfile(this);
+    }
+    
+    public void removeOrderAndUnlink(Order order) {
+        orders.remove(order);
     }
     
     @Override

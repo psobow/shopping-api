@@ -39,6 +39,8 @@ public class SandboxTests {
         
         Product product = productFixtures.productEntity();
         
+        Image image = productFixtures.imageEntity();
+        
         Category category = product.getCategory();
         
         Category saved = categoryRepository.save(category);

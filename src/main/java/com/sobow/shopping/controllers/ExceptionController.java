@@ -1,5 +1,6 @@
 package com.sobow.shopping.controllers;
 
+import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
@@ -93,6 +94,14 @@ public class ExceptionController {
         pd.setDetail(ex.getMessage());
         pd.setProperty("productId", ex.getProductId());
         pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    public ResponseEntity<ProblemDetail> handleCartEmpty(CartEmptyException ex, HttpServletRequest req) {
+        var pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY); // 422
+        pd.setTitle("Empty cart");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("path", req.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
 }

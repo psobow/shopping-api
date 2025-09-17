@@ -38,7 +38,7 @@ public class UserAuthority {
     @Column(nullable = false, updatable = false)
     private String authority;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
     

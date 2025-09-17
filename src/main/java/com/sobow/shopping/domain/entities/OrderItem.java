@@ -1,15 +1,14 @@
 package com.sobow.shopping.domain.entities;
 
 import com.sobow.shopping.config.MoneyConfig;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.persistence.PrePersist;
 import java.math.BigDecimal;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -29,27 +28,29 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull
-    @PositiveOrZero
-    private Integer quantity;
+    @Column(nullable = false)
+    private Integer requestedQty;
     
-    @NotBlank
+    @Column(nullable = false)
     private String productName;
     
-    @NotBlank
+    @Column(nullable = false)
     private String productBrandName;
     
-    @NotNull
-    @PositiveOrZero
+    @Column(nullable = false)
     private BigDecimal productPrice;
+    
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
     
-    public BigDecimal getTotalPrice() {
-        return productPrice.multiply(BigDecimal.valueOf(quantity))
-                           .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
+    @PrePersist
+    public void onCreate() {
+        productPrice = productPrice.setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
+        totalPrice = productPrice.multiply(BigDecimal.valueOf(requestedQty));
     }
     
     @Override

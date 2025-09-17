@@ -18,7 +18,7 @@ public class CartItemResponseMapper implements Mapper<CartItem, CartItemResponse
         return new CartItemResponse(item.getId(),
                                     item.getProduct().getId(),
                                     item.getCart().getId(),
-                                    item.getQuantity(),
+                                    item.getRequestedQty(),
                                     item.getTotalPrice()
         );
     }

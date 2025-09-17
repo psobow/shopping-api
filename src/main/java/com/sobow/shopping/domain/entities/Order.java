@@ -34,24 +34,23 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
-    
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus status;
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<OrderItem> orderItems = new HashSet<>();
     
-    @ManyToOne
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+    
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime created_at;
+    
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_profile_id", nullable = false)
     private UserProfile userProfile;
     
-    public BigDecimal getTotalPrice() {
-        return orderItems.stream()
-                         .map(OrderItem::getTotalPrice)
-                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
     
     public void addItemAndLink(OrderItem item) {
         orderItems.add(item);
@@ -60,12 +59,14 @@ public class Order {
     
     public void removeItemAndUnlink(OrderItem item) {
         orderItems.remove(item);
-        item.setOrder(null);
     }
     
     @PrePersist
     public void onCreate() {
         created_at = LocalDateTime.now();
+        totalPrice = orderItems.stream()
+                               .map(OrderItem::getTotalPrice)
+                               .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     
     @Override

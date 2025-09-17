@@ -62,7 +62,7 @@ public class CartServiceImplTests {
             
             // Then
             assertThat(result.getProduct()).isSameAs(product);
-            assertThat(result.getQuantity()).isEqualTo(request.requestedQty());
+            assertThat(result.getRequestedQty()).isEqualTo(request.requestedQty());
             assertThat(result.getCart()).isSameAs(cart);
             assertThat(cart.getCartItems()).hasSize(1).contains(result);
         }
@@ -130,7 +130,7 @@ public class CartServiceImplTests {
             
             // Then
             assertThat(result).isSameAs(item);
-            assertThat(result.getQuantity()).isEqualTo(request.requestedQty());
+            assertThat(result.getRequestedQty()).isEqualTo(request.requestedQty());
             assertThat(cart.getCartItems()).contains(item);
         }
         
@@ -151,10 +151,9 @@ public class CartServiceImplTests {
             
             // then
             assertThat(result).isSameAs(item);
-            assertThat(result.getQuantity()).isZero();
+            assertThat(result.getRequestedQty()).isZero();
             
             assertThat(cart.getCartItems()).doesNotContain(result);
-            assertThat(result.getCart()).isNull();
         }
         
         @Test
@@ -193,7 +192,6 @@ public class CartServiceImplTests {
             
             // Then
             assertThat(cart.getCartItems()).doesNotContain(item);
-            assertThat(item.getCart()).isNull();
         }
         
         @Test
@@ -229,7 +227,6 @@ public class CartServiceImplTests {
             underTest.removeCartItem(cart.getId(), item.getId());
             
             assertThat(cart.getCartItems()).doesNotContain(item);
-            assertThat(item.getCart()).isNull();
             
             // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(cart.getId(), item.getId()));
@@ -257,7 +254,6 @@ public class CartServiceImplTests {
             
             // Then
             assertThat(cart.getCartItems()).doesNotContain(item);
-            assertThat(item.getCart()).isNull();
         }
         
         @Test

@@ -3,17 +3,19 @@ package com.sobow.shopping.exceptions;
 public class OverDecrementException extends RuntimeException {
     
     private final Long productId;
-    private final int currentQty;
-    private final int requestedRemoval;
+    private final int newQty;
     
-    public OverDecrementException(Long productId, int currentQty, int requestedRemoval) {
-        super("Cannot remove " + requestedRemoval + " – only " + currentQty + " of product " + productId + " in stock");
+    public OverDecrementException(Long productId, int newQty) {
+        super("Cannot set negative available quantity: " + newQty + " of product " + productId);
         this.productId = productId;
-        this.currentQty = currentQty;
-        this.requestedRemoval = requestedRemoval;
+        this.newQty = newQty;
     }
     
     public Long getProductId() {
         return productId;
+    }
+    
+    public int getNewQty() {
+        return newQty;
     }
 }

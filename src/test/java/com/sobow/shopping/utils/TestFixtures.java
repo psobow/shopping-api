@@ -19,6 +19,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -60,7 +61,9 @@ public class TestFixtures {
     }
     
     public Cart cart() {
-        Cart cart = new Cart(cartId, new HashSet<>());
+        Cart cart = new Cart();
+        cart.setId(cartId);
+        cart.setCartItems(new HashSet<>());
         return cart;
     }
     
@@ -82,8 +85,8 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Product product = new Product(productId, productName, brandName, price,
-                                      availableQuantity, description, null, new ArrayList<>());
+        Product product = new Product(productId, productName, brandName, description, price,
+                                      availableQuantity, null, new ArrayList<>());
         return product;
     }
     
@@ -96,7 +99,7 @@ public class TestFixtures {
     }
     
     public ProductResponse productResponseOf(Product p) {
-        return new ProductResponse(p.getId(), p.getName(), p.getBrandName(), p.getPrice(), p.getAvailableQuantity(), p.getDescription(),
+        return new ProductResponse(p.getId(), p.getName(), p.getBrandName(), p.getPrice(), p.getAvailableQty(), p.getDescription(),
                                    p.getCategory().getId(),
                                    p.getImages().stream().map(Image::getId).toList());
     }
@@ -172,7 +175,7 @@ public class TestFixtures {
     
     public TestFixtures withImageId(Long newId) {
         imageId = newId;
-        downloadUrl = "/api/images/" + imageId;
+        downloadUrl = "/api/images/" + Objects.toString(newId, "");
         return this;
     }
     

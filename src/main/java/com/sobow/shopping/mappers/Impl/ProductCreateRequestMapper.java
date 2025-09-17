@@ -14,7 +14,7 @@ public class ProductCreateRequestMapper implements Mapper<Product, ProductCreate
                             .name(productCreateRequest.name())
                             .brandName(productCreateRequest.brandName())
                             .price(productCreateRequest.price())
-                            .availableQuantity(productCreateRequest.availableQuantity())
+                            .availableQty(productCreateRequest.availableQuantity())
                             .description(productCreateRequest.description())
                             .images(new ArrayList<>())
                             .build();

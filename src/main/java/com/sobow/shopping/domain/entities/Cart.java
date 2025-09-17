@@ -10,6 +10,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,23 +28,23 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @OneToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "user_profile_id", nullable = false, unique = true)
     private UserProfile userProfile;
     
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();
     
+    public List<Long> getProductsId() {
+        return cartItems.stream()
+                        .map(item -> item.getProduct().getId())
+                        .toList();
+    }
+    
     public BigDecimal getTotalPrice() {
         return cartItems.stream()
                         .map(CartItem::getTotalPrice)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-    
-    public void removeAllCartItems() {
-        for (CartItem item : new HashSet<>(cartItems)) {
-            removeCartItemAndUnlink(item);
-        }
     }
     
     public void addCartItemAndLink(CartItem item) {
@@ -53,6 +54,11 @@ public class Cart {
     
     public void removeCartItemAndUnlink(CartItem item) {
         cartItems.remove(item);
-        item.setCart(null);
+    }
+    
+    public void removeAllCartItems() {
+        for (CartItem item : new HashSet<>(cartItems)) {
+            removeCartItemAndUnlink(item);
+        }
     }
 }

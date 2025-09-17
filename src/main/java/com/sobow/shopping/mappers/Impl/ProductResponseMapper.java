@@ -20,7 +20,7 @@ public class ProductResponseMapper implements Mapper<Product, ProductResponse> {
                                    product.getName(),
                                    product.getBrandName(),
                                    product.getPrice(),
-                                   product.getAvailableQuantity(),
+                                   product.getAvailableQty(),
                                    product.getDescription(),
                                    product.getCategory().getId(),
                                    product.getImages()
