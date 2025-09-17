@@ -29,7 +29,7 @@ public class User {
     private Long id;
     
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
     
     @Column(nullable = false)
     private String password;
@@ -37,10 +37,10 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
     
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAuthority> authorities = new HashSet<>();
     
     public void addAuthorityAndLink(UserAuthority userAuthority) {

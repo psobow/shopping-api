@@ -28,19 +28,21 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    private String firstName;
+    
+    private String lastName;
+    
+    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserAddress address;
+    
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    private String email;
-    
-    @OneToOne(cascade = CascadeType.ALL)
-    private UserAddress address;
-    
-    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
     
-    @OneToMany(mappedBy = "userProfile")
+    @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders = new HashSet<>();
     
     @Override

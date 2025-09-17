@@ -13,11 +13,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
         SELECT DISTINCT u
         FROM User u
         LEFT JOIN FETCH u.authorities
-        WHERE u.username = :username
+        WHERE u.email = :email
         """)
-    Optional<User> findByUsernameWithAuthorities(String username);
+    Optional<User> findByEmailWithAuthorities(String email);
     
-    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
     
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

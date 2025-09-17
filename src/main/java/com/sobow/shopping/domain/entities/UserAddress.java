@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +29,8 @@ public class UserAddress {
     private String streetNumber;
     
     private String postCode;
+    
+    @OneToOne
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 }
