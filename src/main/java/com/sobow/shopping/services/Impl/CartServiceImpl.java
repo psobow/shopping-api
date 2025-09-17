@@ -3,6 +3,7 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.entities.Cart;
 import com.sobow.shopping.domain.entities.CartItem;
 import com.sobow.shopping.domain.entities.Product;
+import com.sobow.shopping.domain.entities.UserProfile;
 import com.sobow.shopping.domain.requests.CartItemCreateRequest;
 import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
@@ -10,6 +11,7 @@ import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
 import com.sobow.shopping.services.CartService;
 import com.sobow.shopping.services.ProductService;
+import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,28 +24,23 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductService productService;
+    private final UserProfileService userProfileService;
     
+    @Transactional
     @Override
     public Cart createOrGetCart(long userId) {
-        // check if cart exists by userId
-        /*
-        boolean cartExists = false;
-        if (cartExists) {
-            // find it and return
-            return null;
-        } else {
-            Cart newCart = new Cart();
-            return cartRepository.save(newCart);
-        }
-        */
-        throw new UnsupportedOperationException("createOrGetCart is not implemented yet");
+        UserProfile userProfile = userProfileService.findByUserId(userId);
+        if (userProfile.getCart() != null) return userProfile.getCart();
+        Cart newCart = new Cart();
+        userProfile.addCartAndLink(newCart);
+        return newCart;
     }
     
+    @Transactional
     @Override
     public void removeCart(long userId) {
-        throw new UnsupportedOperationException("removeCartForUser is not implemented yet");
-        // find cart by user id
-        // delete it by id
+        UserProfile userProfile = userProfileService.findByUserId(userId);
+        if (userProfile.getCart() != null) userProfile.removeCartAndUnlink();
     }
     
     @Override
