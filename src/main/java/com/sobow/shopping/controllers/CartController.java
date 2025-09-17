@@ -35,22 +35,22 @@ public class CartController {
     
     @PutMapping("/users/{userId}/cart")
     public ResponseEntity<ApiResponse> createOrGetCart(@PathVariable @Positive long userId) {
-        // 201 when created
-        // 200 when already exists and return existing
-        /*
-        Cart cart = cartService.createOrGetCart(1L);
+        boolean cartExists = cartService.existsByUserProfile_UserId(userId);
+        Cart cart = cartService.createOrGetCart(userId);
         CartResponse response = cartResponseMapper.mapToDto(cart);
         
-        return ResponseEntity.status(HttpStatus.CREATED)
+        if (cartExists) {
+            return ResponseEntity.ok(new ApiResponse("Found", response));
+        }
+        
+        return ResponseEntity.created(URI.create("/api/carts/" + cart.getId()))
                              .body(new ApiResponse("Created", response));
-                             
-         */
-        throw new UnsupportedOperationException("createOrGetCart is not implemented yet");
     }
     
     @DeleteMapping("/users/{userId}/cart")
     public ResponseEntity<Void> deleteCart(@PathVariable @Positive long userId) {
-        throw new UnsupportedOperationException("deleteCart is not implemented yet");
+        cartService.removeCart(userId);
+        return ResponseEntity.noContent().build();
     }
     
     @GetMapping("/carts/{id}")

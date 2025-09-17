@@ -31,6 +31,7 @@ public class CartServiceImpl implements CartService {
     public Cart createOrGetCart(long userId) {
         UserProfile userProfile = userProfileService.findByUserId(userId);
         if (userProfile.getCart() != null) return userProfile.getCart();
+        
         Cart newCart = new Cart();
         userProfile.addCartAndLink(newCart);
         return newCart;
@@ -40,7 +41,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeCart(long userId) {
         UserProfile userProfile = userProfileService.findByUserId(userId);
-        if (userProfile.getCart() != null) userProfile.removeCartAndUnlink();
+        userProfile.removeCartAndUnlink();
     }
     
     @Override
@@ -88,6 +89,11 @@ public class CartServiceImpl implements CartService {
     public void removeAllCartItems(long cartId) {
         Cart cart = findById(cartId);
         cart.removeAllCartItems();
+    }
+    
+    @Override
+    public boolean existsByUserProfile_UserId(long userId) {
+        return cartRepository.existsByUserProfile_UserId(userId);
     }
     
     private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {

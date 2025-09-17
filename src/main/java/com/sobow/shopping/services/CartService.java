@@ -21,4 +21,6 @@ public interface CartService {
     
     void removeAllCartItems(long cartId);
     
+    boolean existsByUserProfile_UserId(long userId);
+    
 }
