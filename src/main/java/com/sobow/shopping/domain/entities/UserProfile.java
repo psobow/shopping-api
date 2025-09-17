@@ -36,7 +36,7 @@ public class UserProfile {
     private UserAddress address;
     
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
     
     @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -44,6 +44,15 @@ public class UserProfile {
     
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders = new HashSet<>();
+    
+    public void addCartAndLink(Cart cart) {
+        this.cart = cart;
+        cart.setUserProfile(this);
+    }
+    
+    public void removeCartAndUnlink() {
+        this.cart = null;
+    }
     
     @Override
     public final boolean equals(Object o) {

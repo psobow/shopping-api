@@ -31,6 +31,6 @@ public class UserAddress {
     private String postCode;
     
     @OneToOne
-    @JoinColumn(name = "user_profile_id", nullable = false)
+    @JoinColumn(name = "user_profile_id", nullable = false, unique = true)
     private UserProfile userProfile;
 }
