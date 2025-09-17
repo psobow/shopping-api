@@ -1,22 +1,15 @@
 package com.sobow.shopping.domain.entities;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashSet;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.Objects;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,45 +21,26 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Order {
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uc_auth_user_authority",
+            columnNames = {"user_id", "authority"}
+        )
+    }
+)
+public class UserAuthority {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
-    
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-    
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<OrderItem> orderItems = new HashSet<>();
+    private String authority;
     
     @ManyToOne
-    @JoinColumn(name = "user_profile_id", nullable = false)
-    private UserProfile userProfile;
-    
-    public BigDecimal getTotalPrice() {
-        return orderItems.stream()
-                         .map(OrderItem::getTotalPrice)
-                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-    
-    public void addItemAndLink(OrderItem item) {
-        orderItems.add(item);
-        item.setOrder(this);
-    }
-    
-    public void removeItemAndUnlink(OrderItem item) {
-        orderItems.remove(item);
-        item.setOrder(null);
-    }
-    
-    @PrePersist
-    public void onCreate() {
-        created_at = LocalDateTime.now();
-    }
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    private User user;
     
     @Override
     public final boolean equals(Object o) {
@@ -79,8 +53,8 @@ public class Order {
                                       ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
                                       : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Order order = (Order) o;
-        return getId() != null && Objects.equals(getId(), order.getId());
+        UserAuthority userAuthority = (UserAuthority) o;
+        return getId() != null && Objects.equals(getId(), userAuthority.getId());
     }
     
     @Override

@@ -1,19 +1,13 @@
 package com.sobow.shopping.domain.entities;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import jakarta.persistence.OneToOne;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -28,45 +22,26 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Order {
+public class UserProfile {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private String email;
     
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<OrderItem> orderItems = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    private UserAddress address;
     
-    @ManyToOne
-    @JoinColumn(name = "user_profile_id", nullable = false)
-    private UserProfile userProfile;
+    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL)
+    private Cart cart;
     
-    public BigDecimal getTotalPrice() {
-        return orderItems.stream()
-                         .map(OrderItem::getTotalPrice)
-                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-    
-    public void addItemAndLink(OrderItem item) {
-        orderItems.add(item);
-        item.setOrder(this);
-    }
-    
-    public void removeItemAndUnlink(OrderItem item) {
-        orderItems.remove(item);
-        item.setOrder(null);
-    }
-    
-    @PrePersist
-    public void onCreate() {
-        created_at = LocalDateTime.now();
-    }
+    @OneToMany(mappedBy = "userProfile")
+    private Set<Order> orders = new HashSet<>();
     
     @Override
     public final boolean equals(Object o) {
@@ -79,8 +54,8 @@ public class Order {
                                       ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
                                       : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Order order = (Order) o;
-        return getId() != null && Objects.equals(getId(), order.getId());
+        UserProfile that = (UserProfile) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
     
     @Override
