@@ -59,13 +59,13 @@ public class TestFixtures {
         }
     }
     
-    public Cart cart() {
+    public Cart cartEntity() {
         Cart cart = new Cart();
         cart.setId(cartId);
         return cart;
     }
     
-    public CartItem cartItem() {
+    public CartItem cartItemEntity() {
         Category c = categoryEntity();
         Product p = productEntity();
         Image i = imageEntity();

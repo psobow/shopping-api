@@ -2,6 +2,7 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.entities.Cart;
@@ -43,13 +44,38 @@ public class CartServiceImplTests {
     private final TestFixtures fixtures = new TestFixtures();
     
     @Nested
+    @DisplayName("createOrGetCart")
+    class createOrGetCart {
+        
+        @Test
+        public void createOrGetCart_should_createNewCart_when_CartDoesNotExist() {
+            fail("implement me");
+        }
+        
+        @Test
+        public void createOrGetCart_should_ReturnExistingCart_when_CartExists() {
+            fail("implement me");
+        }
+    }
+    
+    @Nested
+    @DisplayName("removeCart")
+    class removeCart {
+        
+        @Test
+        public void removeCart_should_removeCart_when_CartExist() {
+            fail("implement me");
+        }
+    }
+    
+    @Nested
     @DisplayName("createCartItem")
     class createCartItem {
         
         @Test
         public void createCartItem_should_CreateNewCartItem_and_AddToCart_when_CartItemDoesNotExist() {
             // Given
-            Cart cart = fixtures.cart();
+            Cart cart = fixtures.cartEntity();
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
@@ -69,7 +95,7 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
-            Cart cart = fixtures.cart();
+            Cart cart = fixtures.cartEntity();
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
@@ -81,7 +107,7 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
-            Cart cart = fixtures.cart();
+            Cart cart = fixtures.cartEntity();
             CartItemCreateRequest request = fixtures.withProductId(fixtures.nonExistingId())
                                                     .cartItemCreateRequest();
             
@@ -94,7 +120,7 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
-            Cart cart = fixtures.cart();
+            Cart cart = fixtures.cartEntity();
             var itemsBefore = List.copyOf(cart.getCartItems());
             Product product = fixtures.productEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
@@ -116,8 +142,8 @@ public class CartServiceImplTests {
         @Test
         public void updateCartItemQty_should_UpdateItemQty_when_NewQtyWithinZero_and_AvailableStock() {
             // Given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
             
             CartItemUpdateRequest request = fixtures.withRequestedQty(2)
@@ -137,8 +163,8 @@ public class CartServiceImplTests {
         @Test
         public void updateCartItemQty_should_RemoveItemFromCart_when_NewQtyEqualsZero() {
             // given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
             
             CartItemUpdateRequest request = fixtures.withRequestedQty(0)
@@ -158,7 +184,7 @@ public class CartServiceImplTests {
         
         @Test
         public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
-            Cart cart = fixtures.cart();
+            Cart cart = fixtures.cartEntity();
             
             CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
             
@@ -177,8 +203,8 @@ public class CartServiceImplTests {
         @Test
         public void removeCartItem_should_RemoveItem_when_ItemExistsInCart() {
             // Given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
             
             // Precondition: they were related
@@ -197,8 +223,8 @@ public class CartServiceImplTests {
         @Test
         public void removeCartItem_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
             // Given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             
             assertThat(cart.getCartItems()).doesNotContain(item);
             assertThat(item.getCart()).isNull();
@@ -213,8 +239,8 @@ public class CartServiceImplTests {
         @Test
         public void removeCartItem_should_BeIdempotent_when_CalledTwice_SecondCallThrowsNotFound() {
             // Given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
             
             assertThat(item.getCart()).isSameAs(cart);
@@ -240,8 +266,8 @@ public class CartServiceImplTests {
         @Test
         public void removeAllCartItems_should_RemoveAllCartItems_when_CartExists() {
             // Given
-            Cart cart = fixtures.cart();
-            CartItem item = fixtures.cartItem();
+            Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
             
             assertThat(item.getCart()).isSameAs(cart);
