@@ -64,6 +64,7 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     
+    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
     
@@ -74,7 +75,6 @@ public class Product {
     
     public void removeImageAndUnlink(Image img) {
         images.remove(img);
-        img.setProduct(null);
     }
     
     public void setAvailableQty(Integer newQty) {

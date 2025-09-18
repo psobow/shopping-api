@@ -11,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,9 +38,11 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
     
+    @Setter(AccessLevel.NONE)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
     
+    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAuthority> authorities = new HashSet<>();
     
@@ -59,7 +62,6 @@ public class User {
     
     public void removeAuthorityAndUnlink(UserAuthority userAuthority) {
         authorities.remove(userAuthority);
-        userAuthority.setUser(null);
     }
     
     @Override

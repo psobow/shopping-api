@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Category {
     @Column(unique = true, nullable = false)
     private String name;
     
+    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
     
@@ -39,6 +41,5 @@ public class Category {
     
     public void removeProductAndUnlink(Product p) {
         products.remove(p);
-        p.setCategory(null);
     }
 }

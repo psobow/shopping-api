@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Objects;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.mock.web.MockMultipartFile;
@@ -63,7 +62,6 @@ public class TestFixtures {
     public Cart cart() {
         Cart cart = new Cart();
         cart.setId(cartId);
-        cart.setCartItems(new HashSet<>());
         return cart;
     }
     
