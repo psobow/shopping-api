@@ -1,8 +1,8 @@
 package com.sobow.shopping.sandbox;
 
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.entities.Image;
-import com.sobow.shopping.domain.entities.Product;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.repositories.ProductRepository;

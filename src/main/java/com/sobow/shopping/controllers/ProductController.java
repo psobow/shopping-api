@@ -1,10 +1,10 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
-import com.sobow.shopping.domain.responses.ApiResponse;
-import com.sobow.shopping.domain.responses.ProductResponse;
+import com.sobow.shopping.domain.ApiResponse;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.product.ProductCreateRequest;
+import com.sobow.shopping.domain.product.ProductResponse;
+import com.sobow.shopping.domain.product.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
 import jakarta.validation.Valid;

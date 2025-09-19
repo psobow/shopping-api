@@ -5,6 +5,7 @@ import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
+import com.sobow.shopping.exceptions.InvalidPriceException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -93,6 +94,16 @@ public class ExceptionController {
         pd.setTitle("Requested removal exceeds product quantity");
         pd.setDetail(ex.getMessage());
         pd.setProperty("productId", ex.getProductId());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(InvalidPriceException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidPrice(InvalidPriceException ex, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Invalid price");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("price", ex.getPrice());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }

@@ -3,8 +3,8 @@ package com.sobow.shopping.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.entities.Product;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import java.math.BigDecimal;
@@ -19,19 +19,18 @@ public class CartItemTests {
         p.setAvailableQty(10);
         p.setPrice(new BigDecimal(unitPrice));
         CartItem ci = new CartItem();
-        ci.setProduct(p);
+        ci.linkTo(p);
         ci.setRequestedQty(qty);
         return ci;
     }
     
     private CartItem itemWith(Product p, Integer qty) {
-        CartItem ci = new CartItem(1L, qty, p, null);
+        CartItem ci = new CartItem(p, qty);
         return ci;
     }
     
     private Product productWithAvailableQty(int availableQty) {
         Product p = new Product();
-        p.setId(1L);
         p.setAvailableQty(availableQty);
         p.setPrice(new BigDecimal("1.23"));
         return p;

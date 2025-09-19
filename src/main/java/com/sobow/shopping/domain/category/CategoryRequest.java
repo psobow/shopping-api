@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.requests;
+package com.sobow.shopping.domain.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

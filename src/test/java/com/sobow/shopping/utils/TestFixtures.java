@@ -1,23 +1,24 @@
 package com.sobow.shopping.utils;
 
-import com.sobow.shopping.domain.dto.FileContent;
-import com.sobow.shopping.domain.entities.Cart;
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.entities.Image;
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.requests.CartItemCreateRequest;
-import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
-import com.sobow.shopping.domain.requests.CategoryRequest;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
-import com.sobow.shopping.domain.responses.CategoryResponse;
-import com.sobow.shopping.domain.responses.ImageResponse;
-import com.sobow.shopping.domain.responses.ProductResponse;
+import com.sobow.shopping.domain.cart.Cart;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.cart.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.CategoryRequest;
+import com.sobow.shopping.domain.category.CategoryResponse;
+import com.sobow.shopping.domain.image.FileContent;
+import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.ImageResponse;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.product.ProductCreateRequest;
+import com.sobow.shopping.domain.product.ProductResponse;
+import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.user.UserAddress;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.sql.rowset.serial.SerialBlob;
 import org.springframework.mock.web.MockMultipartFile;
@@ -51,6 +52,14 @@ public class TestFixtures {
     private Integer requestedQty = 1;
     private Integer cartItemQuantity = 1;
     
+    private String userFirstName = "first name";
+    private String userLastName = "last name";
+    
+    private String cityName = "city name";
+    private String streetName = "street name";
+    private String streetNumber = "15";
+    private String postCode = "11-222";
+    
     public TestFixtures() {
         try {
             this.blob = new SerialBlob(byteArray);
@@ -59,9 +68,18 @@ public class TestFixtures {
         }
     }
     
+    public UserAddress userAddressEntity() {
+        return new UserAddress().builder()
+                                .cityName(cityName)
+                                .streetName(streetName)
+                                .streetNumber(streetNumber)
+                                .postCode(postCode)
+                                .build();
+    }
+    
+    
     public Cart cartEntity() {
         Cart cart = new Cart();
-        cart.setId(cartId);
         return cart;
     }
     
@@ -71,7 +89,11 @@ public class TestFixtures {
         Image i = imageEntity();
         c.addProductAndLink(p);
         p.addImageAndLink(i);
-        return new CartItem(cartItemId, cartItemQuantity, p, null);
+        CartItem cartItem = CartItem.builder()
+                                    .requestedQty(requestedQty)
+                                    .product(p)
+                                    .build();
+        return cartItem;
     }
     
     public CartItemCreateRequest cartItemCreateRequest() {
@@ -83,8 +105,8 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Product product = new Product(productId, productName, brandName, description, price,
-                                      availableQuantity, null, new ArrayList<>());
+        Product product = new Product(productName, brandName, description, price,
+                                      availableQuantity);
         return product;
     }
     
@@ -97,13 +119,12 @@ public class TestFixtures {
     }
     
     public ProductResponse productResponseOf(Product p) {
-        return new ProductResponse(p.getId(), p.getName(), p.getBrandName(), p.getPrice(), p.getAvailableQty(), p.getDescription(),
-                                   p.getCategory().getId(),
-                                   p.getImages().stream().map(Image::getId).toList());
+        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description,
+                                   categoryId, List.of(imageId));
     }
     
     public Category categoryEntity() {
-        Category category = new Category(categoryId, categoryName, new ArrayList<>());
+        Category category = new Category(categoryName);
         return category;
     }
     
@@ -116,7 +137,7 @@ public class TestFixtures {
     }
     
     public Image imageEntity() {
-        Image image = new Image(imageId, fileName, fileType, blob, downloadUrl, null);
+        Image image = new Image(fileName, fileType, blob);
         return image;
     }
     
@@ -151,6 +172,14 @@ public class TestFixtures {
     
     public Long imageId() {
         return imageId;
+    }
+    
+    public Long cartId() {
+        return cartId;
+    }
+    
+    public Long cartItemId() {
+        return cartItemId;
     }
     
     // setters

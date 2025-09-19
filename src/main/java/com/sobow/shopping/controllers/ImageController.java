@@ -1,9 +1,9 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.dto.FileContent;
-import com.sobow.shopping.domain.entities.Image;
-import com.sobow.shopping.domain.responses.ApiResponse;
-import com.sobow.shopping.domain.responses.ImageResponse;
+import com.sobow.shopping.domain.ApiResponse;
+import com.sobow.shopping.domain.image.FileContent;
+import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.validation.constraints.NotEmpty;

@@ -1,12 +1,12 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.entities.Cart;
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.entities.Order;
-import com.sobow.shopping.domain.entities.OrderItem;
-import com.sobow.shopping.domain.entities.OrderStatus;
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.entities.UserProfile;
+import com.sobow.shopping.domain.cart.Cart;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.order.Order;
+import com.sobow.shopping.domain.order.OrderItem;
+import com.sobow.shopping.domain.order.OrderStatus;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.repositories.OrderRepository;
@@ -15,7 +15,6 @@ import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,8 +37,8 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartService.findByIdWithItems(userProfile.getCart().getId());
         
         // Assert cart is not empty
-        if (cart == null || cart.getCartItems().isEmpty()) {
-            throw new CartEmptyException(Optional.of(cart));
+        if (cart.getCartItems().isEmpty()) {
+            throw new CartEmptyException(cart);
         }
         
         // Lock + assert stock available + decrement
@@ -52,8 +51,8 @@ public class OrderServiceImpl implements OrderService {
         // Link to user
         userProfile.addOrderAndLink(order);
         
-        // Clear cart after successful order creation
-        userProfile.removeCartAndUnlink();
+        // Remove cart after successful order creation
+        userProfile.removeCart();
         
         return order;
     }
@@ -72,28 +71,26 @@ public class OrderServiceImpl implements OrderService {
             if (requestedQty > availableQty) {
                 throw new InsufficientStockException(p.getId(), availableQty, requestedQty);
             }
-            
             productService.decrementAvailableQty(p.getId(), item.getRequestedQty());
         }
     }
     
     private Order orderFrom(Cart cart) {
-        Order order = new Order();
+        Order order = new Order(OrderStatus.NEW);
         for (CartItem cartItem : cart.getCartItems()) {
             OrderItem orderItem = orderItemFrom(cartItem);
             order.addItemAndLink(orderItem);
         }
-        order.setStatus(OrderStatus.NEW);
-        order.setTotalPrice(cart.getTotalPrice());
         return order;
     }
     
     private OrderItem orderItemFrom(CartItem cartItem) {
-        OrderItem orderItem = new OrderItem();
-        orderItem.setRequestedQty(cartItem.getRequestedQty());
-        orderItem.setProductPrice(cartItem.unitPrice());
-        orderItem.setProductName(cartItem.getProduct().getName());
-        orderItem.setProductBrandName(cartItem.getProduct().getBrandName());
+        OrderItem orderItem = OrderItem.builder()
+                                       .requestedQty(cartItem.getRequestedQty())
+                                       .productName(cartItem.getProduct().getName())
+                                       .productBrandName(cartItem.getProduct().getBrandName())
+                                       .productPrice(cartItem.productPrice())
+                                       .build();
         return orderItem;
     }
 }

@@ -15,9 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.domain.dto.FileContent;
-import com.sobow.shopping.domain.entities.Image;
-import com.sobow.shopping.domain.responses.ImageResponse;
+import com.sobow.shopping.domain.image.FileContent;
+import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import com.sobow.shopping.utils.TestFixtures;

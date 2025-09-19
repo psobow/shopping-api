@@ -11,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.requests.CategoryRequest;
-import com.sobow.shopping.domain.responses.CategoryResponse;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.CategoryRequest;
+import com.sobow.shopping.domain.category.CategoryResponse;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
@@ -56,7 +56,7 @@ public class CategoryControllerTests {
     class createCategory {
         
         @Test
-        public void createCategory_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
+        public void createCategory_should_Return201WithDto_when_ValidRequest() throws Exception {
             CategoryRequest request = fixtures.categoryRequest();
             Category mapped = fixtures.categoryEntity();
             Category saved = fixtures.categoryEntity();

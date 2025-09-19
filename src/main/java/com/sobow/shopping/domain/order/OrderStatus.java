@@ -1,8 +1,7 @@
-package com.sobow.shopping.domain.entities;
+package com.sobow.shopping.domain.order;
 
 public enum OrderStatus {
     NEW,
-    PROCESSING,
     SHIPPED,
     DELIVERED,
     CANCELLED

@@ -1,6 +1,6 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.entities.UserProfile;
+import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.repositories.UserProfileRepository;
 import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;

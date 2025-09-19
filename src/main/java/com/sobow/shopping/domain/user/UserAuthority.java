@@ -1,8 +1,5 @@
-package com.sobow.shopping.domain.entities;
+package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.config.MoneyConfig;
-import com.sobow.shopping.exceptions.InsufficientStockException;
-import com.sobow.shopping.exceptions.OverDecrementException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,68 +9,51 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(
-    name = "cart_item",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uc_cart_item_cart_product",
-            columnNames = {"cart_id", "product_id"}
+            name = "uc_auth_user_authority",
+            columnNames = {"user_id", "authority"}
         )
     }
 )
-public class CartItem {
+public class UserAuthority {
     
+    // ---- Construction (builder) ----------------------------
+    @Builder
+    public UserAuthority(String authority) {
+        this.authority = authority;
+    }
+    
+    // ---- Identifier ----------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Setter(AccessLevel.NONE)
-    @Column(nullable = false)
-    private Integer requestedQty;
+    // ---- Basic columns -------------------------------------
+    @Column(nullable = false, updatable = false)
+    private String authority;
     
+    // ---- Associations --------------------------------------
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    private User user;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
-    
-    public int setRequestedQty(int requestedQty) {
-        int availableQty = product.getAvailableQty();
-        if (requestedQty > availableQty) {
-            throw new InsufficientStockException(product.getId(), availableQty, requestedQty);
-        }
-        if (requestedQty < 0) {
-            throw new OverDecrementException(product.getId(), requestedQty);
-        }
-        this.requestedQty = requestedQty;
-        return requestedQty;
+    // ---- Domain methods ------------------------------------
+    public void linkTo(User user) {
+        this.user = user;
     }
     
-    public BigDecimal unitPrice() {
-        return product.getPrice()
-                      .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
-    }
-    
-    public BigDecimal getTotalPrice() {
-        return unitPrice().multiply(BigDecimal.valueOf(requestedQty));
-    }
-    
+    // ---- Equality (proxy-safe) -----------------------------
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -85,8 +65,8 @@ public class CartItem {
                                       ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
                                       : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        CartItem cartItem = (CartItem) o;
-        return getId() != null && Objects.equals(getId(), cartItem.getId());
+        UserAuthority userAuthority = (UserAuthority) o;
+        return getId() != null && Objects.equals(getId(), userAuthority.getId());
     }
     
     @Override

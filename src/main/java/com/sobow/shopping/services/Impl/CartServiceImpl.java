@@ -1,11 +1,11 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.entities.Cart;
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.entities.UserProfile;
-import com.sobow.shopping.domain.requests.CartItemCreateRequest;
-import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.Cart;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.cart.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
@@ -41,7 +41,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeCart(long userId) {
         UserProfile userProfile = userProfileService.findByUserId(userId);
-        userProfile.removeCartAndUnlink();
+        userProfile.removeCart();
     }
     
     @Override
@@ -60,15 +60,14 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItem createCartItem(long cartId, CartItemCreateRequest request) {
         Cart cart = findById(cartId);
-        Product product = productService.findById(request.productId());
+        Long productId = request.productId();
+        Product product = productService.findById(productId);
         
-        // I could update existing CartItem when already in the Cart
-        boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, product.getId());
-        if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, product.getId());
+        // I could update existing CartItem when already in the Cart, instead of throwing exception
+        boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, productId);
+        if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, productId);
         
-        CartItem newItem = new CartItem();
-        newItem.setProduct(product);
-        newItem.setRequestedQty(request.requestedQty());
+        CartItem newItem = new CartItem(product, request.requestedQty());
         cart.addCartItemAndLink(newItem);
         return newItem;
     }
@@ -87,7 +86,7 @@ public class CartServiceImpl implements CartService {
     public void removeCartItem(long cartId, long itemId) {
         CartItem item = findCartItemByCartIdAndId(cartId, itemId);
         Cart cart = item.getCart();
-        cart.removeCartItemAndUnlink(item);
+        cart.removeCartItem(item);
     }
     
     @Transactional

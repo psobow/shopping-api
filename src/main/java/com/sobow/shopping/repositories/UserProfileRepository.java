@@ -1,6 +1,6 @@
 package com.sobow.shopping.repositories;
 
-import com.sobow.shopping.domain.entities.UserProfile;
+import com.sobow.shopping.domain.user.UserProfile;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

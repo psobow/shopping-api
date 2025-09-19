@@ -1,6 +1,6 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.entities.Order;
+import com.sobow.shopping.domain.order.Order;
 
 public interface OrderService {
     

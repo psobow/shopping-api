@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;
@@ -47,8 +47,7 @@ public class CategoryServiceImplTests {
         @Test
         public void create_should_ReturnSavedCategory_when_ValidInput() {
             // Given
-            Category category = fixtures.withCategoryId(null)
-                                        .categoryEntity();
+            Category category = fixtures.categoryEntity();
             
             when(categoryRepository.existsByName(category.getName())).thenReturn(false);
             when(categoryRepository.save(category)).thenReturn(category);
@@ -63,8 +62,7 @@ public class CategoryServiceImplTests {
         @Test
         public void create_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            Category category = fixtures.withCategoryId(null)
-                                        .withCategoryName("name already exists")
+            Category category = fixtures.withCategoryName("name already exists")
                                         .categoryEntity();
             
             when(categoryRepository.existsByName(category.getName())).thenReturn(true);
@@ -82,55 +80,52 @@ public class CategoryServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedCategory_when_ValidInput() {
             // Given
-            Category existing = fixtures.withCategoryName("old name")
+            Category category = fixtures.withCategoryName("old name")
                                         .categoryEntity();
             
-            Category patch = fixtures.withCategoryId(null)
-                                     .withCategoryName("new name")
+            Category patch = fixtures.withCategoryName("new name")
                                      .categoryEntity();
             
-            when(categoryRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
             
             // When
-            Category result = underTest.partialUpdateById(patch, existing.getId());
+            Category result = underTest.partialUpdateById(patch, fixtures.categoryId());
             
             // Then
-            assertSame(existing, result);
-            assertEquals(patch.getName(), existing.getName());
+            assertSame(category, result);
+            assertEquals(patch.getName(), category.getName());
         }
         
         @Test
         public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            Category existing = fixtures.withCategoryName("old name")
+            Category category = fixtures.withCategoryName("old name")
                                         .categoryEntity();
             
-            Category patch = fixtures.withCategoryId(null)
-                                     .withCategoryName("name already exists")
+            Category patch = fixtures.withCategoryName("name already exists")
                                      .categoryEntity();
             
-            when(categoryRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
             when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
             
             // When & Then
-            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, existing.getId()));
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, fixtures.categoryId()));
         }
         
         @Test
         public void partialUpdateById_should_NotPersist_when_NoChangesDetected() {
             // Given
-            Category existing = fixtures.categoryEntity();
-            Category patchWithSameName = fixtures.withCategoryId(null)
-                                                 .categoryEntity();
+            Category category = fixtures.categoryEntity();
+            Category patchWithSameName = fixtures.categoryEntity();
             
-            when(categoryRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
+            when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
             
             // When
-            Category result = underTest.partialUpdateById(patchWithSameName, existing.getId());
+            Category result = underTest.partialUpdateById(patchWithSameName, fixtures.categoryId());
             
             // Then
-            assertSame(existing, result);
+            assertSame(category, result);
         }
     }
 }

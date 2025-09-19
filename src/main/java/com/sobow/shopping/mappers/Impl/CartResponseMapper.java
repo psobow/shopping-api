@@ -1,9 +1,9 @@
 package com.sobow.shopping.mappers.Impl;
 
-import com.sobow.shopping.domain.entities.Cart;
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.responses.CartItemResponse;
-import com.sobow.shopping.domain.responses.CartResponse;
+import com.sobow.shopping.domain.cart.Cart;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.cart.CartItemResponse;
+import com.sobow.shopping.domain.cart.CartResponse;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

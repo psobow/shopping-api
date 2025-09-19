@@ -1,6 +1,6 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.category.Category;
 import java.util.List;
 
 public interface CategoryService {

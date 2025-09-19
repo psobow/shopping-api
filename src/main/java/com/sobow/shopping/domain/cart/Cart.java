@@ -1,5 +1,6 @@
-package com.sobow.shopping.domain.entities;
+package com.sobow.shopping.domain.cart;
 
+import com.sobow.shopping.domain.user.UserProfile;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,31 +13,48 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Cart {
     
+    // ---- Identifier ----------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // ---- Associations --------------------------------------
     @OneToOne(optional = false)
     @JoinColumn(name = "user_profile_id", nullable = false, unique = true)
     private UserProfile userProfile;
     
-    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();
     
+    // ---- Domain methods ------------------------------------
+    public void linkTo(UserProfile userProfile) {
+        this.userProfile = userProfile;
+    }
+    
+    public void addCartItemAndLink(CartItem item) {
+        cartItems.add(item);
+        item.linkTo(this);
+    }
+    
+    public void removeCartItem(CartItem item) {
+        cartItems.remove(item);
+    }
+    
+    public void removeAllCartItems() {
+        for (CartItem item : new HashSet<>(cartItems)) {
+            removeCartItem(item);
+        }
+    }
+    
+    // ---- Derived / non-persistent --------------------------
     public List<Long> getProductsId() {
         return cartItems.stream()
                         .map(item -> item.getProduct().getId())
@@ -47,20 +65,5 @@ public class Cart {
         return cartItems.stream()
                         .map(CartItem::getTotalPrice)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-    
-    public void addCartItemAndLink(CartItem item) {
-        cartItems.add(item);
-        item.setCart(this);
-    }
-    
-    public void removeCartItemAndUnlink(CartItem item) {
-        cartItems.remove(item);
-    }
-    
-    public void removeAllCartItems() {
-        for (CartItem item : new HashSet<>(cartItems)) {
-            removeCartItemAndUnlink(item);
-        }
     }
 }

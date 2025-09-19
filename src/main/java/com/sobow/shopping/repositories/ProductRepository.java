@@ -1,6 +1,6 @@
 package com.sobow.shopping.repositories;
 
-import com.sobow.shopping.domain.entities.Product;
+import com.sobow.shopping.domain.product.Product;
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;

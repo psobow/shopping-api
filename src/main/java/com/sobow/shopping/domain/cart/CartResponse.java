@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.responses;
+package com.sobow.shopping.domain.cart;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -3,8 +3,8 @@ package com.sobow.shopping.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.sobow.shopping.domain.requests.CartItemCreateRequest;
-import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.stream.Stream;
@@ -31,9 +31,9 @@ public class CartItemRequestValidationTests {
     
     private static Stream<Arguments> invalidCasesOnUpdate() {
         return Stream.of(
-            arguments(new CartItemUpdateRequest(0),
+            arguments(new CartItemUpdateRequest(-1),
                       "requestedQty",
-                      "is not positive"
+                      "is not positive or zero"
             )
         );
     }

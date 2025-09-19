@@ -1,8 +1,8 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.product.ProductCreateRequest;
+import com.sobow.shopping.domain.product.ProductUpdateRequest;
 import java.util.List;
 
 public interface ProductService {

@@ -1,8 +1,10 @@
-package com.sobow.shopping.domain.responses;
+package com.sobow.shopping.domain.product;
 
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record ProductResponse(Long id,
                               String name,
                               String brandName,

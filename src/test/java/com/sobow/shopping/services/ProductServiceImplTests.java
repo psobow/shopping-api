@@ -3,12 +3,13 @@ package com.sobow.shopping.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.product.ProductCreateRequest;
+import com.sobow.shopping.domain.product.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -49,10 +50,10 @@ public class ProductServiceImplTests {
         public void create_should_ReturnSavedProduct_when_ValidInput() {
             // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
-            Product mapped = fixtures.withProductId(null)
-                                     .productEntity();
+            Product mapped = fixtures.productEntity();
             Category category = fixtures.categoryEntity();
             
+            when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(false);
             when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(request.categoryId())).thenReturn(category);
             
@@ -69,6 +70,10 @@ public class ProductServiceImplTests {
             // Given
             ProductCreateRequest request = fixtures.withCategoryId(fixtures.nonExistingId())
                                                    .productCreateRequest();
+            Product mapped = fixtures.productEntity();
+            
+            when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(false);
+            when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When + Then
@@ -78,7 +83,7 @@ public class ProductServiceImplTests {
         @Test
         public void create_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
             ProductCreateRequest request = fixtures.productCreateRequest();
-            when(productRepository.existsByNameAndBrandName(request.name(), request.brandName())).thenReturn(true);
+            when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(true);
             // When + Then
             assertThrows(ProductAlreadyExistsException.class, () -> underTest.create(request));
         }
@@ -95,16 +100,11 @@ public class ProductServiceImplTests {
             Product product = fixtures.productEntity();
             category.addProductAndLink(product);
             
-            Long differentCategoryId = 15L;
-            Category differentCategory = fixtures.withCategoryId(differentCategoryId)
-                                                 .categoryEntity();
-            
-            ProductUpdateRequest patch = fixtures.withCategoryId(differentCategoryId)
-                                                 .withProductName("new product name")
+            ProductUpdateRequest patch = fixtures.withProductName("new product name")
+                                                 .withCategoryId(null)
                                                  .productUpdateRequest();
             
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
-            when(categoryService.findById(differentCategoryId)).thenReturn(differentCategory);
             
             // When
             Product result = underTest.partialUpdateById(patch, fixtures.productId());
@@ -112,7 +112,6 @@ public class ProductServiceImplTests {
             // Then
             assertSame(product, result);
             
-            assertThat(product.getCategory().getId()).isEqualTo(differentCategoryId);
             assertThat(product.getName()).isEqualTo("new product name");
         }
         

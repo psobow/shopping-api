@@ -1,18 +1,19 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.entities.Cart;
-import com.sobow.shopping.domain.entities.CartItem;
-import com.sobow.shopping.domain.requests.CartItemCreateRequest;
-import com.sobow.shopping.domain.requests.CartItemUpdateRequest;
-import com.sobow.shopping.domain.responses.ApiResponse;
-import com.sobow.shopping.domain.responses.CartItemResponse;
-import com.sobow.shopping.domain.responses.CartResponse;
+import com.sobow.shopping.domain.ApiResponse;
+import com.sobow.shopping.domain.cart.Cart;
+import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.cart.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.CartItemResponse;
+import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.CartResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CartService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,13 +38,13 @@ public class CartController {
         boolean cartExists = cartService.existsByUserProfile_UserId(userId);
         Cart cart = cartService.createOrGetCart(userId);
         CartResponse response = cartResponseMapper.mapToDto(cart);
+        ApiResponse body = new ApiResponse(cartExists ? "Found" : "Created", response);
         
         if (cartExists) {
-            return ResponseEntity.ok(new ApiResponse("Found", response));
+            return ResponseEntity.ok().body(body);
         }
-        
         return ResponseEntity.created(URI.create("/api/carts/" + cart.getId()))
-                             .body(new ApiResponse("Created", response));
+                             .body(body);
     }
     
     @DeleteMapping("/users/{userId}/cart")
@@ -67,12 +67,7 @@ public class CartController {
     ) {
         CartItem cartItem = cartService.createCartItem(cartId, request);
         CartItemResponse response = cartItemResponseMapper.mapToDto(cartItem);
-        URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{itemId}")
-            .buildAndExpand(cartItem.getId())
-            .toUri();
-        return ResponseEntity.created(location)
+        return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("Created", response));
     }
     

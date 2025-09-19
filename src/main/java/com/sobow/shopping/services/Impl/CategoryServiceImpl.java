@@ -1,11 +1,13 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.entities.Category;
+import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public Category create(Category category) {
-        assertCategoryUnique(category.getName());
+        String name = normalize(category.getName());
+        assertCategoryUnique(name);
+        
+        category.setName(name);
         return categoryRepository.save(category);
     }
     
@@ -27,10 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category partialUpdateById(Category patch, long id) {
         Category existingCategory = findById(id);
+        String patchName = normalize(patch.getName());
         
-        if (patch.getName() != null && existingCategory.getName() != patch.getName()) {
-            assertCategoryUnique(patch.getName());
-            existingCategory.setName(patch.getName());
+        if (existingCategory.getName() != patchName) {
+            assertCategoryUnique(patchName);
+            existingCategory.setName(patchName);
         }
         return existingCategory;
     }
@@ -71,5 +77,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.existsByName(name)) {
             throw new CategoryAlreadyExistsException(name);
         }
+    }
+    
+    private String normalize(String s) {
+        return Objects.requireNonNull(s, "value required").strip().toLowerCase(Locale.ROOT);
     }
 }

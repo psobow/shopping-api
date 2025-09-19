@@ -1,6 +1,6 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.entities.UserProfile;
+import com.sobow.shopping.domain.user.UserProfile;
 
 public interface UserProfileService {
     

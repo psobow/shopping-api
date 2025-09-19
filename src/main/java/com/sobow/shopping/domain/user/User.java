@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.entities;
+package com.sobow.shopping.domain.user;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,59 +11,62 @@ import jakarta.persistence.OneToOne;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class User {
     
+    // ---- Construction (builder) ----------------------------
+    @Builder
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+    
+    // ---- Identifier ----------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // ---- Basic columns -------------------------------------
     @Column(nullable = false, unique = true)
     private String email;
     
     @Column(nullable = false)
     private String password;
     
-    @Column(nullable = false)
-    private boolean enabled = true;
-    
-    @Setter(AccessLevel.NONE)
+    // ---- Associations --------------------------------------
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
     
-    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAuthority> authorities = new HashSet<>();
     
+    // ---- Domain methods ------------------------------------
     public void addProfileAndLink(UserProfile userProfile) {
         this.profile = userProfile;
-        userProfile.setUser(this);
+        userProfile.linkTo(this);
     }
     
-    public void removeProfileAndUnlink() {
+    public void removeProfile() {
         this.profile = null;
     }
     
     public void addAuthorityAndLink(UserAuthority userAuthority) {
         authorities.add(userAuthority);
-        userAuthority.setUser(this);
+        userAuthority.linkTo(this);
     }
     
-    public void removeAuthorityAndUnlink(UserAuthority userAuthority) {
+    public void removeAuthority(UserAuthority userAuthority) {
         authorities.remove(userAuthority);
     }
     
+    // ---- Equality (proxy-safe) -----------------------------
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

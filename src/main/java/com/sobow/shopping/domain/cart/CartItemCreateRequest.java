@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.requests;
+package com.sobow.shopping.domain.cart;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

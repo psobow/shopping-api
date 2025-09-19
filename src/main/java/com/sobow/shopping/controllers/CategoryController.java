@@ -1,9 +1,9 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.requests.CategoryRequest;
-import com.sobow.shopping.domain.responses.ApiResponse;
-import com.sobow.shopping.domain.responses.CategoryResponse;
+import com.sobow.shopping.domain.ApiResponse;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.CategoryRequest;
+import com.sobow.shopping.domain.category.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.validation.Valid;

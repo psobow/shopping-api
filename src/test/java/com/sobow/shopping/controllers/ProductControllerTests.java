@@ -11,12 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.domain.entities.Category;
-import com.sobow.shopping.domain.entities.Image;
-import com.sobow.shopping.domain.entities.Product;
-import com.sobow.shopping.domain.requests.ProductCreateRequest;
-import com.sobow.shopping.domain.requests.ProductUpdateRequest;
-import com.sobow.shopping.domain.responses.ProductResponse;
+import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.product.ProductCreateRequest;
+import com.sobow.shopping.domain.product.ProductResponse;
+import com.sobow.shopping.domain.product.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
@@ -60,7 +60,7 @@ public class ProductControllerTests {
     class createProduct {
         
         @Test
-        public void createProduct_should_Return201WithDtoAndLocation_when_ValidRequest() throws Exception {
+        public void createProduct_should_Return201WithDto_when_ValidRequest() throws Exception {
             ProductCreateRequest request = fixtures.productCreateRequest();
             
             Category category = fixtures.categoryEntity();

@@ -1,5 +1,6 @@
-package com.sobow.shopping.domain.entities;
+package com.sobow.shopping.domain.category;
 
+import com.sobow.shopping.domain.product.Product;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,37 +10,46 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Builder
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Category {
+    
+    // ---- Construction (builder) ----------------------------
+    @Builder
+    public Category(String name) {
+        this.name = name;
+    }
+    
+    // ---- Identifier ----------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // ---- Basic columns -------------------------------------
     @Column(unique = true, nullable = false)
     private String name;
     
-    @Setter(AccessLevel.NONE)
+    // ---- Associations --------------------------------------
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
     
+    // ---- Domain methods ------------------------------------
     public void addProductAndLink(Product p) {
         products.add(p);
-        p.setCategory(this);
+        p.linkTo(this);
     }
     
-    public void removeProductAndUnlink(Product p) {
+    public void removeProduct(Product p) {
         products.remove(p);
+    }
+    
+    // ---- Setter methods ------------------------------------
+    public void setName(String name) {
+        this.name = name;
     }
 }
