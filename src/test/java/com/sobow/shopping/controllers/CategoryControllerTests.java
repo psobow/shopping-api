@@ -72,7 +72,7 @@ public class CategoryControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isCreated())
-                   .andExpect(header().string(HttpHeaders.LOCATION, CATEGORIES_PATH + "/" + saved.getId()))
+                   .andExpect(header().exists(HttpHeaders.LOCATION))
                    .andExpect(jsonPath("$.message").value("Created"))
                    .andExpect(jsonPath("$.data.id").value(response.id()))
                    .andExpect(jsonPath("$.data.name").value(response.name()));

@@ -85,14 +85,6 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public void decrementAvailableQty(long id, int decrementQty) {
-        Product p = findById(id);
-        int availableQty = p.getAvailableQty();
-        int newQty = availableQty - decrementQty;
-        p.setAvailableQty(newQty);
-    }
-    
-    @Override
     public Product findById(long id) {
         return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
             "Product with id " + id + " not found"));

@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
         
         // Lock + assert stock available + decrement
         productService.lockForOrder(cart.getProductsId());
-        assertStockAvailableAndDecrementQty(cart.getCartItems());
+        assertStockAvailableAndDecrement(cart.getCartItems());
         
         // Build order from cart
         Order order = orderFrom(cart);
@@ -63,15 +63,19 @@ public class OrderServiceImpl implements OrderService {
             () -> new EntityNotFoundException("Order with id " + orderId + " not found"));
     }
     
-    private void assertStockAvailableAndDecrementQty(Set<CartItem> items) {
+    private void assertStockAvailableAndDecrement(Set<CartItem> items) {
         for (CartItem item : items) {
-            Product p = item.getProduct();
-            int availableQty = p.getAvailableQty();
+            // Assert products still available
+            Product product = item.getProduct();
+            int availableQty = product.getAvailableQty();
             int requestedQty = item.getRequestedQty();
             if (requestedQty > availableQty) {
-                throw new InsufficientStockException(p.getId(), availableQty, requestedQty);
+                throw new InsufficientStockException(product.getId(), availableQty, requestedQty);
             }
-            productService.decrementAvailableQty(p.getId(), item.getRequestedQty());
+            
+            // Decrement stock
+            int newQty = availableQty - requestedQty;
+            product.setAvailableQty(newQty);
         }
     }
     
@@ -85,12 +89,11 @@ public class OrderServiceImpl implements OrderService {
     }
     
     private OrderItem orderItemFrom(CartItem cartItem) {
-        OrderItem orderItem = OrderItem.builder()
-                                       .requestedQty(cartItem.getRequestedQty())
-                                       .productName(cartItem.getProduct().getName())
-                                       .productBrandName(cartItem.getProduct().getBrandName())
-                                       .productPrice(cartItem.productPrice())
-                                       .build();
-        return orderItem;
+        return OrderItem.builder()
+                        .requestedQty(cartItem.getRequestedQty())
+                        .productName(cartItem.getProduct().getName())
+                        .productBrandName(cartItem.getProduct().getBrandName())
+                        .productPrice(cartItem.productPrice())
+                        .build();
     }
 }

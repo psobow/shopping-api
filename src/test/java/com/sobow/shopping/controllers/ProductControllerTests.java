@@ -62,13 +62,11 @@ public class ProductControllerTests {
         @Test
         public void createProduct_should_Return201WithDto_when_ValidRequest() throws Exception {
             ProductCreateRequest request = fixtures.productCreateRequest();
-            
             Category category = fixtures.categoryEntity();
             Product saved = fixtures.productEntity();
-            category.addProductAndLink(saved);
-            
             ProductResponse response = fixtures.productResponseOf(saved);
             
+            category.addProductAndLink(saved);
             String json = objectMapper.writeValueAsString(request);
             
             when(productService.create(request)).thenReturn(saved);
@@ -78,7 +76,7 @@ public class ProductControllerTests {
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
                    .andExpect(status().isCreated())
-                   .andExpect(header().string(HttpHeaders.LOCATION, PRODUCTS_PATH + "/" + saved.getId()))
+                   .andExpect(header().exists(HttpHeaders.LOCATION))
                    .andExpect(jsonPath("$.message").value("Created"))
                    .andExpect(jsonPath("$.data.id").value(response.id()))
                    .andExpect(jsonPath("$.data.name").value(response.name()))

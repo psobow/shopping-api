@@ -1,9 +1,12 @@
 package com.sobow.shopping.utils;
 
+import com.sobow.shopping.config.MoneyConfig;
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.cart.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.CartItemResponse;
 import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.CartResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.category.CategoryRequest;
 import com.sobow.shopping.domain.category.CategoryResponse;
@@ -48,10 +51,14 @@ public class TestFixtures {
     private Blob blob;
     private String downloadUrl = "/api/images/" + imageId;
     
-    private Long cartId = 40L;
-    
-    private Long cartItemId = 50L;
+    private Long cartItemId = 40L;
     private Integer requestedQty = 1;
+    private BigDecimal totalItemPrice =
+        new BigDecimal(requestedQty).multiply(BigDecimal.valueOf(availableQuantity))
+                                    .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
+    
+    private Long cartId = 50L;
+    private BigDecimal totalCartPrice = totalItemPrice;
     
     private Long userId = 60L;
     private String userFirstName = "first name";
@@ -95,6 +102,11 @@ public class TestFixtures {
         return cart;
     }
     
+    public CartResponse cartResponse() {
+        CartItemResponse cartItemResponse = cartItemResponse();
+        return new CartResponse(cartId, totalCartPrice, List.of(cartItemResponse));
+    }
+    
     public CartItem cartItemEntity() {
         Category c = categoryEntity();
         Product p = productEntity();
@@ -106,6 +118,10 @@ public class TestFixtures {
                                     .product(p)
                                     .build();
         return cartItem;
+    }
+    
+    public CartItemResponse cartItemResponse() {
+        return new CartItemResponse(cartItemId, productId, cartId, requestedQty, totalItemPrice);
     }
     
     public CartItemCreateRequest cartItemCreateRequest() {

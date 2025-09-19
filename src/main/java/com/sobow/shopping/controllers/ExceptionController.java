@@ -59,7 +59,7 @@ public class ExceptionController {
     }
     
     @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleProductConflict(CategoryAlreadyExistsException e, HttpServletRequest request) {
+    public ResponseEntity<ProblemDetail> handleProductConflict(ProductAlreadyExistsException e, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Product already exists");
         pd.setDetail(e.getMessage());
@@ -68,7 +68,7 @@ public class ExceptionController {
     }
     
     @ExceptionHandler(CartItemAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleCartItemConflict(CategoryAlreadyExistsException e, HttpServletRequest request) {
+    public ResponseEntity<ProblemDetail> handleCartItemConflict(CartItemAlreadyExistsException e, HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Product already exists in the cart");
         pd.setDetail(e.getMessage());
@@ -108,6 +108,7 @@ public class ExceptionController {
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
     
+    @ExceptionHandler(CartEmptyException.class)
     public ResponseEntity<ProblemDetail> handleCartEmpty(CartEmptyException ex, HttpServletRequest req) {
         var pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY); // 422
         pd.setTitle("Empty cart");

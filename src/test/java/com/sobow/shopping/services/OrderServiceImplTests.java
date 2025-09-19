@@ -2,11 +2,9 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
@@ -25,11 +23,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTests {
@@ -53,7 +49,7 @@ public class OrderServiceImplTests {
     class createOrder {
         
         @Test
-        public void createOrder_should_CreateOrder_and_DecrementStock_and_RemoveCart_when_CartNotEmpty() {
+        public void createOrder_should_CreateOrder_and_RemoveCart_when_CartNotEmpty() {
             // Given
             User user = fixtures.userEntity();
             UserProfile userProfile = fixtures.userProfileEntity();
@@ -64,8 +60,6 @@ public class OrderServiceImplTests {
             userProfile.addCartAndLink(cart);
             cart.addCartItemAndLink(cartItem);
             
-            ReflectionTestUtils.setField(cartItem.getProduct(), "id", fixtures.productId());
-            
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
@@ -74,11 +68,7 @@ public class OrderServiceImplTests {
             
             // Then
             assertThat(userProfile.getOrders()).contains(result).hasSize(1);
-            
-            InOrder inOrder = inOrder(productService);
-            inOrder.verify(productService, times(1)).lockForOrder(anyList());
-            inOrder.verify(productService, times(1)).decrementAvailableQty(anyLong(), anyInt());
-            
+            verify(productService, times(1)).lockForOrder(anyList());
             assertThat(userProfile.getCart()).isNull();
         }
         
@@ -115,7 +105,6 @@ public class OrderServiceImplTests {
             
             Product product = cartItem.getProduct();
             product.setAvailableQty(0);
-            ReflectionTestUtils.setField(product, "id", fixtures.productId());
             
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);

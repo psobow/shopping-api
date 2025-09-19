@@ -1,32 +1,37 @@
 package com.sobow.shopping.controllers;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
+import com.sobow.shopping.domain.cart.CartItemCreateRequest;
 import com.sobow.shopping.domain.cart.CartItemResponse;
+import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
 import com.sobow.shopping.domain.cart.CartResponse;
+import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CartService;
+import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CartController.class)
-class CartControllerTests {
+public class CartControllerTests {
     
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +45,14 @@ class CartControllerTests {
     @MockitoBean
     private Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
     
+    private TestFixtures fixtures = new TestFixtures();
+    
+    private ObjectMapper objectMapper = new ObjectMapper();
+    
     private static final String CART_PATH_BY_USER_ID = "/api/users/{userId}/cart";
+    private static final String CARTS_PATH_BY_ID = "/api/carts/{id}";
+    private static final String ITEMS_PATH_BY_CART_ID = "/api/carts/{cartId}/items";
+    private static final String ITEMS_PATH_BY_CART_ID_AND_ITEM_ID = "/api/carts/{cartId}/items/{itemId}";
     
     @Nested
     @DisplayName("createOrGetCart")
@@ -49,50 +61,43 @@ class CartControllerTests {
         @Test
         public void createOrGetCart_should_Return200_when_CartAlreadyExists() throws Exception {
             // Given
-            long userId = 123L;
-            Cart cart = Mockito.mock(Cart.class);
+            long userId = fixtures.userId();
+            Cart cart = fixtures.cartEntity();
+            CartResponse response = fixtures.cartResponse();
             
             when(cartService.existsByUserProfile_UserId(userId)).thenReturn(true);
             when(cartService.createOrGetCart(userId)).thenReturn(cart);
-            // We don't assert DTO fields here, so null is fine
-            when(cartResponseMapper.mapToDto(cart)).thenReturn(null);
+            when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
             
             // When & Then
-            mockMvc.perform(put(CART_PATH_BY_USER_ID, userId)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            mockMvc.perform(put(CART_PATH_BY_USER_ID, userId))
                    .andExpect(status().isOk())
-                   .andExpect(header().doesNotExist("Location"))
-                   .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                   .andExpect(jsonPath("$.message", equalTo("Found")));
+                   .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
+                   .andExpect(jsonPath("$.message").value("Found"));
         }
         
         @Test
         public void createOrGetCart_should_Return201_when_CartCreated() throws Exception {
             // Given
-            long userId = 123L;
-            Cart cart = Mockito.mock(Cart.class);
+            long userId = fixtures.userId();
+            Cart cart = fixtures.cartEntity();
+            CartResponse response = fixtures.cartResponse();
             
             when(cartService.existsByUserProfile_UserId(userId)).thenReturn(false);
             when(cartService.createOrGetCart(userId)).thenReturn(cart);
-            when(cartResponseMapper.mapToDto(cart)).thenReturn(null);
+            when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
             
             // When & Then
-            mockMvc.perform(put(CART_PATH_BY_USER_ID, userId)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            mockMvc.perform(put(CART_PATH_BY_USER_ID, userId))
                    .andExpect(status().isCreated())
-                   .andExpect(header().exists("Location"))
-                   .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                   .andExpect(jsonPath("$.message", equalTo("Created")));
+                   .andExpect(header().exists(HttpHeaders.LOCATION))
+                   .andExpect(jsonPath("$.message").value("Created"));
         }
         
         @Test
         public void createOrGetCart_should_Return400_when_UserIdIsNotPositive() throws Exception {
-            // Given
-            long userId = -1L;
-            
             // When & Then
-            mockMvc.perform(put(CART_PATH_BY_USER_ID, userId)
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            mockMvc.perform(put(CART_PATH_BY_USER_ID, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }
     }
@@ -102,13 +107,17 @@ class CartControllerTests {
     class deleteCart {
         
         @Test
-        public void deleteCart_should_Return204_when_CartDeleted() {
-            fail("implement more tests");
+        public void deleteCart_should_Return204_when_CartDeleted() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(CART_PATH_BY_USER_ID, fixtures.userId()))
+                   .andExpect(status().isNoContent());
         }
         
         @Test
         public void deleteCart_should_Return400_when_UserIdLessThanOne() throws Exception {
-            fail("implement more tests");
+            // When & Then
+            mockMvc.perform(delete(CART_PATH_BY_USER_ID, fixtures.invalidId()))
+                   .andExpect(status().isBadRequest());
         }
     }
     
@@ -117,13 +126,25 @@ class CartControllerTests {
     class getCart {
         
         @Test
-        public void getCart_should_Return200_when_CartExists() {
-            fail("implement more tests");
+        public void getCart_should_Return200_when_CartExists() throws Exception {
+            // Given
+            Cart cart = fixtures.cartEntity();
+            CartResponse response = fixtures.cartResponse();
+            
+            when(cartService.findById(fixtures.cartId())).thenReturn(cart);
+            when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
+            
+            // When & Then
+            mockMvc.perform(get(CARTS_PATH_BY_ID, fixtures.cartId()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Found"));
         }
         
         @Test
-        public void getCart_should_Return400_when_CartIdLessThanOne() {
-            fail("implement more tests");
+        public void getCart_should_Return400_when_CartIdLessThanOne() throws Exception {
+            // When & Then
+            mockMvc.perform(get(CARTS_PATH_BY_ID, fixtures.invalidId()))
+                   .andExpect(status().isBadRequest());
         }
     }
     
@@ -132,23 +153,66 @@ class CartControllerTests {
     class createCartItem {
         
         @Test
-        public void createCartItem_should_Return201_when_CartItemCreated() {
-            fail("implement more tests");
+        public void createCartItem_should_Return201_when_CartItemCreated() throws Exception {
+            // Given
+            CartItemCreateRequest request = fixtures.cartItemCreateRequest();
+            CartItem item = fixtures.cartItemEntity();
+            CartItemResponse response = fixtures.cartItemResponse();
+            
+            when(cartService.createCartItem(fixtures.cartId(), request)).thenReturn(item);
+            when(cartItemResponseMapper.mapToDto(item)).thenReturn(response);
+            
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(post(ITEMS_PATH_BY_CART_ID, fixtures.cartId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isCreated())
+                   .andExpect(jsonPath("$.message").value("Created"));
         }
         
         @Test
-        public void createCartItem_should_Return409_when_CartItemAlreadyExists() {
-            fail("implement more tests");
+        public void createCartItem_should_Return409_when_CartItemAlreadyExists() throws Exception {
+            // Given
+            CartItemCreateRequest request = fixtures.cartItemCreateRequest();
+            
+            when(cartService.createCartItem(fixtures.cartId(), request))
+                .thenThrow(new CartItemAlreadyExistsException(fixtures.cartId(), fixtures.productId()));
+            
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(post(ITEMS_PATH_BY_CART_ID, fixtures.cartId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isConflict());
         }
         
         @Test
-        public void createCartItem_should_Return400_when_CartIdLessThanOne() {
-            fail("implement more tests");
+        public void createCartItem_should_Return400_when_CartIdLessThanOne() throws Exception {
+            // Given
+            CartItemCreateRequest request = fixtures.cartItemCreateRequest();
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(post(ITEMS_PATH_BY_CART_ID, fixtures.invalidId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isBadRequest());
         }
         
         @Test
-        public void createCartItem_should_Return400_when_RequestBodyInvalid() {
-            fail("implement more tests");
+        public void createCartItem_should_Return400_when_RequestBodyInvalid() throws Exception {
+            // Given
+            CartItemCreateRequest request = new CartItemCreateRequest(0L, 0);
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(post(ITEMS_PATH_BY_CART_ID, fixtures.invalidId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isBadRequest());
         }
     }
     
@@ -157,23 +221,62 @@ class CartControllerTests {
     class updateCartItemQty {
         
         @Test
-        public void updateCartItemQty_should_Return200_when_CartItemUpdated() {
-            fail("implement more tests");
+        public void updateCartItemQty_should_Return200_when_CartItemUpdated() throws Exception {
+            // Given
+            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            CartItem item = fixtures.cartItemEntity();
+            CartItemResponse response = fixtures.cartItemResponse();
+            
+            when(cartService.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request)).thenReturn(item);
+            when(cartItemResponseMapper.mapToDto(item)).thenReturn(response);
+            
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(put(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.cartId(), fixtures.cartItemId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Updated"));
         }
         
         @Test
-        public void updateCartItemQty_should_Return400_when_CartIdLessThanOne() {
-            fail("implement more tests");
+        public void updateCartItemQty_should_Return400_when_CartIdLessThanOne() throws Exception {
+            // Given
+            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(put(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.invalidId(), fixtures.cartItemId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isBadRequest());
         }
         
         @Test
-        public void updateCartItemQty_should_Return400_when_ItemIdLessThanOne() {
-            fail("implement more tests");
+        public void updateCartItemQty_should_Return400_when_ItemIdLessThanOne() throws Exception {
+            // Given
+            CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(put(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.cartId(), fixtures.invalidId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isBadRequest());
         }
         
         @Test
-        public void updateCartItemQty_should_Return400_when_RequestBodyInvalid() {
-            fail("implement more tests");
+        public void updateCartItemQty_should_Return400_when_RequestBodyInvalid() throws Exception {
+            // Given
+            CartItemUpdateRequest request = new CartItemUpdateRequest(-1);
+            String json = objectMapper.writeValueAsString(request);
+            
+            // When & Then
+            mockMvc.perform(put(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.cartId(), fixtures.cartItemId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(json))
+                   .andExpect(status().isBadRequest());
         }
     }
     
@@ -182,18 +285,24 @@ class CartControllerTests {
     class deleteCartItem {
         
         @Test
-        public void deleteCartItem_should_Return204_when_CartItemDeleted() {
-            fail("implement more tests");
+        public void deleteCartItem_should_Return204_when_CartItemDeleted() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.cartId(), fixtures.cartItemId()))
+                   .andExpect(status().isNoContent());
         }
         
         @Test
-        public void deleteCartItem_should_Return400_when_CartIdLessThanOne() {
-            fail("implement more tests");
+        public void deleteCartItem_should_Return400_when_CartIdLessThanOne() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.invalidId(), fixtures.cartItemId()))
+                   .andExpect(status().isBadRequest());
         }
         
         @Test
-        public void deleteCartItem_should_Return400_when_CartItemIdLessThanOne() {
-            fail("implement more tests");
+        public void deleteCartItem_should_Return400_when_CartItemIdLessThanOne() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(ITEMS_PATH_BY_CART_ID_AND_ITEM_ID, fixtures.cartId(), fixtures.invalidId()))
+                   .andExpect(status().isBadRequest());
         }
     }
     
@@ -202,13 +311,17 @@ class CartControllerTests {
     class deleteAllCartItems {
         
         @Test
-        public void deleteAllCartItems_should_Return204_when_CartItemsDeleted() {
-            fail("implement more tests");
+        public void deleteAllCartItems_should_Return204_when_CartItemsDeleted() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(ITEMS_PATH_BY_CART_ID, fixtures.cartId()))
+                   .andExpect(status().isNoContent());
         }
         
         @Test
-        public void deleteAllCartItems_should_Return400_when_CartIdLessThanOne() {
-            fail("implement more tests");
+        public void deleteAllCartItems_should_Return400_when_CartIdLessThanOne() throws Exception {
+            // When & Then
+            mockMvc.perform(delete(ITEMS_PATH_BY_CART_ID, fixtures.invalidId()))
+                   .andExpect(status().isBadRequest());
         }
     }
 }

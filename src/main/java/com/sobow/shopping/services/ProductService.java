@@ -25,8 +25,6 @@ public interface ProductService {
     
     List<Product> lockForOrder(List<Long> ids);
     
-    void decrementAvailableQty(long id, int decrementQty);
-    
     List<Product> search(String nameLike,
                          String brandName,
                          String categoryName);
