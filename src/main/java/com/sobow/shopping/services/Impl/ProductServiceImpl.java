@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public List<Product> lockForOrder(List<Long> ids) {
-        List<Long> sorted = ids.stream() // deadlock prevention, always lock rows in the same order
+        List<Long> sorted = ids.stream() // deadlock prevention. Always lock rows in the same order
                                .distinct()
                                .sorted()
                                .toList();

@@ -51,9 +51,9 @@ public class CartServiceImpl implements CartService {
     }
     
     @Override
-    public Cart findByIdWithItems(long id) {
-        return cartRepository.findByIdWithItems(id)
-                             .orElseThrow(() -> new EntityNotFoundException("Cart with " + id + " not found"));
+    public Cart findByUserIdWithItems(long userId) {
+        return cartRepository.findByUserProfile_UserIdWithItems(userId)
+                             .orElseThrow(() -> new EntityNotFoundException("Cart of user " + userId + " not found"));
     }
     
     @Transactional

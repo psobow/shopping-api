@@ -32,9 +32,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public Order createOrder(long userId) {
-        // Load cart with items
+        // Load UserProfile and Cart with items
         UserProfile userProfile = userProfileService.findByUserId(userId);
-        Cart cart = cartService.findByIdWithItems(userProfile.getCart().getId());
+        Cart cart = cartService.findByUserIdWithItems(userId);
         
         // Assert cart is not empty
         if (cart.getCartItems().isEmpty()) {

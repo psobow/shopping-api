@@ -83,14 +83,11 @@ public class TestFixtures {
     
     public UserProfile userProfileEntity() {
         UserProfile userProfile = new UserProfile(userFirstName, userLastName);
-        
-        User user = new User(userEmail, userPassword);
-        userProfile.linkTo(user);
-        
-        UserAddress address = userAddressEntity();
-        userProfile.addAddressAndLink(address);
-        
         return userProfile;
+    }
+    
+    public User userEntity() {
+        return new User(userEmail, userPassword);
     }
     
     public Cart cartEntity() {

@@ -13,7 +13,7 @@ public interface CartService {
     
     Cart findById(long id);
     
-    Cart findByIdWithItems(long id);
+    Cart findByUserIdWithItems(long id);
     
     CartItem createCartItem(long cartId, CartItemCreateRequest dto);
     
