@@ -17,6 +17,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -72,9 +73,15 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
+    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public List<Product> lockForOrder(List<Long> ids) {
-        return productRepository.findAllForUpdate(ids);
+        List<Long> sorted = ids.stream() // deadlock prevention, always lock rows in the same order
+                               .distinct()
+                               .sorted()
+                               .toList();
+        
+        return productRepository.findAllForUpdate(sorted);
     }
     
     @Override

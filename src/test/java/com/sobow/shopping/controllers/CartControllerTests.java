@@ -1,6 +1,7 @@
 package com.sobow.shopping.controllers;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -99,6 +100,10 @@ class CartControllerTests {
     @Nested
     @DisplayName("deleteCart")
     class deleteCart {
-    
+        
+        @Test
+        public void test() {
+            fail("implement more tests");
+        }
     }
 }
