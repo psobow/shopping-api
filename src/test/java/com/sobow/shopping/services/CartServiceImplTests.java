@@ -2,6 +2,7 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
@@ -103,6 +104,11 @@ public class CartServiceImplTests {
             
             // Then
             assertThat(userProfile.getCart()).isNull();
+        }
+        
+        @Test
+        public void removeCart_should_ThrowEntityNotFound_when_UserDoesNotExist() {
+            fail("implement me");
         }
     }
     
