@@ -2,7 +2,6 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
@@ -10,6 +9,7 @@ import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.cart.CartItemCreateRequest;
 import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
@@ -38,6 +38,9 @@ public class CartServiceImplTests {
     @Mock
     private ProductService productService;
     
+    @Mock
+    private UserProfileService userProfileService;
+    
     @InjectMocks
     private CartServiceImpl underTest;
     
@@ -50,12 +53,34 @@ public class CartServiceImplTests {
         @Test
         public void createOrGetCart_should_createNewCart_when_CartDoesNotExist() {
             // Given
-            fail("implement me");
+            UserProfile userProfile = fixtures.userProfileEntity();
+            when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
+            assertThat(userProfile.getCart()).isNull();
+            
+            // When
+            Cart result = underTest.createOrGetCart(fixtures.userId());
+            
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(userProfile.getCart()).isSameAs(result);
         }
         
         @Test
         public void createOrGetCart_should_ReturnExistingCart_when_CartExists() {
-            fail("implement me");
+            // Given
+            UserProfile userProfile = fixtures.userProfileEntity();
+            Cart cart = fixtures.cartEntity();
+            userProfile.addCartAndLink(cart);
+            assertThat(userProfile.getCart()).isNotNull();
+            
+            when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
+            
+            // When
+            Cart result = underTest.createOrGetCart(fixtures.userId());
+            
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result).isSameAs(cart);
         }
     }
     
@@ -65,7 +90,19 @@ public class CartServiceImplTests {
         
         @Test
         public void removeCart_should_removeCart_when_CartExist() {
-            fail("implement me");
+            // Given
+            UserProfile userProfile = fixtures.userProfileEntity();
+            Cart cart = fixtures.cartEntity();
+            userProfile.addCartAndLink(cart);
+            assertThat(userProfile.getCart()).isNotNull();
+            
+            when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
+            
+            // When
+            underTest.removeCart(fixtures.userId());
+            
+            // Then
+            assertThat(userProfile.getCart()).isNull();
         }
     }
     

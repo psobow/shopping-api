@@ -14,7 +14,9 @@ import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.ProductCreateRequest;
 import com.sobow.shopping.domain.product.ProductResponse;
 import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
+import com.sobow.shopping.domain.user.UserProfile;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -50,10 +52,12 @@ public class TestFixtures {
     
     private Long cartItemId = 50L;
     private Integer requestedQty = 1;
-    private Integer cartItemQuantity = 1;
     
+    private Long userId = 60L;
     private String userFirstName = "first name";
     private String userLastName = "last name";
+    private String userEmail = "user@email.com";
+    private String userPassword = "password";
     
     private String cityName = "city name";
     private String streetName = "street name";
@@ -69,14 +73,25 @@ public class TestFixtures {
     }
     
     public UserAddress userAddressEntity() {
-        return new UserAddress().builder()
-                                .cityName(cityName)
-                                .streetName(streetName)
-                                .streetNumber(streetNumber)
-                                .postCode(postCode)
-                                .build();
+        return UserAddress.builder()
+                          .cityName(cityName)
+                          .streetName(streetName)
+                          .streetNumber(streetNumber)
+                          .postCode(postCode)
+                          .build();
     }
     
+    public UserProfile userProfileEntity() {
+        UserProfile userProfile = new UserProfile(userFirstName, userLastName);
+        
+        User user = new User(userEmail, userPassword);
+        userProfile.linkTo(user);
+        
+        UserAddress address = userAddressEntity();
+        userProfile.addAddressAndLink(address);
+        
+        return userProfile;
+    }
     
     public Cart cartEntity() {
         Cart cart = new Cart();
@@ -105,8 +120,7 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Product product = new Product(productName, brandName, description, price,
-                                      availableQuantity);
+        Product product = new Product(productName, brandName, description, price, availableQuantity);
         return product;
     }
     
@@ -182,6 +196,10 @@ public class TestFixtures {
         return cartItemId;
     }
     
+    public Long userId() {
+        return userId;
+    }
+    
     // setters
     public TestFixtures withCategoryAndProductAndImageNullIds() {
         withProductId(null);
@@ -211,7 +229,7 @@ public class TestFixtures {
         return this;
     }
     
-    public TestFixtures withProductBrandName(String newBrandName) {
+    public TestFixtures withBrandName(String newBrandName) {
         brandName = newBrandName;
         return this;
     }
