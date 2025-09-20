@@ -2,7 +2,6 @@ package com.sobow.shopping.controllers;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -117,33 +116,6 @@ public class CartControllerTests {
         public void deleteCart_should_Return400_when_UserIdLessThanOne() throws Exception {
             // When & Then
             mockMvc.perform(delete(CART_PATH_BY_USER_ID, fixtures.invalidId()))
-                   .andExpect(status().isBadRequest());
-        }
-    }
-    
-    @Nested
-    @DisplayName("getCart")
-    class getCart {
-        
-        @Test
-        public void getCart_should_Return200_when_CartExists() throws Exception {
-            // Given
-            Cart cart = fixtures.cartEntity();
-            CartResponse response = fixtures.cartResponse();
-            
-            when(cartService.findById(fixtures.cartId())).thenReturn(cart);
-            when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
-            
-            // When & Then
-            mockMvc.perform(get(CARTS_PATH_BY_ID, fixtures.cartId()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.message").value("Found"));
-        }
-        
-        @Test
-        public void getCart_should_Return400_when_CartIdLessThanOne() throws Exception {
-            // When & Then
-            mockMvc.perform(get(CARTS_PATH_BY_ID, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }
     }

@@ -61,6 +61,7 @@ public class ProductControllerTests {
         
         @Test
         public void createProduct_should_Return201WithDto_when_ValidRequest() throws Exception {
+            // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
             Category category = fixtures.categoryEntity();
             Product saved = fixtures.productEntity();
@@ -72,6 +73,7 @@ public class ProductControllerTests {
             when(productService.create(request)).thenReturn(saved);
             when(productResponseMapper.mapToDto(saved)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(post(PRODUCTS_PATH)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -90,6 +92,7 @@ public class ProductControllerTests {
         
         @Test
         public void createProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
+            // Given
             ProductCreateRequest invalidRequest =
                 new ProductCreateRequest(null, "  ", new BigDecimal(0),
                                          -1, "", null
@@ -97,6 +100,7 @@ public class ProductControllerTests {
             
             String json = objectMapper.writeValueAsString(invalidRequest);
             
+            // When & Then
             mockMvc.perform(post(PRODUCTS_PATH)
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -110,6 +114,7 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return200WithDto_when_ValidRequest() throws Exception {
+            // Given
             ProductUpdateRequest request = fixtures.productUpdateRequest();
             
             Category category = fixtures.categoryEntity();
@@ -123,6 +128,7 @@ public class ProductControllerTests {
             when(productService.partialUpdateById(request, fixtures.productId())).thenReturn(updated);
             when(productResponseMapper.mapToDto(updated)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(put(PRODUCTS_BY_ID_PATH, fixtures.productId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -139,12 +145,14 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_RequestBodyViolatesDtoConstraints() throws Exception {
+            // Given
             ProductCreateRequest invalidRequest =
                 new ProductCreateRequest("   ", "  ", new BigDecimal(0),
                                          -1, "", -1L
                 );
             String json = objectMapper.writeValueAsString(invalidRequest);
             
+            // When & Then
             mockMvc.perform(put(PRODUCTS_BY_ID_PATH, fixtures.productId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -153,10 +161,12 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
+            // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
             
             String json = objectMapper.writeValueAsString(request);
             
+            // When & Then
             mockMvc.perform(put(PRODUCTS_BY_ID_PATH, fixtures.invalidId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -165,6 +175,7 @@ public class ProductControllerTests {
         
         @Test
         public void updateProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
+            // Given
             ProductUpdateRequest request = fixtures.productUpdateRequest();
             
             when(productService.partialUpdateById(request, fixtures.nonExistingId()))
@@ -172,6 +183,7 @@ public class ProductControllerTests {
             
             String json = objectMapper.writeValueAsString(request);
             
+            // When & Then
             mockMvc.perform(put(PRODUCTS_BY_ID_PATH, fixtures.nonExistingId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(json))
@@ -185,6 +197,7 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithList_when_ProductsExists() throws Exception {
+            // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
@@ -197,6 +210,7 @@ public class ProductControllerTests {
             when(productService.findAllWithCategoryAndImages()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_PATH))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
@@ -212,8 +226,10 @@ public class ProductControllerTests {
         
         @Test
         public void getAllProducts_should_Return200WithEmptyList_when_ProductsDoesNotExist() throws Exception {
+            // Given
             when(productService.findAll()).thenReturn(List.of());
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_PATH))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.data").isArray())
@@ -222,6 +238,7 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return200WithDto_when_ProductIdValid() throws Exception {
+            // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
@@ -234,6 +251,7 @@ public class ProductControllerTests {
             when(productService.findWithCategoryAndImagesById(fixtures.productId())).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.productId()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
@@ -249,14 +267,17 @@ public class ProductControllerTests {
         
         @Test
         public void getProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
+            // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }
         
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
+            // Given
             when(productService.findWithCategoryAndImagesById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.nonExistingId()))
                    .andExpect(status().isNotFound());
         }
@@ -268,6 +289,7 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByNameOnly() throws Exception {
+            // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
@@ -280,6 +302,7 @@ public class ProductControllerTests {
             when(productService.search(product.getName(), null, null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("name", product.getName()))
                    .andExpect(status().isOk())
@@ -296,6 +319,7 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByBrandOnly() throws Exception {
+            // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
@@ -308,6 +332,7 @@ public class ProductControllerTests {
             when(productService.search(null, product.getBrandName(), null)).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("brandName", product.getBrandName()))
                    .andExpect(status().isOk())
@@ -324,6 +349,7 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return200WithDto_when_FilterByCategoryOnly() throws Exception {
+            // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
@@ -336,6 +362,7 @@ public class ProductControllerTests {
             when(productService.search(null, null, product.getCategory().getName())).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("categoryName", product.getCategory().getName()))
                    .andExpect(status().isOk())
@@ -352,7 +379,7 @@ public class ProductControllerTests {
         
         @Test
         public void searchProducts_should_Return404WithEmptyList_when_NoProductsFound() throws Exception {
-            
+            // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH))
                    .andExpect(status().isNotFound())
                    .andExpect(jsonPath("$.message").value("Not found"))
@@ -367,12 +394,14 @@ public class ProductControllerTests {
         
         @Test
         public void deleteProduct_should_Return204_when_Deleted() throws Exception {
+            // When & Then
             mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, fixtures.productId()))
                    .andExpect(status().isNoContent());
         }
         
         @Test
         public void deleteProduct_should_Return400_when_ProductIdLessThanOne() throws Exception {
+            // When & Then
             mockMvc.perform(delete(PRODUCTS_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
         }

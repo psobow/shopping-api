@@ -76,15 +76,17 @@ public class ProductServiceImplTests {
             when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
-            // When + Then
+            // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.create(request));
         }
         
         @Test
         public void create_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
+            // Given
             ProductCreateRequest request = fixtures.productCreateRequest();
             when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(true);
-            // When + Then
+            
+            // When & Then
             assertThrows(ProductAlreadyExistsException.class, () -> underTest.create(request));
         }
     }
@@ -125,19 +127,21 @@ public class ProductServiceImplTests {
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
-            // When + Then
+            // When & Then
             assertThrows(EntityNotFoundException.class,
                          () -> underTest.partialUpdateById(patch, fixtures.productId()));
         }
         
         @Test
         public void partialUpdateById_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
+            // Given
             Product product = fixtures.productEntity();
             ProductUpdateRequest patch = fixtures.productUpdateRequest();
             
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
             when(productRepository.existsByNameAndBrandName(patch.name(), patch.brandName())).thenReturn(true);
-            // When + Then
+            
+            // When & Then
             assertThrows(ProductAlreadyExistsException.class,
                          () -> underTest.partialUpdateById(patch, fixtures.productId()));
         }

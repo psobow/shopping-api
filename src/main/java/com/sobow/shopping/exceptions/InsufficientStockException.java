@@ -8,7 +8,7 @@ public class InsufficientStockException extends RuntimeException {
     
     public InsufficientStockException(Long productId, int available, int requested) {
         super("Requested quantity exceeds stock for product id " + productId +
-                  " available=" + available + ", requested=" + requested);
+                  " available " + available + ", requested " + requested);
         this.productId = productId;
         this.available = available;
         this.requested = requested;

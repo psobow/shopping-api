@@ -59,6 +59,7 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return201WithList_when_ValidRequest() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
             List<Image> saved = List.of(fixtures.imageEntity());
             ImageResponse response = fixtures.imageResponse();
@@ -66,6 +67,7 @@ public class ImageControllerTests {
             when(imageService.saveImages(List.of(file), fixtures.productId())).thenReturn(saved);
             when(imageMapper.mapToDto(saved.get(0))).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -79,6 +81,7 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return400_when_FilePartMissing() throws Exception {
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
@@ -88,6 +91,7 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return400_when_PartNameIsWrong() throws Exception {
+            // Given
             MockMultipartFile badFile = new MockMultipartFile(
                 "wrongName_shouldBe_file",
                 "photo.png",
@@ -95,6 +99,7 @@ public class ImageControllerTests {
                 new byte[]{1}
             );
             
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
                                 .file(badFile)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -105,8 +110,10 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return400_when_ProductIdLessThanOne() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
             
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.invalidId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -117,11 +124,13 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return404_when_ProductIdDoesNotExist() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
             
             when(imageService.saveImages(List.of(file), fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.nonExistingId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -130,6 +139,7 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return415_when_ContentTypeUnsupported() throws Exception {
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{}"))
@@ -140,11 +150,13 @@ public class ImageControllerTests {
         
         @Test
         public void saveImages_should_Return413_when_FileExceedsLimit() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
             
             when(imageService.saveImages(List.of(file), fixtures.productId()))
                 .thenThrow(new MaxUploadSizeExceededException(DataSize.ofMegabytes(5).toBytes()));
             
+            // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -159,6 +171,7 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return200WithDto_when_ValidRequest() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.withMultipartByteArray(new byte[]{1, 2, 3})
                                              .multipartFile();
             
@@ -168,6 +181,7 @@ public class ImageControllerTests {
             when(imageService.updateById(file, fixtures.imageId())).thenReturn(updated);
             when(imageMapper.mapToDto(updated)).thenReturn(response);
             
+            // When & Then
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.imageId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -181,6 +195,7 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return400_when_FilePartMissing() throws Exception {
+            // When & Then
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.imageId())
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
@@ -190,7 +205,10 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
+            
+            // When & Then
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.invalidId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -201,6 +219,7 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return415_when_ContentTypeUnsupported() throws Exception {
+            // When & Then
             mockMvc.perform(put(IMAGES_BY_ID_PATH, fixtures.imageId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content("{}"))
@@ -211,10 +230,12 @@ public class ImageControllerTests {
         
         @Test
         public void updateImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
+            // Given
             MockMultipartFile file = fixtures.multipartFile();
             when(imageService.updateById(file, fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
+            // When & Then
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.nonExistingId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -228,10 +249,12 @@ public class ImageControllerTests {
         
         @Test
         public void downloadImage_should_Return200WithFile_when_ImageIdValid() throws Exception {
+            // Given
             FileContent fileContent = fixtures.fileContent();
             
             when(imageService.getImageContent(fixtures.imageId())).thenReturn(fileContent);
             
+            // When & Then
             mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.imageId()))
                    .andExpect(status().isOk())
                    .andExpect(header().string("Content-Type", fileContent.fileType()))
@@ -243,6 +266,7 @@ public class ImageControllerTests {
         
         @Test
         public void downloadImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
+            // When & Then
             mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
             
@@ -251,8 +275,10 @@ public class ImageControllerTests {
         
         @Test
         public void downloadImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
+            // Given
             when(imageService.getImageContent(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
+            // When & Then
             mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.nonExistingId()))
                    .andExpect(status().isNotFound());
         }
@@ -264,6 +290,7 @@ public class ImageControllerTests {
         
         @Test
         public void deleteImage_should_Return204_when_Deleted() throws Exception {
+            // When & Then
             mockMvc.perform(delete(IMAGES_BY_ID_PATH, fixtures.imageId()))
                    .andExpect(status().isNoContent());
             verify(imageService).deleteById(fixtures.imageId());
@@ -271,6 +298,7 @@ public class ImageControllerTests {
         
         @Test
         public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
+            // When & Then
             mockMvc.perform(delete(IMAGES_BY_ID_PATH, fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
             verify(imageService, never()).deleteById(fixtures.invalidId());

@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public Cart findByUserIdWithItems(long userId) {
-        return cartRepository.findByUserProfile_UserIdWithItems(userId)
+        return cartRepository.findByUserProfile_User_IdWithItems(userId)
                              .orElseThrow(() -> new EntityNotFoundException("Cart of user " + userId + " not found"));
     }
     
@@ -98,7 +98,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public boolean existsByUserProfile_UserId(long userId) {
-        return cartRepository.existsByUserProfile_UserId(userId);
+        return cartRepository.existsByUserProfile_User_Id(userId);
     }
     
     private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {

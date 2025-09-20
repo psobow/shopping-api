@@ -45,7 +45,7 @@ public class Order {
     private OrderStatus status;
     
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
     
     @Column(nullable = false)
     private BigDecimal totalPrice;
@@ -53,7 +53,7 @@ public class Order {
     // ---- Lifecycle callbacks -------------------------------
     @PrePersist
     public void onCreate() {
-        created_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
         totalPrice = orderItems.stream()
                                .map(OrderItem::getTotalPrice)
                                .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
     
-    boolean existsByUserProfile_UserId(long userId);
+    boolean existsByUserProfile_User_Id(long userId);
     
     @Query("""
         SELECT DISTINCT c
@@ -17,5 +17,5 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         LEFT JOIN FETCH c.cartItems
         WHERE c.userProfile.user.id = :userId
         """)
-    Optional<Cart> findByUserProfile_UserIdWithItems(long userId);
+    Optional<Cart> findByUserProfile_User_IdWithItems(long userId);
 }

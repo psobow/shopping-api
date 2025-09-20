@@ -15,6 +15,7 @@ import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,9 +59,17 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public Order findById(long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(
-            () -> new EntityNotFoundException("Order with id " + orderId + " not found"));
+    public Order findByUserIdAndId(long userId, long orderId) {
+        return orderRepository.findByUserProfile_User_IdAndId(userId, orderId)
+                              .orElseThrow(
+                                  () -> new EntityNotFoundException(
+                                      "Order with id " + orderId + " for user " + userId + " not found")
+                              );
+    }
+    
+    @Override
+    public List<Order> findAllByUserId(long userId) {
+        return orderRepository.findAllByUserProfile_User_IdOrderByCreatedAtDesc(userId);
     }
     
     private void assertStockAvailableAndDecrement(Set<CartItem> items) {

@@ -143,17 +143,20 @@ public class CartServiceImplTests {
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_CartDoesNotExist() {
+            // Given
             Cart cart = fixtures.cartEntity();
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
             when(cartRepository.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
+            // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.nonExistingId(), request));
             assertThat(cart.getCartItems()).isEmpty();
         }
         
         @Test
         public void createCartItem_should_ThrowNotFound_when_ProductDoesNotExist() {
+            // Given
             Cart cart = fixtures.cartEntity();
             CartItemCreateRequest request = fixtures.withProductId(fixtures.nonExistingId())
                                                     .cartItemCreateRequest();
@@ -161,12 +164,14 @@ public class CartServiceImplTests {
             when(cartRepository.findById(fixtures.cartId())).thenReturn(Optional.of(cart));
             when(productService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
+            // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
             assertThat(cart.getCartItems()).isEmpty();
         }
         
         @Test
         public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
+            // Given
             Cart cart = fixtures.cartEntity();
             var itemsBefore = List.copyOf(cart.getCartItems());
             
@@ -178,6 +183,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.existsByCartIdAndProductId(fixtures.cartId(), fixtures.productId()))
                 .thenThrow(new CartItemAlreadyExistsException(fixtures.cartId(), fixtures.productId()));
             
+            // When & Then
             assertThrows(CartItemAlreadyExistsException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
             assertThat(cart.getCartItems()).hasSize(itemsBefore.size());
         }
@@ -210,7 +216,7 @@ public class CartServiceImplTests {
         
         @Test
         public void updateCartItemQty_should_RemoveItemFromCart_when_NewQtyEqualsZero() {
-            // given
+            // Given
             Cart cart = fixtures.cartEntity();
             CartItem item = fixtures.cartItemEntity();
             cart.addCartItemAndLink(item);
@@ -220,10 +226,10 @@ public class CartServiceImplTests {
             
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId())).thenReturn(Optional.of(item));
             
-            // when
+            // When
             CartItem result = underTest.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
             
-            // then
+            // Rhen
             assertThat(result).isSameAs(item);
             assertThat(result.getRequestedQty()).isZero();
             
@@ -232,11 +238,13 @@ public class CartServiceImplTests {
         
         @Test
         public void updateCartItemQty_should_ThrowNotFound_when_ItemDoesNotExistInCart() {
+            // Given
             CartItemUpdateRequest request = fixtures.cartItemUpdateRequest();
             
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.nonExistingId()))
                 .thenThrow(new EntityNotFoundException());
             
+            // When & Then
             assertThrows(EntityNotFoundException.class,
                          () -> underTest.updateCartItemQty(fixtures.cartId(), fixtures.nonExistingId(), request));
         }
@@ -278,7 +286,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId()))
                 .thenThrow(new EntityNotFoundException());
             
-            // When
+            // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId()));
         }
         
@@ -330,8 +338,10 @@ public class CartServiceImplTests {
         
         @Test
         public void removeAllCartItems_should_ThrowNotFound_when_CartDoesNotExist() {
+            // Given
             when(cartRepository.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
+            // When & Then
             assertThrows(EntityNotFoundException.class, () -> underTest.removeAllCartItems(fixtures.nonExistingId()));
         }
     }
