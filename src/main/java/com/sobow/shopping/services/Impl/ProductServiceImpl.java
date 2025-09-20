@@ -73,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
     
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.MANDATORY) // throw if there's no existing transaction
     @Override
     public List<Product> lockForOrder(List<Long> ids) {
         List<Long> sorted = ids.stream() // deadlock prevention. Always lock rows in the same order

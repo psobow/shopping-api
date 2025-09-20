@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
         
         // Assert cart is not empty
         if (cart.getCartItems().isEmpty()) {
-            throw new CartEmptyException(cart);
+            throw new CartEmptyException(cart.getId());
         }
         
         // Lock + assert stock available + decrement

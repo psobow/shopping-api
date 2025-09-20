@@ -13,6 +13,10 @@ import com.sobow.shopping.domain.category.CategoryResponse;
 import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.image.ImageResponse;
+import com.sobow.shopping.domain.order.Order;
+import com.sobow.shopping.domain.order.OrderItemResponse;
+import com.sobow.shopping.domain.order.OrderResponse;
+import com.sobow.shopping.domain.order.OrderStatus;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.ProductCreateRequest;
 import com.sobow.shopping.domain.product.ProductResponse;
@@ -23,6 +27,7 @@ import com.sobow.shopping.domain.user.UserProfile;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import javax.sql.rowset.serial.SerialBlob;
@@ -40,7 +45,7 @@ public class TestFixtures {
     private Long productId = 20L;
     private String productName = "product name";
     private String brandName = "brand name";
-    private BigDecimal price = new BigDecimal("10.00");
+    private BigDecimal productPrice = new BigDecimal("10.00");
     private Integer availableQuantity = 10;
     private String description = "product description";
     
@@ -71,12 +76,41 @@ public class TestFixtures {
     private String streetNumber = "15";
     private String postCode = "11-222";
     
+    private Long orderItemId = 70L;
+    private Long orderId = 80L;
+    
     public TestFixtures() {
         try {
             this.blob = new SerialBlob(byteArray);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public Order orderEntity() {
+        return new Order(OrderStatus.NEW);
+    }
+    
+    public OrderResponse orderResponse() {
+        return OrderResponse.builder()
+                            .id(orderId)
+                            .status(OrderStatus.NEW.toString())
+                            .createdAt(LocalDateTime.now())
+                            .totalOrderPrice(totalCartPrice)
+                            .itemResponseList(List.of(orderItemResponse()))
+                            .build();
+    }
+    
+    public OrderItemResponse orderItemResponse() {
+        return OrderItemResponse.builder()
+                                .id(orderItemId)
+                                .orderId(orderId)
+                                .requestedQty(requestedQty)
+                                .productName(productName)
+                                .productBrandName(brandName)
+                                .productPrice(productPrice)
+                                .totalItemPrice(totalItemPrice)
+                                .build();
     }
     
     public UserAddress userAddressEntity() {
@@ -133,20 +167,20 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Product product = new Product(productName, brandName, description, price, availableQuantity);
+        Product product = new Product(productName, brandName, description, productPrice, availableQuantity);
         return product;
     }
     
     public ProductCreateRequest productCreateRequest() {
-        return new ProductCreateRequest(productName, brandName, price, availableQuantity, description, categoryId);
+        return new ProductCreateRequest(productName, brandName, productPrice, availableQuantity, description, categoryId);
     }
     
     public ProductUpdateRequest productUpdateRequest() {
-        return new ProductUpdateRequest(productName, brandName, price, availableQuantity, description, categoryId);
+        return new ProductUpdateRequest(productName, brandName, productPrice, availableQuantity, description, categoryId);
     }
     
     public ProductResponse productResponseOf(Product p) {
-        return new ProductResponse(productId, productName, brandName, price, availableQuantity, description,
+        return new ProductResponse(productId, productName, brandName, productPrice, availableQuantity, description,
                                    categoryId, List.of(imageId));
     }
     
@@ -211,6 +245,10 @@ public class TestFixtures {
     
     public Long userId() {
         return userId;
+    }
+    
+    public Long orderId() {
+        return orderId;
     }
     
     // setters

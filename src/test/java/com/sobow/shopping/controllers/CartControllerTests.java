@@ -44,12 +44,11 @@ public class CartControllerTests {
     @MockitoBean
     private Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
     
-    private TestFixtures fixtures = new TestFixtures();
+    private final TestFixtures fixtures = new TestFixtures();
     
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     
     private static final String CART_PATH_BY_USER_ID = "/api/users/{userId}/cart";
-    private static final String CARTS_PATH_BY_ID = "/api/carts/{id}";
     private static final String ITEMS_PATH_BY_CART_ID = "/api/carts/{cartId}/items";
     private static final String ITEMS_PATH_BY_CART_ID_AND_ITEM_ID = "/api/carts/{cartId}/items/{itemId}";
     
@@ -72,7 +71,8 @@ public class CartControllerTests {
             mockMvc.perform(put(CART_PATH_BY_USER_ID, userId))
                    .andExpect(status().isOk())
                    .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
-                   .andExpect(jsonPath("$.message").value("Found"));
+                   .andExpect(jsonPath("$.message").value("Found"))
+                   .andExpect(jsonPath("$.data").exists());
         }
         
         @Test
@@ -90,7 +90,8 @@ public class CartControllerTests {
             mockMvc.perform(put(CART_PATH_BY_USER_ID, userId))
                    .andExpect(status().isCreated())
                    .andExpect(header().exists(HttpHeaders.LOCATION))
-                   .andExpect(jsonPath("$.message").value("Created"));
+                   .andExpect(jsonPath("$.message").value("Created"))
+                   .andExpect(jsonPath("$.data").exists());
         }
         
         @Test

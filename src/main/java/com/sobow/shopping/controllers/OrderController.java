@@ -50,7 +50,7 @@ public class OrderController {
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
-    @GetMapping("/{id}")
+    @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse> getOrder(
         @PathVariable @Positive long userId,
         @PathVariable @Positive long orderId
