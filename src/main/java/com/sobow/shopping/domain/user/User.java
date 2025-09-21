@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @NoArgsConstructor
@@ -28,6 +30,32 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+    
+    public User withAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
+        grantedAuthorities.forEach(grantedAuthority -> {
+            UserAuthority authority = new UserAuthority(grantedAuthority.getAuthority());
+            this.addAuthorityAndLink(authority);
+        });
+        return this;
+    }
+    
+    public User withProfileAndAddress(UserProfile userProfile, UserAddress userAddress) {
+        UserProfile newProfile = UserProfile.builder()
+                                            .firstName(userProfile.getFirstName())
+                                            .lastName(userProfile.getLastName())
+                                            .build();
+        this.addProfileAndLink(newProfile);
+        
+        UserAddress newAddress = UserAddress.builder()
+                                            .cityName(userAddress.getCityName())
+                                            .streetName(userAddress.getStreetName())
+                                            .streetNumber(userAddress.getStreetNumber())
+                                            .postCode(userAddress.getPostCode())
+                                            .build();
+        profile.addAddressAndLink(newAddress);
+        
+        return this;
     }
     
     // ---- Identifier ----------------------------------------
