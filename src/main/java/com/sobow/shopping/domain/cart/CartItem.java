@@ -18,6 +18,8 @@ import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
 
 @Getter
@@ -41,18 +43,18 @@ public class CartItem {
         setRequestedQty(requestedQty);
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false)
     private Integer requestedQty;
     
     // ---- Associations --------------------------------------
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
     
     @ManyToOne(optional = false)
