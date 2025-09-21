@@ -32,12 +32,11 @@ public class OrderItem {
         this.productPrice = productPrice;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false)
     private Integer requestedQty;
     

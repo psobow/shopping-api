@@ -33,12 +33,11 @@ public class UserProfile {
         this.lastName = lastName;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false)
     private String firstName;
     
@@ -60,6 +59,13 @@ public class UserProfile {
     private Set<Order> orders = new HashSet<>();
     
     // ---- Domain methods ------------------------------------
+    
+    public void updateFrom(UserProfile patch) {
+        if (patch.getFirstName() != null) this.firstName = patch.getFirstName();
+        if (patch.getLastName() != null) this.lastName = patch.getLastName();
+        if (patch.getAddress() != null) this.address.updateFrom(patch.getAddress());
+    }
+    
     public void linkTo(User user) {
         this.user = user;
     }

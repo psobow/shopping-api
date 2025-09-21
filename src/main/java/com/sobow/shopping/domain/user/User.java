@@ -58,12 +58,11 @@ public class User {
         return this;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false, unique = true)
     private String email;
     
@@ -78,6 +77,15 @@ public class User {
     private Set<UserAuthority> authorities = new HashSet<>();
     
     // ---- Domain methods ------------------------------------
+    public void updateAuthoritiesFrom(Collection<? extends GrantedAuthority> grantedAuthorities) {
+        this.removeAllAuthorities();
+        this.withAuthorities(grantedAuthorities);
+    }
+    
+    public void updateProfileFrom(UserProfile patch) {
+        if (patch != null) profile.updateFrom(patch);
+    }
+    
     public void addProfileAndLink(UserProfile userProfile) {
         this.profile = userProfile;
         userProfile.linkTo(this);
@@ -94,6 +102,21 @@ public class User {
     
     public void removeAuthority(UserAuthority userAuthority) {
         authorities.remove(userAuthority);
+    }
+    
+    public void removeAllAuthorities() {
+        for (UserAuthority authority : new HashSet<>(authorities)) {
+            removeAuthority(authority);
+        }
+    }
+    
+    // ---- Setter methods ------------------------------------
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     // ---- Equality (proxy-safe) -----------------------------

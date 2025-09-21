@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "carts")
 public class Cart {
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

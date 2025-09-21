@@ -36,12 +36,11 @@ public class Order {
         this.status = status;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;

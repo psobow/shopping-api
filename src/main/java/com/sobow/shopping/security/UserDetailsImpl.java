@@ -4,15 +4,17 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class CustomUserDetails implements UserDetails {
+@Getter
+public class UserDetailsImpl implements UserDetails {
     
     private final User user;
     
-    public CustomUserDetails(User user) {
+    public UserDetailsImpl(User user) {
         this.user = user;
     }
     
@@ -55,15 +57,11 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
     
-    public User getUser() {
-        return user;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         
-        CustomUserDetails that = (CustomUserDetails) o;
+        UserDetailsImpl that = (UserDetailsImpl) o;
         return user.equals(that.user);
     }
     

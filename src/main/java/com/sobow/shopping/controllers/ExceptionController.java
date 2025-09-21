@@ -3,9 +3,12 @@ package com.sobow.shopping.controllers;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
+import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
+import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.InvalidPriceException;
+import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -110,10 +114,49 @@ public class ExceptionController {
     
     @ExceptionHandler(CartEmptyException.class)
     public ResponseEntity<ProblemDetail> handleCartEmpty(CartEmptyException ex, HttpServletRequest req) {
-        var pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY); // 422
+        var pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         pd.setTitle("Empty cart");
         pd.setDetail(ex.getMessage());
         pd.setProperty("path", req.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleUserNotFound(UsernameNotFoundException ex,
+                                                            HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setTitle("User not found");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(NoAuthenticationException.class)
+    public ResponseEntity<ProblemDetail> handleNoAuthentication(NoAuthenticationException ex,
+                                                                HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        pd.setTitle("Authentication required");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(InvalidOldPasswordException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidOldPassword(InvalidOldPasswordException ex,
+                                                                  HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Invalid old password");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleEmailConflict(EmailAlreadyExistsException e, HttpServletRequest request) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Email already exists");
+        pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
 }

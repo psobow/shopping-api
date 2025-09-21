@@ -27,12 +27,11 @@ public class UserAddress {
         this.postCode = postCode;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false)
     private String cityName;
     
@@ -53,5 +52,12 @@ public class UserAddress {
     // ---- Domain methods ------------------------------------
     public void linkTo(UserProfile userProfile) {
         this.userProfile = userProfile;
+    }
+    
+    public void updateFrom(UserAddress patch) {
+        if (patch.getCityName() != null) this.cityName = patch.getCityName();
+        if (patch.getStreetName() != null) this.streetName = patch.getStreetName();
+        if (patch.getStreetNumber() != null) this.streetNumber = patch.getStreetNumber();
+        if (patch.getPostCode() != null) this.postCode = patch.getPostCode();
     }
 }

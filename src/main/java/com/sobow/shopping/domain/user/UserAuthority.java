@@ -35,12 +35,11 @@ public class UserAuthority {
         this.authority = authority;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(nullable = false, updatable = false)
     private String authority;
     

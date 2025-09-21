@@ -27,12 +27,11 @@ public class Category {
         this.name = name;
     }
     
-    // ---- Identifier ----------------------------------------
+    // ---- Identifier & Basic columns ------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ---- Basic columns -------------------------------------
     @Column(unique = true, nullable = false)
     private String name;
     

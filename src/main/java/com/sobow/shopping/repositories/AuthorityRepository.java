@@ -10,5 +10,4 @@ public interface AuthorityRepository extends JpaRepository<UserAuthority, Long> 
     
     Set<UserAuthority> findAllByUserId(Long userId);
     
-    void deleteAllByUserId(Long userId);
 }
