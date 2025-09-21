@@ -9,6 +9,7 @@ import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     public Product create(ProductCreateRequest request) {
         String name = normalize(request.name());
         String brand = normalize(request.brandName());
-        assertProductUnique(name, brand);
+        assertProductUnique(name, brand, null);
         
         Product product = productCreateRequestMapper.mapToEntity(request);
         product.setName(name);
@@ -54,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         
         // If name or brandName were present in patch, validate if duplication occurs
         if (patch.name() != null || patch.brandName() != null) {
-            assertProductUnique(existingProduct.getName(), existingProduct.getBrandName());
+            assertProductUnique(existingProduct.getName(), existingProduct.getBrandName(), existingProduct.getId());
         }
         
         if (patch.price() != null) existingProduct.setPrice(patch.price());
@@ -92,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public Product findWithCategoryAndImagesById(long id) {
-        return productRepository.findWithCategoryAndImagesById(id)
+        return productRepository.findByIdWithCategoryAndImages(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
     }
     
@@ -147,9 +148,13 @@ public class ProductServiceImpl implements ProductService {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("category").get("name"), categoryName);
     }
     
-    private void assertProductUnique(String name, String brandName) {
-        if (productRepository.existsByNameAndBrandName(name, brandName)) {
-            throw new ProductAlreadyExistsException(name, brandName);
+    private void assertProductUnique(String name, String brand, @Nullable Long existingProductId) {
+        boolean duplicate =
+            (existingProductId == null && productRepository.existsByNameAndBrandName(name, brand)) ||
+                (existingProductId != null && productRepository.existsByNameAndBrandNameAndIdNot(name, brand, existingProductId));
+        
+        if (duplicate) {
+            throw new ProductAlreadyExistsException(name, brand);
         }
     }
     

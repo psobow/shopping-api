@@ -4,6 +4,7 @@ import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Locale;
@@ -22,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category create(Category category) {
         String name = normalize(category.getName());
-        assertCategoryUnique(name);
+        assertCategoryUnique(name, null);
         
         category.setName(name);
         return categoryRepository.save(category);
@@ -34,10 +35,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category existingCategory = findById(id);
         String patchName = normalize(patch.getName());
         
-        if (existingCategory.getName() != patchName) {
-            assertCategoryUnique(patchName);
-            existingCategory.setName(patchName);
-        }
+        assertCategoryUnique(patchName, existingCategory.getId());
+        existingCategory.setName(patchName);
+        
         return existingCategory;
     }
     
@@ -73,8 +73,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.existsByName(name);
     }
     
-    private void assertCategoryUnique(String name) {
-        if (categoryRepository.existsByName(name)) {
+    private void assertCategoryUnique(String name, @Nullable Long existingCategoryId) {
+        boolean duplicate =
+            (existingCategoryId == null && categoryRepository.existsByName(name)) ||
+                (existingCategoryId != null && categoryRepository.existsByNameAndIdNot(name, existingCategoryId));
+        
+        if (duplicate) {
             throw new CategoryAlreadyExistsException(name);
         }
     }

@@ -4,8 +4,8 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
-import com.sobow.shopping.repositories.AuthorityRepository;
 import com.sobow.shopping.repositories.UserRepository;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsManagerImpl implements CustomUserDetailsManager {
     
     private final UserRepository userRepository;
-    private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     
     @Transactional(readOnly = true)
@@ -39,6 +38,8 @@ public class UserDetailsManagerImpl implements CustomUserDetailsManager {
         // Extract data from userDetails
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
         User userToCreate = userDetailsImpl.getUser();
+        
+        assertNewEmailAvailable(userToCreate.getEmail(), null); // TODO: move it to service layer
         
         // Build user + encode password
         User newUser = User.builder()
@@ -94,7 +95,7 @@ public class UserDetailsManagerImpl implements CustomUserDetailsManager {
         User user = getAuthenticatedUser(authentication);
         assertPasswordMatch(oldPassword, user);
         
-        assertNewEmailAvailable(newEmail);
+        assertNewEmailAvailable(newEmail, user.getId()); // TODO: move it to service layer
         user.setEmail(newEmail);
         
         updateSecurityContext(user, authentication.getAuthorities());
@@ -123,9 +124,12 @@ public class UserDetailsManagerImpl implements CustomUserDetailsManager {
         }
     }
     
-    private void assertNewEmailAvailable(String newEmail) {
-        boolean taken = userRepository.existsByEmail(newEmail);
-        if (taken) throw new EmailAlreadyExistsException(newEmail);
+    private void assertNewEmailAvailable(String newEmail, @Nullable Long existingUserId) {
+        boolean duplicate =
+            (existingUserId == null && userRepository.existsByEmail(newEmail)) ||
+                (existingUserId != null && userRepository.existsByEmailAndIdNot(newEmail, existingUserId));
+        
+        if (duplicate) throw new EmailAlreadyExistsException(newEmail);
     }
     
     private void updateSecurityContext(User user, Collection<? extends GrantedAuthority> authorities) {

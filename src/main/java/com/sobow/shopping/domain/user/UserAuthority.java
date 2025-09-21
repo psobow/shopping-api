@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.util.Assert;
 
 @Getter
 @NoArgsConstructor
@@ -32,7 +33,7 @@ public class UserAuthority {
     // ---- Construction (builder) ----------------------------
     @Builder
     public UserAuthority(String authority) {
-        this.authority = authority;
+        setAuthority(authority);
     }
     
     // ---- Identifier & Basic columns ------------------------
@@ -51,6 +52,14 @@ public class UserAuthority {
     // ---- Domain methods ------------------------------------
     public void linkTo(User user) {
         this.user = user;
+    }
+    
+    // ---- Setter methods ------------------------------------
+    public void setAuthority(String authority) {
+        Assert.isTrue(!authority.startsWith("ROLE_"),
+                      () -> authority + " cannot start with ROLE_ (it is automatically added)");
+        
+        this.authority = "ROLE_" + authority;
     }
     
     // ---- Equality (proxy-safe) -----------------------------

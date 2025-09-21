@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         LEFT JOIN FETCH p.images
         WHERE p.id = :id
         """)
-    Optional<Product> findWithCategoryAndImagesById(long id);
+    Optional<Product> findByIdWithCategoryAndImages(long id);
     
     @Query("""
         SELECT DISTINCT p
@@ -32,6 +32,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     List<Product> findAllWithCategoryAndImages();
     
     boolean existsByNameAndBrandName(String name, String brandName);
+    
+    boolean existsByNameAndBrandNameAndIdNot(String name, String brandName, long id);
     
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
