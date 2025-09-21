@@ -24,7 +24,7 @@ import org.hibernate.proxy.HibernateProxy;
 @NoArgsConstructor
 @Entity
 @Table(
-    name = "cart_item",
+    name = "cart_items",
     uniqueConstraints = {
         @UniqueConstraint(
             name = "uc_cart_item_cart_product",

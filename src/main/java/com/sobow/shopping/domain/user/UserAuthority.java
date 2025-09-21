@@ -19,6 +19,7 @@ import org.hibernate.proxy.HibernateProxy;
 @NoArgsConstructor
 @Entity
 @Table(
+    name = "user_authorities",
     uniqueConstraints = {
         @UniqueConstraint(
             name = "uc_auth_user_authority",

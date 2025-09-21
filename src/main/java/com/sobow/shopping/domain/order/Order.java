@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(name = "orders")
 public class Order {
     
     // ---- Construction (builder) ----------------------------
