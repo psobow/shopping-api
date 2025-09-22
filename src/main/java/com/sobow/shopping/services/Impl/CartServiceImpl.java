@@ -2,8 +2,8 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
-import com.sobow.shopping.domain.cart.CartItemCreateRequest;
-import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
@@ -33,7 +33,7 @@ public class CartServiceImpl implements CartService {
         if (userProfile.getCart() != null) return userProfile.getCart();
         
         Cart newCart = new Cart();
-        userProfile.addCartAndLink(newCart);
+        userProfile.setCartAndLink(newCart);
         return newCart;
     }
     
@@ -58,26 +58,26 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem createCartItem(long cartId, CartItemCreateRequest request) {
+    public CartItem createCartItem(long cartId, CartItemCreateRequest createRequest) {
         Cart cart = findById(cartId);
-        Long productId = request.productId();
+        Long productId = createRequest.productId();
         Product product = productService.findById(productId);
         
         // I could update existing CartItem when already in the Cart, instead of throwing exception
         boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, productId);
         if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, productId);
         
-        CartItem newItem = new CartItem(product, request.requestedQty());
+        CartItem newItem = new CartItem(product, createRequest.requestedQty());
         cart.addCartItemAndLink(newItem);
         return newItem;
     }
     
     @Transactional
     @Override
-    public CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest request) {
+    public CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest updateRequest) {
         CartItem item = findCartItemByCartIdAndId(cartId, itemId);
-        int resultQuantity = item.setRequestedQty(request.requestedQty());
-        if (resultQuantity == 0) removeCartItem(cartId, itemId);
+        item.updateFrom(updateRequest);
+        if (item.isEmpty()) removeCartItem(cartId, itemId);
         return item;
     }
     

@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.CategoryRequest;
-import com.sobow.shopping.domain.category.CategoryResponse;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
+import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CategoryController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class CategoryControllerTests {
     
     @Autowired
@@ -41,9 +43,6 @@ public class CategoryControllerTests {
     
     @MockitoBean
     private Mapper<Category, CategoryResponse> categoryResponseMapper;
-    
-    @MockitoBean
-    private Mapper<Category, CategoryRequest> categoryRequestMapper;
     
     private static final String CATEGORIES_PATH = "/api/categories";
     private static final String CATEGORIES_BY_ID_PATH = "/api/categories/{id}";
@@ -59,14 +58,12 @@ public class CategoryControllerTests {
         public void createCategory_should_Return201WithDto_when_ValidRequest() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
             Category saved = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.create(mapped)).thenReturn(saved);
+            when(categoryService.create(request)).thenReturn(saved);
             when(categoryResponseMapper.mapToDto(saved)).thenReturn(response);
             
             // When & Then
@@ -97,13 +94,11 @@ public class CategoryControllerTests {
         public void createCategory_should_Return409_when_CategoryNameAlreadyExists() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.create(mapped)).thenThrow(
-                new CategoryAlreadyExistsException(mapped.getName()));
+            when(categoryService.create(request)).thenThrow(
+                new CategoryAlreadyExistsException(request.name()));
             
             // When & Then
             mockMvc.perform(post(CATEGORIES_PATH)
@@ -121,14 +116,12 @@ public class CategoryControllerTests {
         public void updateCategory_should_Return200WithDto_when_ValidRequest() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
             Category updated = fixtures.categoryEntity();
             CategoryResponse response = fixtures.categoryResponse();
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, fixtures.categoryId())).thenReturn(updated);
+            when(categoryService.partialUpdateById(fixtures.categoryId(), request)).thenReturn(updated);
             when(categoryResponseMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
@@ -172,10 +165,8 @@ public class CategoryControllerTests {
         public void updateCategory_should_Return404_when_CategoryIdDoestNotExist() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
             
-            when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, fixtures.nonExistingId()))
+            when(categoryService.partialUpdateById(fixtures.nonExistingId(), request))
                 .thenThrow(new EntityNotFoundException());
             
             String json = objectMapper.writeValueAsString(request);
@@ -191,11 +182,9 @@ public class CategoryControllerTests {
         public void updateCategory_should_Return409_when_CategoryNameAlreadyExists() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
-            Category mapped = fixtures.categoryEntity();
             
-            when(categoryRequestMapper.mapToEntity(request)).thenReturn(mapped);
-            when(categoryService.partialUpdateById(mapped, fixtures.categoryId()))
-                .thenThrow(new CategoryAlreadyExistsException(mapped.getName()));
+            when(categoryService.partialUpdateById(fixtures.categoryId(), request))
+                .thenThrow(new CategoryAlreadyExistsException(request.name()));
             
             String json = objectMapper.writeValueAsString(request);
             

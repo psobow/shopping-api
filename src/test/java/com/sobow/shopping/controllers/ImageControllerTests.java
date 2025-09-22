@@ -15,9 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.ImageResponse;
+import com.sobow.shopping.domain.image.dto.FileContent;
+import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import com.sobow.shopping.utils.TestFixtures;
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @WebMvcTest(ImageController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class ImageControllerTests {
     
     @Autowired
@@ -64,7 +66,7 @@ public class ImageControllerTests {
             List<Image> saved = List.of(fixtures.imageEntity());
             ImageResponse response = fixtures.imageResponse();
             
-            when(imageService.saveImages(List.of(file), fixtures.productId())).thenReturn(saved);
+            when(imageService.saveImages(fixtures.productId(), List.of(file))).thenReturn(saved);
             when(imageMapper.mapToDto(saved.get(0))).thenReturn(response);
             
             // When & Then
@@ -86,7 +88,7 @@ public class ImageControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).saveImages(anyList(), anyLong());
+            verify(imageService, never()).saveImages(anyLong(), anyList());
         }
         
         @Test
@@ -105,7 +107,7 @@ public class ImageControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).saveImages(anyList(), anyLong());
+            verify(imageService, never()).saveImages(anyLong(), anyList());
         }
         
         @Test
@@ -119,7 +121,7 @@ public class ImageControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).saveImages(anyList(), anyLong());
+            verify(imageService, never()).saveImages(anyLong(), anyList());
         }
         
         @Test
@@ -127,7 +129,7 @@ public class ImageControllerTests {
             // Given
             MockMultipartFile file = fixtures.multipartFile();
             
-            when(imageService.saveImages(List.of(file), fixtures.nonExistingId()))
+            when(imageService.saveImages(fixtures.nonExistingId(), List.of(file)))
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
@@ -145,7 +147,7 @@ public class ImageControllerTests {
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
             
-            verify(imageService, never()).saveImages(anyList(), anyLong());
+            verify(imageService, never()).saveImages(anyLong(), anyList());
         }
         
         @Test
@@ -153,7 +155,7 @@ public class ImageControllerTests {
             // Given
             MockMultipartFile file = fixtures.multipartFile();
             
-            when(imageService.saveImages(List.of(file), fixtures.productId()))
+            when(imageService.saveImages(fixtures.productId(), List.of(file)))
                 .thenThrow(new MaxUploadSizeExceededException(DataSize.ofMegabytes(5).toBytes()));
             
             // When & Then
@@ -178,7 +180,7 @@ public class ImageControllerTests {
             Image updated = fixtures.imageEntity();
             ImageResponse response = fixtures.imageResponse();
             
-            when(imageService.updateById(file, fixtures.imageId())).thenReturn(updated);
+            when(imageService.updateById(fixtures.imageId(), file)).thenReturn(updated);
             when(imageMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
@@ -200,7 +202,7 @@ public class ImageControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateById(any(), anyLong());
+            verify(imageService, never()).updateById(anyLong(), any());
         }
         
         @Test
@@ -214,7 +216,7 @@ public class ImageControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateById(any(), anyLong());
+            verify(imageService, never()).updateById(anyLong(), any());
         }
         
         @Test
@@ -225,14 +227,14 @@ public class ImageControllerTests {
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
             
-            verify(imageService, never()).updateById(any(), anyLong());
+            verify(imageService, never()).updateById(anyLong(), any());
         }
         
         @Test
         public void updateImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
             // Given
             MockMultipartFile file = fixtures.multipartFile();
-            when(imageService.updateById(file, fixtures.nonExistingId()))
+            when(imageService.updateById(fixtures.nonExistingId(), file))
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then

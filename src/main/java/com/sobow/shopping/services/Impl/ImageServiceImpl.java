@@ -1,7 +1,7 @@
 package com.sobow.shopping.services.Impl;
 
-import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.dto.FileContent;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
@@ -11,7 +11,6 @@ import jakarta.persistence.EntityNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sql.rowset.serial.SerialBlob;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,36 +25,23 @@ public class ImageServiceImpl implements ImageService {
     
     @Transactional
     @Override
-    public List<Image> saveImages(List<MultipartFile> files, long productId) {
+    public List<Image> saveImages(long productId, List<MultipartFile> files) {
         Product product = productService.findById(productId);
-        List<Image> images = new ArrayList<>();
-        
+        List<Image> result = new ArrayList<>();
         for (MultipartFile file : files) {
             Image image = new Image();
-            try {
-                image.setFile(new SerialBlob(file.getBytes()));
-            } catch (Exception e) {
-                throw new ImageProcessingException("Failed to process image file: " + file.getOriginalFilename(), e);
-            }
-            image.setFileName(file.getOriginalFilename());
-            image.setFileType(file.getContentType());
+            image.updateFrom(file);
             product.addImageAndLink(image);
-            images.add(image);
+            result.add(image);
         }
-        return images;
+        return result;
     }
     
     @Transactional
     @Override
-    public Image updateById(MultipartFile patch, long id) {
+    public Image updateById(long id, MultipartFile patch) {
         Image image = findById(id);
-        image.setFileName(patch.getOriginalFilename());
-        image.setFileType(patch.getContentType());
-        try {
-            image.setFile(new SerialBlob(patch.getBytes()));
-        } catch (Exception e) {
-            throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
-        }
+        image.updateFrom(patch);
         return image;
     }
     

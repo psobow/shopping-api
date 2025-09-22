@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.Impl.CategoryServiceImpl;
@@ -47,28 +48,38 @@ public class CategoryServiceImplTests {
         @Test
         public void create_should_ReturnSavedCategory_when_ValidInput() {
             // Given
+            CategoryRequest request = fixtures.categoryRequest();
             Category category = fixtures.categoryEntity();
             
-            when(categoryRepository.existsByName(category.getName())).thenReturn(false);
-            when(categoryRepository.save(category)).thenReturn(category);
+            when(categoryRepository.existsByName(request.name())).thenReturn(false);
+            when(categoryRepository.save(any())).thenReturn(category);
             
             // When
-            Category result = underTest.create(category);
+            Category result = underTest.create(request);
             
             // Then
-            assertSame(category, result);
+            // Assert: Uniqueness check
+            verify(categoryRepository).existsByName(request.name());
+            // Assert: Entity created
+            verify(categoryRepository).save(any());
         }
         
         @Test
         public void create_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            Category category = fixtures.withCategoryName("name already exists")
-                                        .categoryEntity();
+            CategoryRequest request = fixtures.withCategoryName("name already exists")
+                                              .categoryRequest();
             
-            when(categoryRepository.existsByName(category.getName())).thenReturn(true);
+            when(categoryRepository.existsByName(request.name())).thenReturn(true);
             
             // When & Then
-            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.create(category));
+            // Assert: service throws when name already exists
+            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.create(request));
+            
+            // Assert: uniqueness check was performed with the request name
+            verify(categoryRepository).existsByName(request.name());
+            
+            // Assert: repository.save(...) was NOT called
             verify(categoryRepository, never()).save(any());
         }
     }
@@ -83,18 +94,27 @@ public class CategoryServiceImplTests {
             Category category = fixtures.withCategoryName("old name")
                                         .categoryEntity();
             
-            Category patch = fixtures.withCategoryName("new name")
-                                     .categoryEntity();
+            CategoryRequest patch = fixtures.withCategoryName("new name")
+                                            .categoryRequest();
             
             when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
-            when(categoryRepository.existsByName(patch.getName())).thenReturn(false);
+            when(categoryRepository.existsByName(patch.name())).thenReturn(false);
             
             // When
-            Category result = underTest.partialUpdateById(patch, fixtures.categoryId());
+            Category result = underTest.partialUpdateById(fixtures.categoryId(), patch);
             
             // Then
+            // Assert: repository was queried for the entity
+            verify(categoryRepository).findById(fixtures.categoryId());
+            
+            // Assert: uniqueness check performed with the new name
+            verify(categoryRepository).existsByName(patch.name());
+            
+            // Assert: entity state was updated
+            assertEquals(patch.name(), category.getName());
+            
+            // Assert: service returns the same (updated) entity instance
             assertSame(category, result);
-            assertEquals(patch.getName(), category.getName());
         }
         
         @Test
@@ -103,29 +123,28 @@ public class CategoryServiceImplTests {
             Category category = fixtures.withCategoryName("old name")
                                         .categoryEntity();
             
-            Category patch = fixtures.withCategoryName("name already exists")
-                                     .categoryEntity();
+            CategoryRequest patch = fixtures.withCategoryName("name already exists")
+                                            .categoryRequest();
             
             when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
-            when(categoryRepository.existsByName(patch.getName())).thenReturn(true);
+            when(categoryRepository.existsByName(patch.name())).thenReturn(true);
             
             // When & Then
-            assertThrows(CategoryAlreadyExistsException.class, () -> underTest.partialUpdateById(patch, fixtures.categoryId()));
-        }
-        
-        @Test
-        public void partialUpdateById_should_NotPersist_when_NoChangesDetected() {
-            // Given
-            Category category = fixtures.categoryEntity();
-            Category patchWithSameName = fixtures.categoryEntity();
+            // Assert: throws when new name already exists
+            assertThrows(CategoryAlreadyExistsException.class,
+                         () -> underTest.partialUpdateById(fixtures.categoryId(), patch));
             
-            when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
+            // Assert: repository looked up the entity
+            verify(categoryRepository).findById(fixtures.categoryId());
             
-            // When
-            Category result = underTest.partialUpdateById(patchWithSameName, fixtures.categoryId());
+            // Assert: uniqueness check performed with patch name
+            verify(categoryRepository).existsByName(patch.name());
             
-            // Then
-            assertSame(category, result);
+            // Assert: save must NOT be called
+            verify(categoryRepository, never()).save(any());
+            
+            // Assert: entity remains unchanged
+            assertEquals("old name", category.getName());
         }
     }
 }

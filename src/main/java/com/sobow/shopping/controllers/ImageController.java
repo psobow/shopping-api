@@ -1,9 +1,9 @@
 package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.ApiResponse;
-import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.ImageResponse;
+import com.sobow.shopping.domain.image.dto.FileContent;
+import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.validation.constraints.NotEmpty;
@@ -43,7 +43,7 @@ public class ImageController {
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
         @PathVariable @Positive long productId
     ) {
-        List<ImageResponse> responseList = imageService.saveImages(files, productId)
+        List<ImageResponse> responseList = imageService.saveImages(productId, files)
                                                        .stream()
                                                        .map(imageResponseMapper::mapToDto)
                                                        .toList();
@@ -62,7 +62,7 @@ public class ImageController {
         @RequestPart("file") @NotNull MultipartFile file,
         @PathVariable @Positive long id
     ) {
-        Image updatedImage = imageService.updateById(file, id);
+        Image updatedImage = imageService.updateById(id, file);
         ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }

@@ -14,9 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductResponse;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductResponse;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +35,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ProductController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class ProductControllerTests {
     
     @Autowired
@@ -125,7 +127,7 @@ public class ProductControllerTests {
             
             String json = objectMapper.writeValueAsString(request);
             
-            when(productService.partialUpdateById(request, fixtures.productId())).thenReturn(updated);
+            when(productService.partialUpdateById(fixtures.productId(), request)).thenReturn(updated);
             when(productResponseMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
@@ -178,7 +180,7 @@ public class ProductControllerTests {
             // Given
             ProductUpdateRequest request = fixtures.productUpdateRequest();
             
-            when(productService.partialUpdateById(request, fixtures.nonExistingId()))
+            when(productService.partialUpdateById(fixtures.nonExistingId(), request))
                 .thenThrow(new EntityNotFoundException());
             
             String json = objectMapper.writeValueAsString(request);

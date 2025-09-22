@@ -1,5 +1,6 @@
 package com.sobow.shopping.domain.user;
 
+import com.sobow.shopping.domain.user.dto.UserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @NoArgsConstructor
@@ -32,29 +31,8 @@ public class User {
         this.password = password;
     }
     
-    public User withAuthorities(Collection<? extends GrantedAuthority> grantedAuthorities) {
-        grantedAuthorities.forEach(grantedAuthority -> {
-            UserAuthority authority = new UserAuthority(grantedAuthority.getAuthority());
-            this.addAuthorityAndLink(authority);
-        });
-        return this;
-    }
-    
-    public User withProfileAndAddress(UserProfile userProfile, UserAddress userAddress) {
-        UserProfile newProfile = UserProfile.builder()
-                                            .firstName(userProfile.getFirstName())
-                                            .lastName(userProfile.getLastName())
-                                            .build();
-        this.addProfileAndLink(newProfile);
-        
-        UserAddress newAddress = UserAddress.builder()
-                                            .cityName(userAddress.getCityName())
-                                            .streetName(userAddress.getStreetName())
-                                            .streetNumber(userAddress.getStreetNumber())
-                                            .postCode(userAddress.getPostCode())
-                                            .build();
-        profile.addAddressAndLink(newAddress);
-        
+    public User withAuthorities(Set<UserAuthority> authorities) {
+        authorities.forEach(this::addAuthorityAndLink);
         return this;
     }
     
@@ -77,16 +55,21 @@ public class User {
     private Set<UserAuthority> authorities = new HashSet<>();
     
     // ---- Domain methods ------------------------------------
-    public void updateAuthoritiesFrom(Collection<? extends GrantedAuthority> grantedAuthorities) {
-        this.removeAllAuthorities();
-        this.withAuthorities(grantedAuthorities);
+    public void updateFrom(UserUpdateRequest patch) {
+        Objects.requireNonNull(patch, "User patch must not be null");
+        
+        if (patch.userProfile() != null) profile.updateFrom(patch.userProfile());
+        
+        if (patch.authorities() != null) {
+            this.removeAllAuthorities();
+            patch.authorities()
+                 .stream()
+                 .map(authRequest -> new UserAuthority(authRequest.authority()))
+                 .forEach(this::addAuthorityAndLink);
+        }
     }
     
-    public void updateProfileFrom(UserProfile patch) {
-        if (patch != null) profile.updateFrom(patch);
-    }
-    
-    public void addProfileAndLink(UserProfile userProfile) {
+    public void setProfileAndLink(UserProfile userProfile) {
         this.profile = userProfile;
         userProfile.linkTo(this);
     }
@@ -124,12 +107,11 @@ public class User {
     public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy
-                                   ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
-                                   : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy
-                                      ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
-                                      : this.getClass();
+        Class<?> oEffectiveClass =
+            o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass =
+            this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                                           : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         User user = (User) o;
         return getId() != null && Objects.equals(getId(), user.getId());
@@ -138,7 +120,6 @@ public class User {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy
-               ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
-               : getClass().hashCode();
+               ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

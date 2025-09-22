@@ -1,9 +1,8 @@
 package com.sobow.shopping.domain.product;
 
-import com.sobow.shopping.config.MoneyConfig;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.exceptions.InvalidPriceException;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,6 +19,7 @@ import jakarta.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +44,7 @@ public class Product {
         this.name = name;
         this.brandName = brandName;
         this.description = description;
-        setPrice(price);
+        this.price = price;
         setAvailableQty(availableQty);
     }
     
@@ -78,6 +78,15 @@ public class Product {
     private List<Image> images = new ArrayList<>();
     
     // ---- Domain methods ------------------------------------
+    public void updateFrom(ProductUpdateRequest patch) {
+        Objects.requireNonNull(patch, "Product patch must not be null");
+        if (patch.name() != null) this.name = patch.name();
+        if (patch.brandName() != null) this.brandName = patch.brandName();
+        if (patch.description() != null) this.description = patch.description();
+        if (patch.price() != null) this.price = patch.price();
+        if (patch.availableQuantity() != null) this.availableQty = patch.availableQuantity();
+    }
+    
     public void linkTo(Category category) {
         this.category = category;
     }
@@ -92,27 +101,6 @@ public class Product {
     }
     
     // ---- Setter methods ------------------------------------
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public void setBrandName(String brandName) {
-        this.brandName = brandName;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public void setPrice(BigDecimal price) {
-        BigDecimal normalized = price.setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
-        if (normalized.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidPriceException(normalized);
-        }
-        
-        this.price = normalized;
-    }
-    
     public void setAvailableQty(int newQty) {
         if (newQty < 0) throw new OverDecrementException(id, newQty);
         availableQty = newQty;

@@ -1,11 +1,12 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import java.util.List;
 
 public interface CategoryService {
     
-    Category create(Category category);
+    Category create(CategoryRequest request);
     
     Category findById(long id);
     
@@ -19,5 +20,5 @@ public interface CategoryService {
     
     boolean existsByName(String name);
     
-    Category partialUpdateById(Category patch, long id);
+    Category partialUpdateById(long id, CategoryRequest request);
 }

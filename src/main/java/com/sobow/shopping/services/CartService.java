@@ -2,8 +2,8 @@ package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
-import com.sobow.shopping.domain.cart.CartItemCreateRequest;
-import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 
 public interface CartService {
     
@@ -15,9 +15,9 @@ public interface CartService {
     
     Cart findByUserIdWithItems(long id);
     
-    CartItem createCartItem(long cartId, CartItemCreateRequest dto);
+    CartItem createCartItem(long cartId, CartItemCreateRequest createRequest);
     
-    CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest dto);
+    CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest updateRequest);
     
     void removeCartItem(long cartId, long itemId);
     

@@ -3,24 +3,24 @@ package com.sobow.shopping.utils;
 import com.sobow.shopping.config.MoneyConfig;
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
-import com.sobow.shopping.domain.cart.CartItemCreateRequest;
-import com.sobow.shopping.domain.cart.CartItemResponse;
-import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
-import com.sobow.shopping.domain.cart.CartResponse;
+import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemResponse;
+import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.dto.CartResponse;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.CategoryRequest;
-import com.sobow.shopping.domain.category.CategoryResponse;
-import com.sobow.shopping.domain.image.FileContent;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
+import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.ImageResponse;
+import com.sobow.shopping.domain.image.dto.FileContent;
+import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.domain.order.Order;
-import com.sobow.shopping.domain.order.OrderItemResponse;
-import com.sobow.shopping.domain.order.OrderResponse;
 import com.sobow.shopping.domain.order.OrderStatus;
+import com.sobow.shopping.domain.order.dto.OrderItemResponse;
+import com.sobow.shopping.domain.order.dto.OrderResponse;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductResponse;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductResponse;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
@@ -46,7 +46,7 @@ public class TestFixtures {
     private String productName = "product name";
     private String brandName = "brand name";
     private BigDecimal productPrice = new BigDecimal("10.00");
-    private Integer availableQuantity = 10;
+    private Integer availableQty = 10;
     private String description = "product description";
     
     private Long imageId = 30L;
@@ -59,7 +59,7 @@ public class TestFixtures {
     private Long cartItemId = 40L;
     private Integer requestedQty = 1;
     private BigDecimal totalItemPrice =
-        new BigDecimal(requestedQty).multiply(BigDecimal.valueOf(availableQuantity))
+        new BigDecimal(requestedQty).multiply(BigDecimal.valueOf(availableQty))
                                     .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
     
     private Long cartId = 50L;
@@ -167,20 +167,20 @@ public class TestFixtures {
     }
     
     public Product productEntity() {
-        Product product = new Product(productName, brandName, description, productPrice, availableQuantity);
+        Product product = new Product(productName, brandName, description, productPrice, availableQty);
         return product;
     }
     
     public ProductCreateRequest productCreateRequest() {
-        return new ProductCreateRequest(productName, brandName, productPrice, availableQuantity, description, categoryId);
+        return new ProductCreateRequest(productName, brandName, productPrice, availableQty, description, categoryId);
     }
     
     public ProductUpdateRequest productUpdateRequest() {
-        return new ProductUpdateRequest(productName, brandName, productPrice, availableQuantity, description, categoryId);
+        return new ProductUpdateRequest(productName, brandName, productPrice, availableQty, description, categoryId);
     }
     
     public ProductResponse productResponseOf(Product p) {
-        return new ProductResponse(productId, productName, brandName, productPrice, availableQuantity, description,
+        return new ProductResponse(productId, productName, brandName, productPrice, availableQty, description,
                                    categoryId, List.of(imageId));
     }
     
@@ -300,8 +300,13 @@ public class TestFixtures {
         return this;
     }
     
-    public TestFixtures withRequestedQty(Integer newRequestedQty) {
+    public TestFixtures withRequestedQty(int newRequestedQty) {
         requestedQty = newRequestedQty;
+        return this;
+    }
+    
+    public TestFixtures withAvailableQty(int newAvailableQty) {
+        availableQty = newAvailableQty;
         return this;
     }
 }

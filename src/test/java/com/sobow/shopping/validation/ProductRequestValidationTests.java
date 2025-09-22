@@ -3,8 +3,8 @@ package com.sobow.shopping.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

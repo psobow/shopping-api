@@ -1,15 +1,15 @@
 package com.sobow.shopping.services;
 
-import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.dto.FileContent;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageService {
     
-    List<Image> saveImages(List<MultipartFile> files, long productId);
+    List<Image> saveImages(long productId, List<MultipartFile> files);
     
-    Image updateById(MultipartFile patch, long id);
+    Image updateById(long id, MultipartFile patch);
     
     Image findById(long id);
     

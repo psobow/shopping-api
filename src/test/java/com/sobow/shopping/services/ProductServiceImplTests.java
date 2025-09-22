@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -109,7 +109,7 @@ public class ProductServiceImplTests {
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
             
             // When
-            Product result = underTest.partialUpdateById(patch, fixtures.productId());
+            Product result = underTest.partialUpdateById(fixtures.productId(), patch);
             
             // Then
             assertSame(product, result);
@@ -129,7 +129,7 @@ public class ProductServiceImplTests {
             
             // When & Then
             assertThrows(EntityNotFoundException.class,
-                         () -> underTest.partialUpdateById(patch, fixtures.productId()));
+                         () -> underTest.partialUpdateById(fixtures.productId(), patch));
         }
         
         @Test
@@ -143,7 +143,7 @@ public class ProductServiceImplTests {
             
             // When & Then
             assertThrows(ProductAlreadyExistsException.class,
-                         () -> underTest.partialUpdateById(patch, fixtures.productId()));
+                         () -> underTest.partialUpdateById(fixtures.productId(), patch));
         }
     }
 }

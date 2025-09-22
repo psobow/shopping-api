@@ -3,7 +3,7 @@ package com.sobow.shopping.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.sobow.shopping.domain.category.CategoryRequest;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.stream.Stream;

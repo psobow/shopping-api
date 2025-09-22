@@ -2,6 +2,7 @@ package com.sobow.shopping.domain.user;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.order.Order;
+import com.sobow.shopping.domain.user.dto.UserProfileUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,17 +61,18 @@ public class UserProfile {
     
     // ---- Domain methods ------------------------------------
     
-    public void updateFrom(UserProfile patch) {
-        if (patch.getFirstName() != null) this.firstName = patch.getFirstName();
-        if (patch.getLastName() != null) this.lastName = patch.getLastName();
-        if (patch.getAddress() != null) this.address.updateFrom(patch.getAddress());
+    public void updateFrom(UserProfileUpdateRequest patch) {
+        Objects.requireNonNull(patch, "User profile patch must not be null");
+        if (patch.firstName() != null) this.firstName = patch.firstName();
+        if (patch.lastName() != null) this.lastName = patch.lastName();
+        if (patch.userAddress() != null) this.address.updateFrom(patch.userAddress());
     }
     
     public void linkTo(User user) {
         this.user = user;
     }
     
-    public void addAddressAndLink(UserAddress address) {
+    public void setAddressAndLink(UserAddress address) {
         this.address = address;
         address.linkTo(this);
     }
@@ -79,7 +81,7 @@ public class UserProfile {
         this.address = null;
     }
     
-    public void addCartAndLink(Cart cart) {
+    public void setCartAndLink(Cart cart) {
         this.cart = cart;
         cart.linkTo(this);
     }

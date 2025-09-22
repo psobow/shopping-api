@@ -2,8 +2,8 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.CategoryRequest;
-import com.sobow.shopping.domain.category.CategoryResponse;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
+import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.validation.Valid;
@@ -29,16 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     
     private final CategoryService categoryService;
-    
     private final Mapper<Category, CategoryResponse> categoryResponseMapper;
-    private final Mapper<Category, CategoryRequest> categoryRequestMapper;
     
     @PostMapping
     public ResponseEntity<ApiResponse> createCategory(
         @RequestBody @Valid CategoryRequest request
     ) {
-        Category mapped = categoryRequestMapper.mapToEntity(request);
-        Category saved = categoryService.create(mapped);
+        Category saved = categoryService.create(request);
         CategoryResponse response = categoryResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
                              .body(new ApiResponse("Created", response));
@@ -49,8 +46,7 @@ public class CategoryController {
         @RequestBody @Valid CategoryRequest request,
         @PathVariable @Positive long id
     ) {
-        Category mapped = categoryRequestMapper.mapToEntity(request);
-        Category updated = categoryService.partialUpdateById(mapped, id);
+        Category updated = categoryService.partialUpdateById(id, request);
         CategoryResponse response = categoryResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(
             new ApiResponse("Updated", response)

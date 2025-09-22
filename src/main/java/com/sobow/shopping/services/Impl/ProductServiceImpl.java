@@ -2,8 +2,8 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.ProductRepository;
@@ -12,8 +12,6 @@ import com.sobow.shopping.services.ProductService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,38 +29,27 @@ public class ProductServiceImpl implements ProductService {
     
     @Transactional
     @Override
-    public Product create(ProductCreateRequest request) {
-        String name = normalize(request.name());
-        String brand = normalize(request.brandName());
-        assertProductUnique(name, brand, null);
-        
-        Product product = productCreateRequestMapper.mapToEntity(request);
-        product.setName(name);
-        product.setBrandName(brand);
-        
-        Category category = categoryService.findById(request.categoryId());
+    public Product create(ProductCreateRequest createRequest) {
+        assertProductUnique(createRequest.name(), createRequest.brandName(), null);
+        Product product = productCreateRequestMapper.mapToEntity(createRequest);
+        Category category = categoryService.findById(createRequest.categoryId());
         category.addProductAndLink(product);
         return product;
     }
     
     @Transactional
     @Override
-    public Product partialUpdateById(ProductUpdateRequest patch, long id) {
+    public Product partialUpdateById(long id, ProductUpdateRequest updateRequest) {
         Product existingProduct = findById(id);
-        
-        if (patch.name() != null) existingProduct.setName(normalize(patch.name()));
-        if (patch.brandName() != null) existingProduct.setBrandName(normalize(patch.brandName()));
+        existingProduct.updateFrom(updateRequest);
         
         // If name or brandName were present in patch, validate if duplication occurs
-        if (patch.name() != null || patch.brandName() != null) {
+        if (updateRequest.name() != null || updateRequest.brandName() != null) {
             assertProductUnique(existingProduct.getName(), existingProduct.getBrandName(), existingProduct.getId());
         }
         
-        if (patch.price() != null) existingProduct.setPrice(patch.price());
-        if (patch.availableQuantity() != null) existingProduct.setAvailableQty(patch.availableQuantity());
-        if (patch.description() != null) existingProduct.setDescription(patch.description());
-        if (patch.categoryId() != null) {
-            Category category = categoryService.findById(patch.categoryId());
+        if (updateRequest.categoryId() != null) {
+            Category category = categoryService.findById(updateRequest.categoryId());
             existingProduct.linkTo(category);
         }
         
@@ -118,9 +105,9 @@ public class ProductServiceImpl implements ProductService {
                                 String categoryName) {
         
         // normalize blanks to nulls
-        nameLike = stripToNull(nameLike);
-        brandName = stripToNull(brandName);
-        categoryName = stripToNull(categoryName);
+        nameLike = trimToNull(nameLike);
+        brandName = trimToNull(brandName);
+        categoryName = trimToNull(categoryName);
         
         var spec = Specification.allOf(
             Optional.of(nameLike).map(ProductServiceImpl::nameLike).orElse(null),
@@ -130,8 +117,8 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll(spec);
     }
     
-    private static String stripToNull(String s) {
-        return (s == null || s.strip().isEmpty()) ? null : s.strip();
+    private static String trimToNull(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s.trim();
     }
     
     private static Specification<Product> nameLike(String name) {
@@ -156,9 +143,5 @@ public class ProductServiceImpl implements ProductService {
         if (duplicate) {
             throw new ProductAlreadyExistsException(name, brand);
         }
-    }
-    
-    private String normalize(String s) {
-        return Objects.requireNonNull(s, "value required").strip().toLowerCase(Locale.ROOT);
     }
 }

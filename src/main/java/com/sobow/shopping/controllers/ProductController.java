@@ -2,9 +2,9 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductResponse;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductResponse;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ProductService;
 import jakarta.validation.Valid;
@@ -47,7 +47,7 @@ public class ProductController {
         @RequestBody @Valid ProductUpdateRequest request,
         @PathVariable @Positive long id
     ) {
-        Product updated = productService.partialUpdateById(request, id);
+        Product updated = productService.partialUpdateById(id, request);
         ProductResponse response = productResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }

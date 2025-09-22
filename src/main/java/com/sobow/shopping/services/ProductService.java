@@ -1,13 +1,13 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.ProductCreateRequest;
-import com.sobow.shopping.domain.product.ProductUpdateRequest;
+import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import java.util.List;
 
 public interface ProductService {
     
-    Product create(ProductCreateRequest productCreateRequest);
+    Product create(ProductCreateRequest createRequest);
     
     Product findById(long id);
     
@@ -19,7 +19,7 @@ public interface ProductService {
     
     boolean existsById(long id);
     
-    Product partialUpdateById(ProductUpdateRequest patch, long id);
+    Product partialUpdateById(long id, ProductUpdateRequest updateRequest);
     
     List<Product> findAll();
     

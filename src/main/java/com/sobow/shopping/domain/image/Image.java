@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain.image;
 
 import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.exceptions.ImageProcessingException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,9 +12,12 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Blob;
+import java.util.Objects;
+import javax.sql.rowset.serial.SerialBlob;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @NoArgsConstructor
@@ -50,6 +54,17 @@ public class Image {
     private Product product;
     
     // ---- Domain methods ------------------------------------
+    public void updateFrom(MultipartFile patch) {
+        Objects.requireNonNull(patch, "Image patch must not be null");
+        if (patch.getOriginalFilename() != null) this.fileName = patch.getOriginalFilename();
+        if (patch.getContentType() != null) this.fileType = patch.getContentType();
+        try {
+            if (patch.getBytes() != null) this.file = new SerialBlob(patch.getBytes());
+        } catch (Exception e) {
+            throw new ImageProcessingException("Failed to process image file: " + patch.getOriginalFilename(), e);
+        }
+    }
+    
     public void linkTo(Product product) {
         this.product = product;
     }
@@ -57,18 +72,5 @@ public class Image {
     // ---- Derived / non-persistent --------------------------
     public String getDownloadUrl() {
         return "/api/images/" + this.id;
-    }
-    
-    // ---- Setter methods ------------------------------------
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-    
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-    
-    public void setFile(Blob file) {
-        this.file = file;
     }
 }

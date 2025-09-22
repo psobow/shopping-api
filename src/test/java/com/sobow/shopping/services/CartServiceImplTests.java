@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
-import com.sobow.shopping.domain.cart.CartItemCreateRequest;
-import com.sobow.shopping.domain.cart.CartItemUpdateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
+import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
@@ -70,7 +70,7 @@ public class CartServiceImplTests {
             // Given
             UserProfile userProfile = fixtures.userProfileEntity();
             Cart cart = fixtures.cartEntity();
-            userProfile.addCartAndLink(cart);
+            userProfile.setCartAndLink(cart);
             assertThat(userProfile.getCart()).isNotNull();
             
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
@@ -93,7 +93,7 @@ public class CartServiceImplTests {
             // Given
             UserProfile userProfile = fixtures.userProfileEntity();
             Cart cart = fixtures.cartEntity();
-            userProfile.addCartAndLink(cart);
+            userProfile.setCartAndLink(cart);
             assertThat(userProfile.getCart()).isNotNull();
             
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);

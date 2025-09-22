@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain.cart;
 
 import com.sobow.shopping.config.MoneyConfig;
+import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
@@ -62,12 +63,21 @@ public class CartItem {
     private Cart cart;
     
     // ---- Domain methods ------------------------------------
+    public void updateFrom(CartItemUpdateRequest patch) {
+        Objects.requireNonNull(patch, "Cart item patch must not be null");
+        if (patch.requestedQty() != null) setRequestedQty(patch.requestedQty());
+    }
+    
     public void linkTo(Product product) {
         this.product = product;
     }
     
     public void linkTo(Cart cart) {
         this.cart = cart;
+    }
+    
+    public boolean isEmpty() {
+        return requestedQty == 0;
     }
     
     // ---- Derived / non-persistent --------------------------
@@ -81,7 +91,7 @@ public class CartItem {
     }
     
     // ---- Setter methods ------------------------------------
-    public int setRequestedQty(int requestedQty) {
+    public void setRequestedQty(int requestedQty) {
         int availableQty = product.getAvailableQty();
         if (requestedQty > availableQty) {
             throw new InsufficientStockException(product.getId(), availableQty, requestedQty);
@@ -90,7 +100,6 @@ public class CartItem {
             throw new OverDecrementException(product.getId(), requestedQty);
         }
         this.requestedQty = requestedQty;
-        return requestedQty;
     }
     
     // ---- Equality (proxy-safe) -----------------------------

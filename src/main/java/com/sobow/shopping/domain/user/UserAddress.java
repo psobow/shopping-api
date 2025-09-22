@@ -1,5 +1,6 @@
 package com.sobow.shopping.domain.user;
 
+import com.sobow.shopping.domain.user.dto.UserAddressUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,10 +56,11 @@ public class UserAddress {
         this.userProfile = userProfile;
     }
     
-    public void updateFrom(UserAddress patch) {
-        if (patch.getCityName() != null) this.cityName = patch.getCityName();
-        if (patch.getStreetName() != null) this.streetName = patch.getStreetName();
-        if (patch.getStreetNumber() != null) this.streetNumber = patch.getStreetNumber();
-        if (patch.getPostCode() != null) this.postCode = patch.getPostCode();
+    public void updateFrom(UserAddressUpdateRequest patch) {
+        Objects.requireNonNull(patch, "User address patch must not be null");
+        if (patch.cityName() != null) this.cityName = patch.cityName();
+        if (patch.streetName() != null) this.streetName = patch.streetName();
+        if (patch.streetNumber() != null) this.streetNumber = patch.streetNumber();
+        if (patch.postCode() != null) this.postCode = patch.postCode();
     }
 }

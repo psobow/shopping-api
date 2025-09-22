@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -41,5 +40,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         FROM Product p
         WHERE p.id IN :ids
         """)
-    List<Product> findAllForUpdate(@Param("ids") List<Long> ids);
+    List<Product> findAllForUpdate(List<Long> ids);
 }

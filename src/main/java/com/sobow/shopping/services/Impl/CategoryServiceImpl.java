@@ -1,14 +1,13 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.repositories.CategoryRepository;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,23 +20,18 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Transactional
     @Override
-    public Category create(Category category) {
-        String name = normalize(category.getName());
-        assertCategoryUnique(name, null);
-        
-        category.setName(name);
+    public Category create(CategoryRequest request) {
+        assertCategoryUnique(request.name(), null);
+        Category category = new Category(request.name());
         return categoryRepository.save(category);
     }
     
     @Transactional
     @Override
-    public Category partialUpdateById(Category patch, long id) {
+    public Category partialUpdateById(long id, CategoryRequest request) {
         Category existingCategory = findById(id);
-        String patchName = normalize(patch.getName());
-        
-        assertCategoryUnique(patchName, existingCategory.getId());
-        existingCategory.setName(patchName);
-        
+        assertCategoryUnique(request.name(), existingCategory.getId());
+        existingCategory.updateFrom(request);
         return existingCategory;
     }
     
@@ -81,9 +75,5 @@ public class CategoryServiceImpl implements CategoryService {
         if (duplicate) {
             throw new CategoryAlreadyExistsException(name);
         }
-    }
-    
-    private String normalize(String s) {
-        return Objects.requireNonNull(s, "value required").strip().toLowerCase(Locale.ROOT);
     }
 }

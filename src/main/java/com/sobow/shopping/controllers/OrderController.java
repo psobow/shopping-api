@@ -2,7 +2,7 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.order.Order;
-import com.sobow.shopping.domain.order.OrderResponse;
+import com.sobow.shopping.domain.order.dto.OrderResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.OrderService;
 import jakarta.validation.constraints.Positive;

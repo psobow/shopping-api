@@ -1,5 +1,6 @@
 package com.sobow.shopping.domain.category;
 
+import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import com.sobow.shopping.domain.product.Product;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +42,11 @@ public class Category {
     private List<Product> products = new ArrayList<>();
     
     // ---- Domain methods ------------------------------------
+    public void updateFrom(CategoryRequest patch) {
+        Objects.requireNonNull(patch, "Category patch must not be null");
+        this.name = patch.name();
+    }
+    
     public void addProductAndLink(Product p) {
         products.add(p);
         p.linkTo(this);
@@ -49,8 +56,4 @@ public class Category {
         products.remove(p);
     }
     
-    // ---- Setter methods ------------------------------------
-    public void setName(String name) {
-        this.name = name;
-    }
 }

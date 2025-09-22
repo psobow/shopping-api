@@ -67,10 +67,7 @@ public class SandboxTests {
         InputStream stream = blob.getBinaryStream();
         
         // Create Image entity
-        Image image = new Image();
-        image.setFileName("doge.png");
-        image.setFileType("image/png");
-        image.setFile(blob);
+        Image image = new Image("doge.png", "image/png", blob);
         
         // Image saved = imageRepository.save(image);
     }

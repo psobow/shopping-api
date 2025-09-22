@@ -7,6 +7,7 @@ import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;
+import com.sobow.shopping.utils.TestFixtures;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,27 +15,14 @@ import org.junit.jupiter.api.Test;
 
 public class CartItemTests {
     
-    private CartItem itemWith(String unitPrice, int qty) {
-        Product p = new Product();
-        p.setAvailableQty(10);
-        p.setPrice(new BigDecimal(unitPrice));
-        CartItem ci = new CartItem();
-        ci.linkTo(p);
-        ci.setRequestedQty(qty);
-        return ci;
-    }
+    private final TestFixtures fixtures = new TestFixtures();
     
-    private CartItem itemWith(Product p, Integer qty) {
+    private CartItem itemWith(String unitPrice, int qty) {
+        Product p = new Product(null, null, null, new BigDecimal(unitPrice), qty);
         CartItem ci = new CartItem(p, qty);
         return ci;
     }
     
-    private Product productWithAvailableQty(int availableQty) {
-        Product p = new Product();
-        p.setAvailableQty(availableQty);
-        p.setPrice(new BigDecimal("1.23"));
-        return p;
-    }
     
     @Nested
     @DisplayName("getTotalPrice")
@@ -66,55 +54,52 @@ public class CartItemTests {
     }
     
     @Nested
-    @DisplayName("setQuantity")
-    class setQuantity {
+    @DisplayName("setRequestedQty")
+    class setRequestedQty {
         
         @Test
-        public void setQuantity_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
-            Product p = productWithAvailableQty(4);
-            CartItem item = itemWith(p, 3);
+        public void setRequestedQty_should_ThrowInsufficientStock_when_RequestedQtyExceedsAvailable() {
+            CartItem item = fixtures.withAvailableQty(4)
+                                    .cartItemEntity();
             
             assertThrows(InsufficientStockException.class, () -> item.setRequestedQty(6));
         }
         
         @Test
-        public void setQuantity_should_ThrowOverDecrement_when_NewQtyBelowZero() {
-            Product p = productWithAvailableQty(4);
-            CartItem item = itemWith(p, 3);
+        public void setRequestedQty_should_ThrowOverDecrement_when_NewQtyBelowZero() {
+            CartItem item = fixtures.withAvailableQty(4)
+                                    .cartItemEntity();
             
             assertThrows(OverDecrementException.class, () -> item.setRequestedQty(-5));
         }
         
         @Test
-        public void setQuantity_should_SetNewQuantity_when_RequestedQtyWithinAvailable() {
-            Product p = productWithAvailableQty(10);
-            CartItem item = itemWith(p, 2);
+        public void setRequestedQty_should_SetNewQuantity_when_RequestedQtyWithinAvailable() {
+            CartItem item = fixtures.withAvailableQty(4)
+                                    .cartItemEntity();
             
-            int result = item.setRequestedQty(5);
+            item.setRequestedQty(1);
             
-            assertEquals(5, result);
-            assertEquals(5, item.getRequestedQty());
+            assertEquals(1, item.getRequestedQty());
         }
         
         @Test
-        public void setQuantity_should_AllowBoundary_when_requestedQtyEqualsAvailable() {
-            Product p = productWithAvailableQty(5);
-            CartItem item = itemWith(p, 2);
+        public void setRequestedQty_should_AllowBoundary_when_requestedQtyEqualsAvailable() {
+            CartItem item = fixtures.withAvailableQty(4)
+                                    .cartItemEntity();
             
-            int result = item.setRequestedQty(5);
+            item.setRequestedQty(4);
             
-            assertEquals(5, result);
-            assertEquals(5, item.getRequestedQty());
+            assertEquals(4, item.getRequestedQty());
         }
         
         @Test
-        public void setQuantity_should_AllowBoundary_when_RequestedQtyEqualsZero() {
-            Product p = productWithAvailableQty(4);
-            CartItem item = itemWith(p, 3);
+        public void setRequestedQty_should_AllowBoundary_when_RequestedQtyEqualsZero() {
+            CartItem item = fixtures.withAvailableQty(4)
+                                    .cartItemEntity();
             
-            int result = item.setRequestedQty(0);
+            item.setRequestedQty(0);
             
-            assertEquals(0, result);
             assertEquals(0, item.getRequestedQty());
         }
     }

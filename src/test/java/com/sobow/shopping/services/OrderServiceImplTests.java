@@ -56,8 +56,8 @@ public class OrderServiceImplTests {
             Cart cart = fixtures.cartEntity();
             CartItem cartItem = fixtures.cartItemEntity();
             
-            user.addProfileAndLink(userProfile);
-            userProfile.addCartAndLink(cart);
+            user.setProfileAndLink(userProfile);
+            userProfile.setCartAndLink(cart);
             cart.addCartItemAndLink(cartItem);
             
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
@@ -99,8 +99,8 @@ public class OrderServiceImplTests {
             Cart cart = fixtures.cartEntity();
             CartItem cartItem = fixtures.cartItemEntity();
             
-            user.addProfileAndLink(userProfile);
-            userProfile.addCartAndLink(cart);
+            user.setProfileAndLink(userProfile);
+            userProfile.setCartAndLink(cart);
             cart.addCartItemAndLink(cartItem);
             
             Product product = cartItem.getProduct();

@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.sobow.shopping.domain.image.FileContent;
 import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.dto.FileContent;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.repositories.ImageRepository;
@@ -56,7 +56,7 @@ public class ImageServiceImplTests {
             when(productService.findById(fixtures.productId())).thenReturn(product);
             
             // When
-            List<Image> resultList = underTest.saveImages(List.of(file), fixtures.productId());
+            List<Image> resultList = underTest.saveImages(fixtures.productId(), List.of(file));
             
             // Then
             Image resultImage = resultList.get(0);
@@ -80,7 +80,7 @@ public class ImageServiceImplTests {
             
             // When & Then
             assertThrows(ImageProcessingException.class,
-                         () -> underTest.saveImages(List.of(bad), fixtures.productId()));
+                         () -> underTest.saveImages(fixtures.productId(), List.of(bad)));
         }
     }
     
@@ -99,7 +99,7 @@ public class ImageServiceImplTests {
             when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When
-            Image result = underTest.updateById(patch, fixtures.imageId());
+            Image result = underTest.updateById(fixtures.imageId(), patch);
             
             // Then
             assertSame(image, result);
@@ -120,7 +120,7 @@ public class ImageServiceImplTests {
             when(badPatch.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
-            assertThrows(ImageProcessingException.class, () -> underTest.updateById(badPatch, fixtures.imageId()));
+            assertThrows(ImageProcessingException.class, () -> underTest.updateById(fixtures.imageId(), badPatch));
         }
     }
     
