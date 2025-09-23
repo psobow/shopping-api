@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sobow.shopping.controllers.admin.ImageManagementController;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.image.dto.FileContent;
 import com.sobow.shopping.domain.image.dto.ImageResponse;
@@ -37,9 +38,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-@WebMvcTest(ImageController.class)
+@WebMvcTest(ImageManagementController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class ImageControllerTests {
+public class ImageManagementControllerTests {
     
     @Autowired
     private MockMvc mockMvc;

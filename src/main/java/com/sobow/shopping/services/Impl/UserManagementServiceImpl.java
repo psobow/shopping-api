@@ -80,11 +80,9 @@ public class UserManagementServiceImpl implements UserManagementService {
     public void selfUpdateEmail(String oldPassword, String newEmail) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        
         assertPasswordMatch(oldPassword, user.getPassword());
         
         assertNewEmailAvailable(newEmail, user.getId());
-        
         user.setEmail(newEmail);
         
         updateSecurityContext(user, authentication.getAuthorities());
@@ -92,10 +90,11 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public void deleteByEmail(String email) {
-        // Deleting in this way Honors JPA cascades and orphanRemoval on associations in the entity model
-        // Using only derived query deleteByEmail would skip cascades and orphanRemoval
-        userRepository.findByEmail(email).ifPresent(userRepository::delete);
+    public void selfDelete(String oldPassword) {
+        Authentication authentication = getCurrentAuthentication();
+        User user = getAuthenticatedUser(authentication);
+        assertPasswordMatch(oldPassword, user.getPassword());
+        userRepository.deleteById(user.getId());
     }
     
     @Override

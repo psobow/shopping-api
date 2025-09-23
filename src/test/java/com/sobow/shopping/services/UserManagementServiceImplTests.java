@@ -361,17 +361,37 @@ class UserManagementServiceImplTests {
         public void deleteByEmail_should_DeleteUser_when_EmailExists() {
             // Given
             User user = fixtures.userEntity();
+            
             when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
             
             // When
-            underTest.deleteByEmail(fixtures.email());
+            underTest.selfDelete(fixtures.password());
             
             // Then
             // Assert: looked up by email
             verify(userRepository).findByEmail(fixtures.email());
             
             // Assert: entity delete invoked
-            verify(userRepository).delete(user);
+            verify(userRepository).deleteById(user.getId());
+        }
+        
+        @Test
+        public void deleteByEmail_should_ThrowInvalidOldPassword_when_PasswordDoesNotMatch() {
+            // Given
+            User user = fixtures.userEntity();
+            
+            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(false);
+            
+            // When & Then
+            assertThrows(InvalidOldPasswordException.class, () -> underTest.selfDelete(fixtures.password()));
+            
+            // Assert: looked up by email
+            verify(userRepository).findByEmail(fixtures.email());
+            
+            // Assert: entity NOT deleted
+            verify(userRepository, never()).deleteById(user.getId());
         }
     }
 }

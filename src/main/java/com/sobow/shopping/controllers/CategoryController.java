@@ -2,23 +2,16 @@ package com.sobow.shopping.controllers;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.CategoryService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
-import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,28 +23,6 @@ public class CategoryController {
     
     private final CategoryService categoryService;
     private final Mapper<Category, CategoryResponse> categoryResponseMapper;
-    
-    @PostMapping
-    public ResponseEntity<ApiResponse> createCategory(
-        @RequestBody @Valid CategoryRequest request
-    ) {
-        Category saved = categoryService.create(request);
-        CategoryResponse response = categoryResponseMapper.mapToDto(saved);
-        return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
-                             .body(new ApiResponse("Created", response));
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(
-        @RequestBody @Valid CategoryRequest request,
-        @PathVariable @Positive long id
-    ) {
-        Category updated = categoryService.partialUpdateById(id, request);
-        CategoryResponse response = categoryResponseMapper.mapToDto(updated);
-        return ResponseEntity.ok(
-            new ApiResponse("Updated", response)
-        );
-    }
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllCategories() {
@@ -77,9 +48,4 @@ public class CategoryController {
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable @Positive long id) {
-        categoryService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
 }

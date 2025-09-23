@@ -42,7 +42,7 @@ public class OrderController {
     }
     
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllOrders(
+    public ResponseEntity<ApiResponse> getAllOrdersByUserId(
         @PathVariable @Positive long userId
     ) {
         List<Order> orders = orderService.findAllByUserId(userId);

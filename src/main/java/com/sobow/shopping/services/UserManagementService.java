@@ -18,7 +18,7 @@ public interface UserManagementService {
     
     void selfUpdateEmail(String oldPassword, String newEmail);
     
-    void deleteByEmail(String email);
+    void selfDelete(String oldPassword);
     
     boolean userExistsByEmail(String email);
 }
