@@ -1,9 +1,6 @@
 package com.sobow.shopping.controllers;
 
-import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.image.dto.FileContent;
-import com.sobow.shopping.domain.image.dto.ImageResponse;
-import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageController {
     
     private final ImageService imageService;
-    private final Mapper<Image, ImageResponse> imageResponseMapper;
     
     @GetMapping("/images/{id}")
     public ResponseEntity<Resource> downloadImage(@PathVariable @Positive long id) {

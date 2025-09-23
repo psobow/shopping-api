@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers;
+package com.sobow.shopping.controllers.admin;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -7,17 +7,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.controllers.admin.ImageManagementController;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.dto.FileContent;
 import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.services.ImageService;
@@ -51,8 +47,8 @@ public class ImageManagementControllerTests {
     @MockitoBean
     private Mapper<Image, ImageResponse> imageMapper;
     
-    private final static String PRODUCT_IMAGES_BY_PRODUCT_ID_PATH = "/api/products/{productId}/images";
-    private final static String IMAGES_BY_ID_PATH = "/api/images/{id}";
+    private final static String PRODUCT_IMAGES_BY_PRODUCT_ID_PATH = "/api/admin/products/{productId}/images";
+    private final static String IMAGES_BY_ID_PATH = "/api/admin/images/{id}";
     
     private final TestFixtures fixtures = new TestFixtures();
     
@@ -242,47 +238,6 @@ public class ImageManagementControllerTests {
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.nonExistingId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
-                   .andExpect(status().isNotFound());
-        }
-    }
-    
-    @Nested
-    @DisplayName("downloadImage")
-    class downloadImage {
-        
-        @Test
-        public void downloadImage_should_Return200WithFile_when_ImageIdValid() throws Exception {
-            // Given
-            FileContent fileContent = fixtures.fileContent();
-            
-            when(imageService.getImageContent(fixtures.imageId())).thenReturn(fileContent);
-            
-            // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.imageId()))
-                   .andExpect(status().isOk())
-                   .andExpect(header().string("Content-Type", fileContent.fileType()))
-                   .andExpect(header().string("Content-Length", String.valueOf(fileContent.length())))
-                   .andExpect(header().string("Content-Disposition", String.format(
-                       "attachment; filename=\"%s\"", fileContent.fileName())))
-                   .andExpect(content().bytes(fileContent.bytes()));
-        }
-        
-        @Test
-        public void downloadImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
-            // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.invalidId()))
-                   .andExpect(status().isBadRequest());
-            
-            verify(imageService, never()).getImageContent(anyLong());
-        }
-        
-        @Test
-        public void downloadImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
-            // Given
-            when(imageService.getImageContent(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
-            
-            // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.nonExistingId()))
                    .andExpect(status().isNotFound());
         }
     }
