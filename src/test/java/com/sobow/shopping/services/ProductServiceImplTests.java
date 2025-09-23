@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceImplTests {
@@ -100,6 +101,8 @@ public class ProductServiceImplTests {
             // Given
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
+            
+            ReflectionTestUtils.setField(product, "id", fixtures.productId());
             category.addProductAndLink(product);
             
             ProductUpdateRequest patch = fixtures.withProductName("new product name")
@@ -107,6 +110,8 @@ public class ProductServiceImplTests {
                                                  .productUpdateRequest();
             
             when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
+            when(productRepository.existsByNameAndBrandNameAndIdNot(
+                "new product name", product.getBrandName(), fixtures.productId())).thenReturn(false);
             
             // When
             Product result = underTest.partialUpdateById(fixtures.productId(), patch);
@@ -115,6 +120,21 @@ public class ProductServiceImplTests {
             assertSame(product, result);
             
             assertThat(product.getName()).isEqualTo("new product name");
+        }
+        
+        @Test
+        public void partialUpdateById_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
+            // Given
+            Product product = fixtures.productEntity();
+            ReflectionTestUtils.setField(product, "id", fixtures.productId());
+            ProductUpdateRequest patch = fixtures.productUpdateRequest();
+            
+            when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
+            when(productRepository.existsByNameAndBrandNameAndIdNot(patch.name(), patch.brandName(), fixtures.productId())).thenReturn(true);
+            
+            // When & Then
+            assertThrows(ProductAlreadyExistsException.class,
+                         () -> underTest.partialUpdateById(fixtures.productId(), patch));
         }
         
         @Test
@@ -129,20 +149,6 @@ public class ProductServiceImplTests {
             
             // When & Then
             assertThrows(EntityNotFoundException.class,
-                         () -> underTest.partialUpdateById(fixtures.productId(), patch));
-        }
-        
-        @Test
-        public void partialUpdateById_should_ThrowAlreadyExists_when_ProductAlreadyExists() {
-            // Given
-            Product product = fixtures.productEntity();
-            ProductUpdateRequest patch = fixtures.productUpdateRequest();
-            
-            when(productRepository.findById(fixtures.productId())).thenReturn(Optional.of(product));
-            when(productRepository.existsByNameAndBrandName(patch.name(), patch.brandName())).thenReturn(true);
-            
-            // When & Then
-            assertThrows(ProductAlreadyExistsException.class,
                          () -> underTest.partialUpdateById(fixtures.productId(), patch));
         }
     }

@@ -56,7 +56,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public User partialUpdate(UserUpdateRequest updateRequest) {
+    public User selfPartialUpdate(UserUpdateRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User existingUser = getAuthenticatedUser(authentication);
         existingUser.updateFrom(updateRequest);
@@ -65,7 +65,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public void updatePassword(String oldPassword, String newPassword) {
+    public void selfUpdatePassword(String oldPassword, String newPassword) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
         assertPasswordMatch(oldPassword, user.getPassword());
@@ -77,7 +77,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public void updateEmail(String oldPassword, String newEmail) {
+    public void selfUpdateEmail(String oldPassword, String newEmail) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
         

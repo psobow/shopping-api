@@ -24,6 +24,13 @@ import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
+import com.sobow.shopping.domain.user.dto.UserAddressCreateRequest;
+import com.sobow.shopping.domain.user.dto.UserAddressUpdateRequest;
+import com.sobow.shopping.domain.user.dto.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.dto.UserCreateRequest;
+import com.sobow.shopping.domain.user.dto.UserProfileCreateRequest;
+import com.sobow.shopping.domain.user.dto.UserProfileUpdateRequest;
+import com.sobow.shopping.domain.user.dto.UserUpdateRequest;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -66,10 +73,14 @@ public class TestFixtures {
     private BigDecimal totalCartPrice = totalItemPrice;
     
     private Long userId = 60L;
+    private String userAuthority = "USER";
     private String userFirstName = "first name";
     private String userLastName = "last name";
     private String userEmail = "user@email.com";
+    private String newUserEmail = "new-user@email.com";
     private String userPassword = "password";
+    private String newPassword = "new password";
+    private String encodedPassword = "encoded password";
     
     private String cityName = "city name";
     private String streetName = "street name";
@@ -129,6 +140,34 @@ public class TestFixtures {
     
     public User userEntity() {
         return new User(userEmail, userPassword);
+    }
+    
+    public UserAuthorityRequest userAuthorityRequest() {
+        return new UserAuthorityRequest(userAuthority);
+    }
+    
+    public UserAddressUpdateRequest userAddressUpdateRequest() {
+        return new UserAddressUpdateRequest(cityName, streetName, streetNumber, postCode);
+    }
+    
+    public UserAddressCreateRequest userAddressCreateRequest() {
+        return new UserAddressCreateRequest(cityName, streetName, streetNumber, postCode);
+    }
+    
+    public UserProfileUpdateRequest userProfileUpdateRequest() {
+        return new UserProfileUpdateRequest(userFirstName, userLastName, userAddressUpdateRequest());
+    }
+    
+    public UserProfileCreateRequest userProfileCreateRequest() {
+        return new UserProfileCreateRequest(userFirstName, userLastName, userAddressCreateRequest());
+    }
+    
+    public UserUpdateRequest userUpdateRequest() {
+        return new UserUpdateRequest(userProfileUpdateRequest(), List.of(userAuthorityRequest()));
+    }
+    
+    public UserCreateRequest userCreateRequest() {
+        return new UserCreateRequest(userEmail, userPassword, userProfileCreateRequest(), List.of(userAuthorityRequest()));
     }
     
     public Cart cartEntity() {
@@ -249,6 +288,26 @@ public class TestFixtures {
     
     public Long orderId() {
         return orderId;
+    }
+    
+    public String email() {
+        return userEmail;
+    }
+    
+    public String newEmail() {
+        return newUserEmail;
+    }
+    
+    public String password() {
+        return userPassword;
+    }
+    
+    public String newPassword() {
+        return newPassword;
+    }
+    
+    public String encodedPassword() {
+        return encodedPassword;
     }
     
     // setters

@@ -1,7 +1,6 @@
 package com.sobow.shopping.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTests {
@@ -91,14 +91,14 @@ public class CategoryServiceImplTests {
         @Test
         public void partialUpdateById_should_ReturnUpdatedCategory_when_ValidInput() {
             // Given
-            Category category = fixtures.withCategoryName("old name")
-                                        .categoryEntity();
+            Category category = fixtures.categoryEntity();
+            ReflectionTestUtils.setField(category, "id", fixtures.categoryId());
             
             CategoryRequest patch = fixtures.withCategoryName("new name")
                                             .categoryRequest();
             
             when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
-            when(categoryRepository.existsByName(patch.name())).thenReturn(false);
+            when(categoryRepository.existsByNameAndIdNot(patch.name(), fixtures.categoryId())).thenReturn(false);
             
             // When
             Category result = underTest.partialUpdateById(fixtures.categoryId(), patch);
@@ -108,26 +108,27 @@ public class CategoryServiceImplTests {
             verify(categoryRepository).findById(fixtures.categoryId());
             
             // Assert: uniqueness check performed with the new name
-            verify(categoryRepository).existsByName(patch.name());
+            verify(categoryRepository).existsByNameAndIdNot(patch.name(), fixtures.categoryId());
             
             // Assert: entity state was updated
-            assertEquals(patch.name(), category.getName());
+            assertThat(patch.name()).isEqualTo(category.getName());
             
             // Assert: service returns the same (updated) entity instance
-            assertSame(category, result);
+            assertThat(category).isSameAs(result);
         }
         
         @Test
         public void partialUpdateById_should_ThrowAlreadyExists_when_CategoryNameAlreadyExists() {
             // Given
-            Category category = fixtures.withCategoryName("old name")
-                                        .categoryEntity();
+            Category category = fixtures.categoryEntity();
+            String nameBefore = category.getName();
+            ReflectionTestUtils.setField(category, "id", fixtures.categoryId());
             
             CategoryRequest patch = fixtures.withCategoryName("name already exists")
                                             .categoryRequest();
             
             when(categoryRepository.findById(fixtures.categoryId())).thenReturn(Optional.of(category));
-            when(categoryRepository.existsByName(patch.name())).thenReturn(true);
+            when(categoryRepository.existsByNameAndIdNot(patch.name(), fixtures.categoryId())).thenReturn(true);
             
             // When & Then
             // Assert: throws when new name already exists
@@ -138,13 +139,13 @@ public class CategoryServiceImplTests {
             verify(categoryRepository).findById(fixtures.categoryId());
             
             // Assert: uniqueness check performed with patch name
-            verify(categoryRepository).existsByName(patch.name());
+            verify(categoryRepository).existsByNameAndIdNot(patch.name(), fixtures.categoryId());
             
             // Assert: save must NOT be called
             verify(categoryRepository, never()).save(any());
             
             // Assert: entity remains unchanged
-            assertEquals("old name", category.getName());
+            assertThat(category.getName()).isEqualTo(nameBefore);
         }
     }
 }

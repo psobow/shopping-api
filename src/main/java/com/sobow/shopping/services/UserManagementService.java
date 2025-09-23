@@ -12,11 +12,11 @@ public interface UserManagementService {
     
     User create(UserCreateRequest createRequest);
     
-    User partialUpdate(UserUpdateRequest updateRequest);
+    User selfPartialUpdate(UserUpdateRequest updateRequest);
     
-    void updatePassword(String oldPassword, String newPassword);
+    void selfUpdatePassword(String oldPassword, String newPassword);
     
-    void updateEmail(String oldPassword, String newEmail);
+    void selfUpdateEmail(String oldPassword, String newEmail);
     
     void deleteByEmail(String email);
     
