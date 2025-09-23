@@ -2,12 +2,15 @@ package com.sobow.shopping.repositories;
 
 import com.sobow.shopping.domain.product.Product;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
+import org.hibernate.jpa.SpecHints;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,5 +43,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         FROM Product p
         WHERE p.id IN :ids
         """)
+    @QueryHints(@QueryHint(name = SpecHints.HINT_SPEC_LOCK_TIMEOUT, value = "5000"))
+        // value in ms
     List<Product> findAllForUpdate(List<Long> ids);
 }
