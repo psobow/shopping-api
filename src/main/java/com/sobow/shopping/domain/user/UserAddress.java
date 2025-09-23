@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.dto.UserAddressUpdateRequest;
+import com.sobow.shopping.domain.user.requests.UserAddressUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

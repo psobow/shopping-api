@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.user.dto;
+package com.sobow.shopping.domain.user.requests;
 
 import com.sobow.shopping.validation.annotations.Distinct;
 import com.sobow.shopping.validation.annotations.ValidRoles;

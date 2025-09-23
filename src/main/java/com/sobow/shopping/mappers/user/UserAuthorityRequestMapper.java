@@ -1,7 +1,7 @@
 package com.sobow.shopping.mappers.user;
 
 import com.sobow.shopping.domain.user.UserAuthority;
-import com.sobow.shopping.domain.user.dto.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 

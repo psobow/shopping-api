@@ -1,8 +1,8 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.dto.UserCreateRequest;
-import com.sobow.shopping.domain.user.dto.UserUpdateRequest;
+import com.sobow.shopping.domain.user.requests.UserCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 
 public interface UserManagementService {
     

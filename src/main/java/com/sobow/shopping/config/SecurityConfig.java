@@ -1,9 +1,9 @@
 package com.sobow.shopping.config;
 
-import com.sobow.shopping.domain.user.dto.UserAddressCreateRequest;
-import com.sobow.shopping.domain.user.dto.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.dto.UserCreateRequest;
-import com.sobow.shopping.domain.user.dto.UserProfileCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.UserCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
 import com.sobow.shopping.services.UserManagementService;
 import java.util.List;

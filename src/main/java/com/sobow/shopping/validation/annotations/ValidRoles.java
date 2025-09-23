@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  *
  * <h3>Supported types</h3>
  * <ul>
- *   <li>{@code java.util.List<com.sobow.shopping.domain.user.dto.UserAuthorityRequest>}</li>
+ *   <li>{@code java.util.List<com.sobow.shopping.domain.user.requests.UserAuthorityRequest>}</li>
  * </ul>
  *
  * <h3>Null semantics</h3>

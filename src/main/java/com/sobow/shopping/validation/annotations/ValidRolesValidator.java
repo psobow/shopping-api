@@ -1,6 +1,6 @@
 package com.sobow.shopping.validation.annotations;
 
-import com.sobow.shopping.domain.user.dto.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;

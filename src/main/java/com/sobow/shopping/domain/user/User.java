@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.dto.UserUpdateRequest;
+import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

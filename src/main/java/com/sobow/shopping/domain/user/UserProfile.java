@@ -2,7 +2,7 @@ package com.sobow.shopping.domain.user;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.order.Order;
-import com.sobow.shopping.domain.user.dto.UserProfileUpdateRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
