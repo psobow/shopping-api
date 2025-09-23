@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers;
+package com.sobow.shopping.controllers.user;
 
 import com.sobow.shopping.domain.image.dto.FileContent;
 import com.sobow.shopping.services.ImageService;

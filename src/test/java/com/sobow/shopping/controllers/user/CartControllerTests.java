@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers;
+package com.sobow.shopping.controllers.user;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;

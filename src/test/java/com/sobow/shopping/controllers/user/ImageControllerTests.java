@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers;
+package com.sobow.shopping.controllers.user;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
