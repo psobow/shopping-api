@@ -1,4 +1,4 @@
-package com.sobow.shopping.mappers.user;
+package com.sobow.shopping.mappers.user.requests;
 
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
