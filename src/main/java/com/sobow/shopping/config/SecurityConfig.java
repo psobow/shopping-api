@@ -1,15 +1,19 @@
 package com.sobow.shopping.config;
 
+import com.sobow.shopping.domain.user.dto.UserAddressCreateRequest;
+import com.sobow.shopping.domain.user.dto.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.dto.UserCreateRequest;
+import com.sobow.shopping.domain.user.dto.UserProfileCreateRequest;
+import com.sobow.shopping.security.UserDetailsServiceImpl;
+import com.sobow.shopping.services.UserManagementService;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -23,14 +27,22 @@ public class SecurityConfig {
     }
     
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
-                               .username("user")
-                               .password(passwordEncoder().encode("password"))
-                               .roles("USER")
-                               .build();
+    public UserDetailsService userDetailsService(UserManagementService userManagementService) {
         
-        return new InMemoryUserDetailsManager(user);
+        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(userManagementService);
+        
+        if (!userManagementService.userExistsByEmail("address@email.com")) {
+            
+            UserAddressCreateRequest address = new UserAddressCreateRequest(
+                "Wroclaw", "Street", "20", "11-222");
+            UserProfileCreateRequest userProfile = new UserProfileCreateRequest("Patryk", "Tak", address);
+            UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
+            UserCreateRequest user = new UserCreateRequest("address@email.com", "password", userProfile, List.of(authority));
+            
+            userManagementService.create(user);
+        }
+        
+        return userDetailsService;
     }
     
     @Bean
