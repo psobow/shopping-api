@@ -52,7 +52,7 @@ public class CategoryManagementControllerTests {
     class createCategory {
         
         @Test
-        public void createCategory_should_Return201WithDto_when_ValidRequest() throws Exception {
+        public void createCategory_should_Return201_when_ValidRequest() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
             Category saved = fixtures.categoryEntity();
@@ -110,7 +110,7 @@ public class CategoryManagementControllerTests {
     class updateCategory {
         
         @Test
-        public void updateCategory_should_Return200WithDto_when_ValidRequest() throws Exception {
+        public void updateCategory_should_Return200_when_ValidRequest() throws Exception {
             // Given
             CategoryRequest request = fixtures.categoryRequest();
             Category updated = fixtures.categoryEntity();
