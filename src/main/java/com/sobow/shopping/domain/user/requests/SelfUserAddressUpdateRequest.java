@@ -6,14 +6,14 @@ import static com.sobow.shopping.validation.ValidationUtils.normalizeSingleLine;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UserAddressUpdateRequest(
+public record SelfUserAddressUpdateRequest(
     @Size(min = 1, max = 80) String cityName,
     @Size(min = 1, max = 80) String streetName,
     @Size(min = 1, max = 20) String streetNumber,
     @Pattern(regexp = POLAND_POST_CODE_REGEX) String postCode
 ) {
     
-    public UserAddressUpdateRequest {
+    public SelfUserAddressUpdateRequest {
         cityName = normalizeSingleLine(cityName);
         streetName = normalizeSingleLine(streetName);
         streetNumber = normalizeSingleLine(streetNumber);

@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,18 +55,9 @@ public class User {
     private Set<UserAuthority> authorities = new HashSet<>();
     
     // ---- Domain methods ------------------------------------
-    public void updateFrom(UserUpdateRequest patch) {
+    public void updateFrom(SelfUserUpdateRequest patch) {
         Objects.requireNonNull(patch, "User patch must not be null");
-        
         if (patch.userProfile() != null) profile.updateFrom(patch.userProfile());
-        
-        if (patch.authorities() != null) {
-            this.removeAllAuthorities();
-            patch.authorities()
-                 .stream()
-                 .map(authRequest -> new UserAuthority(authRequest.authority()))
-                 .forEach(this::addAuthorityAndLink);
-        }
     }
     
     public void setProfileAndLink(UserProfile userProfile) {

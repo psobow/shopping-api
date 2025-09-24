@@ -24,13 +24,13 @@ import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
+import com.sobow.shopping.domain.user.requests.SelfUserAddressUpdateRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserProfileUpdateRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
 import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserAddressUpdateRequest;
 import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
 import com.sobow.shopping.domain.user.requests.UserCreateRequest;
 import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserProfileUpdateRequest;
-import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -146,24 +146,24 @@ public class TestFixtures {
         return new UserAuthorityRequest(userAuthority);
     }
     
-    public UserAddressUpdateRequest userAddressUpdateRequest() {
-        return new UserAddressUpdateRequest(cityName, streetName, streetNumber, postCode);
+    public SelfUserAddressUpdateRequest userAddressUpdateRequest() {
+        return new SelfUserAddressUpdateRequest(cityName, streetName, streetNumber, postCode);
     }
     
     public UserAddressCreateRequest userAddressCreateRequest() {
         return new UserAddressCreateRequest(cityName, streetName, streetNumber, postCode);
     }
     
-    public UserProfileUpdateRequest userProfileUpdateRequest() {
-        return new UserProfileUpdateRequest(userFirstName, userLastName, userAddressUpdateRequest());
+    public SelfUserProfileUpdateRequest userProfileUpdateRequest() {
+        return new SelfUserProfileUpdateRequest(userFirstName, userLastName, userAddressUpdateRequest());
     }
     
     public UserProfileCreateRequest userProfileCreateRequest() {
         return new UserProfileCreateRequest(userFirstName, userLastName, userAddressCreateRequest());
     }
     
-    public UserUpdateRequest userUpdateRequest() {
-        return new UserUpdateRequest(userProfileUpdateRequest(), List.of(userAuthorityRequest()));
+    public SelfUserUpdateRequest userUpdateRequest() {
+        return new SelfUserUpdateRequest(userProfileUpdateRequest());
     }
     
     public UserCreateRequest userCreateRequest() {

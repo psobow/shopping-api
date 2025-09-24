@@ -6,12 +6,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UpdateEmailRequest(
+public record SelfUpdateEmailRequest(
     @NotBlank @Size(min = 6, max = 100) String oldPassword,
     @NotBlank @Email String newEmail
 ) {
     
-    public UpdateEmailRequest {
+    public SelfUpdateEmailRequest {
         newEmail = normalizeEmail(newEmail);
     }
 }

@@ -1,8 +1,11 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.user.User;
+import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
 import com.sobow.shopping.domain.user.requests.UserCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
@@ -56,7 +59,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public User selfPartialUpdate(UserUpdateRequest updateRequest) {
+    public User selfPartialUpdate(SelfUserUpdateRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User existingUser = getAuthenticatedUser(authentication);
         existingUser.updateFrom(updateRequest);
@@ -65,35 +68,35 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public void selfUpdatePassword(String oldPassword, String newPassword) {
+    public void selfUpdatePassword(SelfUpdatePasswordRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(oldPassword, user.getPassword());
+        assertPasswordMatch(updateRequest.oldPassword(), user.getPassword());
         
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(updateRequest.newPassword()));
         
         updateSecurityContext(user, authentication.getAuthorities());
     }
     
     @Transactional
     @Override
-    public void selfUpdateEmail(String oldPassword, String newEmail) {
+    public void selfUpdateEmail(SelfUpdateEmailRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(oldPassword, user.getPassword());
+        assertPasswordMatch(updateRequest.oldPassword(), user.getPassword());
         
-        assertNewEmailAvailable(newEmail, user.getId());
-        user.setEmail(newEmail);
+        assertNewEmailAvailable(updateRequest.newEmail(), user.getId());
+        user.setEmail(updateRequest.newEmail());
         
         updateSecurityContext(user, authentication.getAuthorities());
     }
     
     @Transactional
     @Override
-    public void selfDelete(String oldPassword) {
+    public void selfDelete(SelfUserDeleteRequest deleteRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(oldPassword, user.getPassword());
+        assertPasswordMatch(deleteRequest.oldPassword(), user.getPassword());
         userRepository.deleteById(user.getId());
     }
     

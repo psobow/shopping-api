@@ -1,8 +1,11 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.user.User;
+import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
 import com.sobow.shopping.domain.user.requests.UserCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 
 public interface UserManagementService {
     
@@ -12,13 +15,13 @@ public interface UserManagementService {
     
     User create(UserCreateRequest createRequest);
     
-    User selfPartialUpdate(UserUpdateRequest updateRequest);
+    User selfPartialUpdate(SelfUserUpdateRequest updateRequest);
     
-    void selfUpdatePassword(String oldPassword, String newPassword);
+    void selfUpdatePassword(SelfUpdatePasswordRequest updateRequest);
     
-    void selfUpdateEmail(String oldPassword, String newEmail);
+    void selfUpdateEmail(SelfUpdateEmailRequest updateRequest);
     
-    void selfDelete(String oldPassword);
+    void selfDelete(SelfUserDeleteRequest deleteRequest);
     
     boolean userExistsByEmail(String email);
 }

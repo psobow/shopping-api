@@ -2,11 +2,11 @@ package com.sobow.shopping.controllers.user;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.DeleteUserRequest;
-import com.sobow.shopping.domain.user.requests.UpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.UpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
+import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
 import com.sobow.shopping.domain.user.requests.UserCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserUpdateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.security.UserDetailsImpl;
@@ -41,34 +41,34 @@ public class UserController {
     }
     
     @GetMapping(path = "/me")
-    public ResponseEntity<ApiResponse> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<ApiResponse> selfGet(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.ok(new ApiResponse("Logged in user", response));
     }
     
     @PutMapping(path = "/me")
-    public ResponseEntity<ApiResponse> partialUpdateLoggedInUser(@RequestBody @Valid UserUpdateRequest updateRequest) {
+    public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUserUpdateRequest updateRequest) {
         User user = userManagementService.selfPartialUpdate(updateRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     
     @PostMapping(path = "/me/password")
-    public ResponseEntity<Void> changedPasswordLoggedInUser(@RequestBody @Valid UpdatePasswordRequest passwordDto) {
-        userManagementService.selfUpdatePassword(passwordDto.oldPassword(), passwordDto.newPassword());
+    public ResponseEntity<Void> selfChangedPassword(@RequestBody @Valid SelfUpdatePasswordRequest updateRequest) {
+        userManagementService.selfUpdatePassword(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping(path = "/me/email")
-    public ResponseEntity<Void> changedEmailLoggedInUser(@RequestBody @Valid UpdateEmailRequest emailDto) {
-        userManagementService.selfUpdateEmail(emailDto.oldPassword(), emailDto.newEmail());
+    public ResponseEntity<Void> selfChangedEmail(@RequestBody @Valid SelfUpdateEmailRequest updateRequest) {
+        userManagementService.selfUpdateEmail(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping(path = "/me")
-    public ResponseEntity<Void> deleteLoggedInUser(DeleteUserRequest deleteRequest) {
-        userManagementService.selfDelete(deleteRequest.oldPassword());
+    public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfUserDeleteRequest deleteRequest) {
+        userManagementService.selfDelete(deleteRequest);
         return ResponseEntity.noContent().build();
     }
 }
