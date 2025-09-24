@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,12 +39,9 @@ public class CartController {
         Cart cart = cartService.createOrGetCart(userId);
         CartResponse response = cartResponseMapper.mapToDto(cart);
         ApiResponse body = new ApiResponse(cartExists ? "Found" : "Created", response);
-        
-        if (cartExists) {
-            return ResponseEntity.ok().body(body);
-        }
-        return ResponseEntity.created(URI.create("/api/carts/" + cart.getId()))
-                             .body(body);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().buildAndExpand(userId).toUri();
+        return cartExists ? ResponseEntity.ok().body(body)
+                          : ResponseEntity.created(location).body(body);
     }
     
     @DeleteMapping("/users/{userId}/cart")
