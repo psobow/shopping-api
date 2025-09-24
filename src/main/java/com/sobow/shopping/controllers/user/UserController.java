@@ -2,11 +2,11 @@ package com.sobow.shopping.controllers.user;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
-import com.sobow.shopping.domain.user.requests.UserCreateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.security.UserDetailsImpl;
@@ -33,8 +33,8 @@ public class UserController {
     private final UserManagementService userManagementService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> create(UserCreateRequest createRequest) {
-        User user = userManagementService.create(createRequest);
+    public ResponseEntity<ApiResponse> selfRegister(SelfCreateUserRequest createRequest) {
+        User user = userManagementService.selfCreate(createRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created", response));
@@ -48,26 +48,26 @@ public class UserController {
     }
     
     @PutMapping(path = "/me")
-    public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUserUpdateRequest updateRequest) {
+    public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUpdateUserRequest updateRequest) {
         User user = userManagementService.selfPartialUpdate(updateRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     
     @PostMapping(path = "/me/password")
-    public ResponseEntity<Void> selfChangedPassword(@RequestBody @Valid SelfUpdatePasswordRequest updateRequest) {
+    public ResponseEntity<Void> selfUpdatePassword(@RequestBody @Valid SelfUpdatePasswordRequest updateRequest) {
         userManagementService.selfUpdatePassword(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping(path = "/me/email")
-    public ResponseEntity<Void> selfChangedEmail(@RequestBody @Valid SelfUpdateEmailRequest updateRequest) {
+    public ResponseEntity<Void> selfUpdateEmail(@RequestBody @Valid SelfUpdateEmailRequest updateRequest) {
         userManagementService.selfUpdateEmail(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping(path = "/me")
-    public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfUserDeleteRequest deleteRequest) {
+    public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfDeleteUserRequest deleteRequest) {
         userManagementService.selfDelete(deleteRequest);
         return ResponseEntity.noContent().build();
     }

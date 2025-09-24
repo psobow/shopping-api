@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  * <ol>
  *   <li>{@code null} list → valid (combine with {@code @NotNull/@NotEmpty} if presence is required)</li>
  *   <li>for each item: reject if the item or its {@code authority} is {@code null}</li>
- *   <li>apply {@code strip()} (trim), then convert to upper case using {@link java.util.Locale#ROOT}</li>
+ *   <li>apply {@code strip()}, then convert to upper case using {@link java.util.Locale#ROOT}</li>
  *   <li>optionally remove a leading {@code "ROLE_"} prefix, if present</li>
  *   <li>check membership in the configured allow-list</li>
  * </ol>
@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  *
  * <h3>Supported types</h3>
  * <ul>
- *   <li>{@code java.util.List<com.sobow.shopping.domain.user.requests.UserAuthorityRequest>}</li>
+ *   <li>{@code java.util.List<UserAuthorityRequest>}</li>
  * </ul>
  *
  * <h3>Example</h3>

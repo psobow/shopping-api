@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
  * <h3>Supported targets</h3>
  * <ul>
  *   <li>{@code FIELD}</li>
- *   <li>{@code PARAMETER}</li>
  * </ul>
  *
  * <h3>Supported types</h3>

@@ -1,6 +1,7 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.Builder;
@@ -55,9 +57,20 @@ public class User {
     private Set<UserAuthority> authorities = new HashSet<>();
     
     // ---- Domain methods ------------------------------------
-    public void updateFrom(SelfUserUpdateRequest patch) {
+    public void updateFrom(SelfUpdateUserRequest patch) {
         Objects.requireNonNull(patch, "User patch must not be null");
         if (patch.userProfile() != null) profile.updateFrom(patch.userProfile());
+    }
+    
+    public void updateFrom(List<UserAuthorityRequest> patch) {
+        Objects.requireNonNull(patch, "authorities patch must not be null");
+        if (patch.isEmpty()) throw new IllegalArgumentException("authorities patch must not be empty");
+        
+        removeAllAuthorities();
+        patch.stream().distinct().forEach(auth -> {
+            UserAuthority newAuthority = new UserAuthority(auth.authority());
+            addAuthorityAndLink(newAuthority);
+        });
     }
     
     public void setProfileAndLink(UserProfile userProfile) {

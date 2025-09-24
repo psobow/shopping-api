@@ -1,17 +1,17 @@
-package com.sobow.shopping.domain.user.requests;
+package com.sobow.shopping.domain.user.requests.shared;
 
 import static com.sobow.shopping.validation.ValidationUtils.normalizeSingleLine;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
-public record SelfUserProfileUpdateRequest(
+public record UpdateUserProfileRequest(
     @Size(min = 1, max = 60) String firstName,
     @Size(min = 1, max = 60) String lastName,
-    @Valid SelfUserAddressUpdateRequest userAddress
+    @Valid UpdateUserAddressRequest userAddress
 ) {
     
-    public SelfUserProfileUpdateRequest {
+    public UpdateUserProfileRequest {
         firstName = normalizeSingleLine(firstName);
         lastName = normalizeSingleLine(lastName);
     }

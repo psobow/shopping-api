@@ -1,6 +1,6 @@
 package com.sobow.shopping.validation.annotations;
 
-import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Validator for {@link ValidRoles}.
  *
- * <p>For each {@link com.sobow.shopping.domain.user.requests.UserAuthorityRequest} in the list:
+ * <p>For each {@link UserAuthorityRequest} in the list:
  * <ul>
  *   <li>returns {@code true} if the list itself is {@code null};</li>
  *   <li>returns {@code false} if an item or its {@code authority} is {@code null};</li>

@@ -24,13 +24,16 @@ import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.requests.SelfUserAddressUpdateRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserProfileUpdateRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
-import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.requests.UserCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.dto.AuthoritiesDto;
+import com.sobow.shopping.domain.user.requests.dto.PasswordDto;
+import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressRequest;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressRequest;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileRequest;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -146,29 +149,39 @@ public class TestFixtures {
         return new UserAuthorityRequest(userAuthority);
     }
     
-    public SelfUserAddressUpdateRequest userAddressUpdateRequest() {
-        return new SelfUserAddressUpdateRequest(cityName, streetName, streetNumber, postCode);
+    public UpdateUserAddressRequest updateUserAddressRequest() {
+        return new UpdateUserAddressRequest(cityName, streetName, streetNumber, postCode);
     }
     
-    public UserAddressCreateRequest userAddressCreateRequest() {
-        return new UserAddressCreateRequest(cityName, streetName, streetNumber, postCode);
+    public CreateUserAddressRequest createUserAddressRequest() {
+        return new CreateUserAddressRequest(cityName, streetName, streetNumber, postCode);
+        
+        
+        
     }
     
-    public SelfUserProfileUpdateRequest userProfileUpdateRequest() {
-        return new SelfUserProfileUpdateRequest(userFirstName, userLastName, userAddressUpdateRequest());
+    public UpdateUserProfileRequest updateUserProfileRequest() {
+        return new UpdateUserProfileRequest(userFirstName, userLastName, updateUserAddressRequest());
     }
     
-    public UserProfileCreateRequest userProfileCreateRequest() {
-        return new UserProfileCreateRequest(userFirstName, userLastName, userAddressCreateRequest());
+    public CreateUserProfileRequest createUserProfileRequest() {
+        return new CreateUserProfileRequest(userFirstName, userLastName, createUserAddressRequest());
     }
     
-    public SelfUserUpdateRequest userUpdateRequest() {
-        return new SelfUserUpdateRequest(userProfileUpdateRequest());
+    public SelfUpdateUserRequest selfUpdateUserRequest() {
+        return new SelfUpdateUserRequest(updateUserProfileRequest());
     }
     
-    public UserCreateRequest userCreateRequest() {
-        return new UserCreateRequest(userEmail, userPassword, userProfileCreateRequest(), List.of(userAuthorityRequest()));
+    public SelfCreateUserRequest selfCreateUserRequest() {
+        return new SelfCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileRequest());
     }
+    
+    public AdminCreateUserRequest adminCreateUserRequest() {
+        return new AdminCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileRequest(),
+                                          new AuthoritiesDto(List.of(userAuthorityRequest())));
+    }
+    
+    
     
     public Cart cartEntity() {
         Cart cart = new Cart();

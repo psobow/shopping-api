@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.user.requests;
+package com.sobow.shopping.domain.user.requests.admin;
 
 import static com.sobow.shopping.validation.ValidationUtils.normalizeAuthority;
 

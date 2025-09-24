@@ -12,18 +12,19 @@ import static org.mockito.Mockito.when;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
-import com.sobow.shopping.domain.user.requests.UserCreateRequest;
+import com.sobow.shopping.domain.user.requests.dto.PasswordDto;
+import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.security.UserDetailsImpl;
-import com.sobow.shopping.services.Impl.UserManagementServiceImpl;
+import com.sobow.shopping.services.Impl.UserServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -43,16 +44,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class UserManagementServiceImplTests {
+class UserServiceImplTests {
     
     @Mock
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private Mapper<User, UserCreateRequest> userCreateRequestMapper;
+    private Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
     @InjectMocks
-    private UserManagementServiceImpl underTest;
+    private UserServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
     
@@ -72,32 +73,32 @@ class UserManagementServiceImplTests {
     }
     
     @Nested
-    @DisplayName("create")
-    class create {
+    @DisplayName("selfRegister")
+    class selfRegister {
         
         @Test
-        public void create_should_CreateNewUser_when_ValidInput() {
+        public void selfRegister_should_CreateNewUser_when_ValidInput() {
             // Given
-            UserCreateRequest createRequest = fixtures.userCreateRequest();
+            SelfCreateUserRequest createRequest = fixtures.selfCreateUserRequest();
             User user = fixtures.userEntity();
             
-            when(userCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
+            when(selfCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
             when(userRepository.existsByEmail(fixtures.email())).thenReturn(false);
-            when(passwordEncoder.encode(createRequest.password())).thenReturn(fixtures.encodedPassword());
+            when(passwordEncoder.encode(createRequest.password().value())).thenReturn(fixtures.encodedPassword());
             when(userRepository.save(user)).thenReturn(user);
             
             // When
-            User result = underTest.create(createRequest);
+            User result = underTest.selfCreate(createRequest);
             
             // Then
             // Assert: request mapped to entity
-            verify(userCreateRequestMapper).mapToEntity(createRequest);
+            verify(selfCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: email uniqueness was checked with the new email
             verify(userRepository).existsByEmail(createRequest.email());
             
             // Assert: password was encoded and set on the entity
-            verify(passwordEncoder).encode(createRequest.password());
+            verify(passwordEncoder).encode(createRequest.password().value());
             assertThat(user.getPassword()).isEqualTo(fixtures.encodedPassword());
             
             // Assert: entity was persisted
@@ -108,19 +109,19 @@ class UserManagementServiceImplTests {
         }
         
         @Test
-        public void create_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
+        public void selfRegister_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
             // Given
-            UserCreateRequest createRequest = fixtures.userCreateRequest();
+            SelfCreateUserRequest createRequest = fixtures.selfCreateUserRequest();
             User user = fixtures.userEntity();
             
-            when(userCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
+            when(selfCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
             when(userRepository.existsByEmail(fixtures.email())).thenReturn(true);
             
             // When & Then
-            assertThrows(EmailAlreadyExistsException.class, () -> underTest.create(createRequest));
+            assertThrows(EmailAlreadyExistsException.class, () -> underTest.selfCreate(createRequest));
             
             // Assert: request was mapped to entity
-            verify(userCreateRequestMapper).mapToEntity(createRequest);
+            verify(selfCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: uniqueness check performed with the new email
             verify(userRepository).existsByEmail(createRequest.email());
@@ -137,7 +138,7 @@ class UserManagementServiceImplTests {
         @Test
         public void selfPartialUpdate_should_UpdateAuthenticatedUser_when_ValidRequest() {
             // Given
-            SelfUserUpdateRequest updateRequest = fixtures.userUpdateRequest();
+            SelfUpdateUserRequest updateRequest = fixtures.selfUpdateUserRequest();
             User user = fixtures.userEntity();
             UserProfile userProfile = fixtures.userProfileEntity();
             UserAddress userAddress = fixtures.userAddressEntity();
@@ -171,7 +172,7 @@ class UserManagementServiceImplTests {
         public void selfPartialUpdate_should_ThrowNoAuthentication_when_SecurityContextIsEmpty() {
             // Given
             SecurityContextHolder.clearContext();
-            SelfUserUpdateRequest updateRequest = fixtures.userUpdateRequest();
+            SelfUpdateUserRequest updateRequest = fixtures.selfUpdateUserRequest();
             
             // When & Then
             assertThrows(NoAuthenticationException.class, () -> underTest.selfPartialUpdate(updateRequest));
@@ -199,7 +200,8 @@ class UserManagementServiceImplTests {
             when(passwordEncoder.encode(fixtures.newPassword())).thenReturn(fixtures.encodedPassword());
             
             // When
-            underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(fixtures.password(), fixtures.newPassword()));
+            underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(new PasswordDto(fixtures.password()),
+                                                                       new PasswordDto(fixtures.newPassword())));
             
             // Then
             // Assert: user loaded and old password verified
@@ -222,7 +224,8 @@ class UserManagementServiceImplTests {
             
             // When & Then
             assertThrows(InvalidOldPasswordException.class,
-                         () -> underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(fixtures.password(), fixtures.newPassword())));
+                         () -> underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(new PasswordDto(fixtures.password()),
+                                                                                          new PasswordDto(fixtures.newPassword()))));
             
             // Assert: old password was checked
             verify(passwordEncoder).matches(fixtures.password(), user.getPassword());
@@ -241,7 +244,8 @@ class UserManagementServiceImplTests {
             
             // When & Then
             assertThrows(NoAuthenticationException.class,
-                         () -> underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(fixtures.password(), fixtures.newPassword())));
+                         () -> underTest.selfUpdatePassword(new SelfUpdatePasswordRequest(new PasswordDto(fixtures.password()),
+                                                                                          new PasswordDto(fixtures.newPassword()))));
             
             // Assert: nothing was touched
             verify(userRepository, never()).findByEmail(anyString());
@@ -271,7 +275,7 @@ class UserManagementServiceImplTests {
             
             // When
             
-            underTest.selfUpdateEmail(new SelfUpdateEmailRequest(fixtures.password(), fixtures.newEmail()));
+            underTest.selfUpdateEmail(new SelfUpdateEmailRequest(new PasswordDto(fixtures.password()), fixtures.newEmail()));
             
             // Then
             // Assert: loaded by current email
@@ -296,7 +300,8 @@ class UserManagementServiceImplTests {
             
             // When & Then
             assertThrows(InvalidOldPasswordException.class,
-                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(fixtures.password(), fixtures.newEmail())));
+                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(new PasswordDto(fixtures.password()),
+                                                                                    fixtures.newEmail())));
             
             // Assert: looked up current user and old password was checked
             verify(userRepository).findByEmail(user.getEmail());
@@ -309,7 +314,6 @@ class UserManagementServiceImplTests {
             
             // Assert: email unchanged
             assertThat(user.getEmail()).isNotEqualTo(fixtures.newEmail());
-            
         }
         
         @Test
@@ -326,7 +330,8 @@ class UserManagementServiceImplTests {
             
             // When & Then
             assertThrows(EmailAlreadyExistsException.class,
-                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(fixtures.password(), fixtures.newEmail())));
+                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(new PasswordDto(fixtures.password()),
+                                                                                    fixtures.newEmail())));
             
             // Assert: user loaded by current email
             verify(userRepository).findByEmail(emailBefore);
@@ -348,7 +353,8 @@ class UserManagementServiceImplTests {
             
             // When & Then
             assertThrows(NoAuthenticationException.class,
-                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(fixtures.password(), fixtures.newEmail())));
+                         () -> underTest.selfUpdateEmail(new SelfUpdateEmailRequest(new PasswordDto(fixtures.password()),
+                                                                                    fixtures.newEmail())));
             
             // Assert: nothing hit the collaborators
             verify(userRepository, never()).findByEmail(anyString());
@@ -358,11 +364,11 @@ class UserManagementServiceImplTests {
     }
     
     @Nested
-    @DisplayName("deleteByEmail")
-    class deleteByEmail {
+    @DisplayName("selfDelete")
+    class selfDelete {
         
         @Test
-        public void deleteByEmail_should_DeleteUser_when_EmailExists() {
+        public void selfDelete_should_DeleteUser_when_EmailExists() {
             // Given
             User user = fixtures.userEntity();
             
@@ -370,7 +376,7 @@ class UserManagementServiceImplTests {
             when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
             
             // When
-            underTest.selfDelete(new SelfUserDeleteRequest(fixtures.password()));
+            underTest.selfDelete(new SelfDeleteUserRequest(new PasswordDto(fixtures.password())));
             
             // Then
             // Assert: looked up by email
@@ -381,7 +387,7 @@ class UserManagementServiceImplTests {
         }
         
         @Test
-        public void deleteByEmail_should_ThrowInvalidOldPassword_when_PasswordDoesNotMatch() {
+        public void selfDelete_should_ThrowInvalidOldPassword_when_PasswordDoesNotMatch() {
             // Given
             User user = fixtures.userEntity();
             
@@ -389,7 +395,8 @@ class UserManagementServiceImplTests {
             when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(false);
             
             // When & Then
-            assertThrows(InvalidOldPasswordException.class, () -> underTest.selfDelete(new SelfUserDeleteRequest(fixtures.password())));
+            assertThrows(InvalidOldPasswordException.class,
+                         () -> underTest.selfDelete(new SelfDeleteUserRequest(new PasswordDto(fixtures.password()))));
             
             // Assert: looked up by email
             verify(userRepository).findByEmail(fixtures.email());

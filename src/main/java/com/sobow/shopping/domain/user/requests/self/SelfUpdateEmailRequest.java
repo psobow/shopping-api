@@ -1,13 +1,14 @@
-package com.sobow.shopping.domain.user.requests;
+package com.sobow.shopping.domain.user.requests.self;
 
 import static com.sobow.shopping.validation.ValidationUtils.normalizeEmail;
 
+import com.sobow.shopping.domain.user.requests.dto.PasswordDto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public record SelfUpdateEmailRequest(
-    @NotBlank @Size(min = 6, max = 100) String oldPassword,
+    @NotBlank @Valid PasswordDto oldPassword,
     @NotBlank @Email String newEmail
 ) {
     

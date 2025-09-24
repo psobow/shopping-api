@@ -1,11 +1,13 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.SelfUpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.SelfUpdatePasswordRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserDeleteRequest;
-import com.sobow.shopping.domain.user.requests.SelfUserUpdateRequest;
-import com.sobow.shopping.domain.user.requests.UserCreateRequest;
+import com.sobow.shopping.domain.user.UserAuthority;
+import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
@@ -28,11 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class UserManagementServiceImpl implements UserManagementService {
+public class UserServiceImpl implements UserManagementService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Mapper<User, UserCreateRequest> userCreateRequestMapper;
+    private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    private final Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
     
     @Override
     public User findByEmailWithAuthorities(String email) {
@@ -50,16 +53,26 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public User create(UserCreateRequest createRequest) {
-        User user = userCreateRequestMapper.mapToEntity(createRequest);
+    public User adminCreate(AdminCreateUserRequest createRequest) {
+        User user = adminCreateRequestMapper.mapToEntity(createRequest);
         assertNewEmailAvailable(createRequest.email(), null);
-        user.setPassword(passwordEncoder.encode(createRequest.password()));
+        user.setPassword(passwordEncoder.encode(createRequest.password().value()));
         return userRepository.save(user);
     }
     
     @Transactional
     @Override
-    public User selfPartialUpdate(SelfUserUpdateRequest updateRequest) {
+    public User selfCreate(SelfCreateUserRequest createRequest) {
+        User user = selfCreateRequestMapper.mapToEntity(createRequest);
+        user.addAuthorityAndLink(new UserAuthority("USER"));
+        assertNewEmailAvailable(createRequest.email(), null);
+        user.setPassword(passwordEncoder.encode(createRequest.password().value()));
+        return userRepository.save(user);
+    }
+    
+    @Transactional
+    @Override
+    public User selfPartialUpdate(SelfUpdateUserRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User existingUser = getAuthenticatedUser(authentication);
         existingUser.updateFrom(updateRequest);
@@ -71,9 +84,9 @@ public class UserManagementServiceImpl implements UserManagementService {
     public void selfUpdatePassword(SelfUpdatePasswordRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(updateRequest.oldPassword(), user.getPassword());
+        assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
         
-        user.setPassword(passwordEncoder.encode(updateRequest.newPassword()));
+        user.setPassword(passwordEncoder.encode(updateRequest.newPassword().value()));
         
         updateSecurityContext(user, authentication.getAuthorities());
     }
@@ -83,7 +96,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     public void selfUpdateEmail(SelfUpdateEmailRequest updateRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(updateRequest.oldPassword(), user.getPassword());
+        assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
         
         assertNewEmailAvailable(updateRequest.newEmail(), user.getId());
         user.setEmail(updateRequest.newEmail());
@@ -93,10 +106,10 @@ public class UserManagementServiceImpl implements UserManagementService {
     
     @Transactional
     @Override
-    public void selfDelete(SelfUserDeleteRequest deleteRequest) {
+    public void selfDelete(SelfDeleteUserRequest deleteRequest) {
         Authentication authentication = getCurrentAuthentication();
         User user = getAuthenticatedUser(authentication);
-        assertPasswordMatch(deleteRequest.oldPassword(), user.getPassword());
+        assertPasswordMatch(deleteRequest.oldPassword().value(), user.getPassword());
         userRepository.deleteById(user.getId());
     }
     
