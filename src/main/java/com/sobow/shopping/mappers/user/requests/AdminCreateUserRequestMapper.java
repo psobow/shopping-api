@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component("adminCreateUserRequestMapper")
+@Component
 public class AdminCreateUserRequestMapper implements Mapper<User, AdminCreateUserRequest> {
     
     private final Mapper<UserAuthority, AuthorityDto> userAuthorityRequestMapper;

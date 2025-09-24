@@ -1,7 +1,7 @@
 package com.sobow.shopping.security;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.services.UserManagementService;
+import com.sobow.shopping.services.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     
-    private final UserManagementService userManagementService;
+    private final AdminService adminService;
     
     @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userManagementService.findByEmailWithAuthorities(email);
+        User user = adminService.findByEmailWithAuthorities(email);
         return new UserDetailsImpl(user);
     }
 }

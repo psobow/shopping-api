@@ -10,7 +10,7 @@ import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.security.UserDetailsImpl;
-import com.sobow.shopping.services.UserManagementService;
+import com.sobow.shopping.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     
     private final Mapper<User, UserResponse> userResponseMapper;
-    private final UserManagementService userManagementService;
+    private final UserService userService;
     
     @PostMapping
     public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfCreateUserRequest createRequest) {
-        User user = userManagementService.selfCreate(createRequest);
+        User user = userService.selfCreate(createRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created", response));
@@ -49,26 +49,26 @@ public class UserController {
     
     @PutMapping(path = "/me")
     public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUpdateUserRequest updateRequest) {
-        User user = userManagementService.selfPartialUpdate(updateRequest);
+        User user = userService.selfPartialUpdate(updateRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     
     @PostMapping(path = "/me/password")
     public ResponseEntity<Void> selfUpdatePassword(@RequestBody @Valid SelfUpdatePasswordRequest updateRequest) {
-        userManagementService.selfUpdatePassword(updateRequest);
+        userService.selfUpdatePassword(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping(path = "/me/email")
     public ResponseEntity<Void> selfUpdateEmail(@RequestBody @Valid SelfUpdateEmailRequest updateRequest) {
-        userManagementService.selfUpdateEmail(updateRequest);
+        userService.selfUpdateEmail(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping(path = "/me")
     public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfDeleteUserRequest deleteRequest) {
-        userManagementService.selfDelete(deleteRequest);
+        userService.selfDelete(deleteRequest);
         return ResponseEntity.noContent().build();
     }
 }

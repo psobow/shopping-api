@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component("selfCreateUserRequestMapper")
+@Component
 public class SelfCreateUserRequestMapper implements Mapper<User, SelfCreateUserRequest> {
     
     private final Mapper<UserProfile, CreateUserProfileDto> userProfileRequestMapper;

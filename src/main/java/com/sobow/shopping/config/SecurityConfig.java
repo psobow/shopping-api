@@ -7,7 +7,7 @@ import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
 import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
 import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
-import com.sobow.shopping.services.UserManagementService;
+import com.sobow.shopping.services.AdminService;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,12 +29,12 @@ public class SecurityConfig {
     }
     
     @Bean
-    public UserDetailsService userDetailsService(UserManagementService userManagementService) {
+    public UserDetailsService userDetailsService(AdminService adminService) {
         
-        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(userManagementService);
+        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(adminService);
         String adminEmail = "admin@email.com";
         String password = "password";
-        if (!userManagementService.userExistsByEmail(adminEmail)) {
+        if (!adminService.userExistsByEmail(adminEmail)) {
             
             CreateUserAddressDto address = new CreateUserAddressDto(
                 "Wroclaw", "Street", "20", "11-222");
@@ -44,7 +44,7 @@ public class SecurityConfig {
             AdminCreateUserRequest user = new AdminCreateUserRequest(adminEmail, new PasswordDto(password), userProfile,
                                                                      new ListAuthorityDto(List.of(authority)));
             
-            userManagementService.adminCreate(user);
+            adminService.adminCreate(user);
         }
         
         return userDetailsService;

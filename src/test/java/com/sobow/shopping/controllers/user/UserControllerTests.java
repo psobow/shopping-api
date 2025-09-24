@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.mappers.Mapper;
-import com.sobow.shopping.services.UserManagementService;
+import com.sobow.shopping.services.UserService;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +24,7 @@ public class UserControllerTests {
     @MockitoBean
     private Mapper<User, UserResponse> userResponseMapper;
     @MockitoBean
-    private UserManagementService userManagementService;
+    private UserService userService;
     
     @Autowired
     MockMvc mockMvc;

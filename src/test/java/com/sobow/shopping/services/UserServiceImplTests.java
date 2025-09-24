@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
@@ -34,6 +33,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,19 +50,17 @@ class UserServiceImplTests {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
-    @Mock
-    private Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    
     @Mock
     private Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
     
+    @InjectMocks
     private UserServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
     
     @BeforeEach
     void setupContext() {
-        underTest = new UserServiceImpl(userRepository, passwordEncoder, adminCreateRequestMapper, selfCreateRequestMapper);
-        
         User user = fixtures.userEntity();
         var principal = new UserDetailsImpl(user);
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
@@ -74,68 +72,6 @@ class UserServiceImplTests {
     @AfterEach
     void tearDownContext() {
         SecurityContextHolder.clearContext();
-    }
-    
-    @Nested
-    @DisplayName("adminCreate")
-    class adminCreate {
-        
-        @Test
-        public void adminCreate_should_CreateNewUser_when_ValidInput() {
-            // Given
-            AdminCreateUserRequest createRequest = fixtures.adminCreateUserRequest();
-            User user = fixtures.userEntity();
-            
-            when(adminCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
-            when(userRepository.existsByEmail(fixtures.email())).thenReturn(false);
-            when(passwordEncoder.encode(createRequest.password().value())).thenReturn(fixtures.encodedPassword());
-            when(userRepository.save(user)).thenReturn(user);
-            
-            // When
-            User result = underTest.adminCreate(createRequest);
-            
-            // Then
-            // Assert: request mapped to entity
-            verify(adminCreateRequestMapper).mapToEntity(createRequest);
-            
-            // Assert: email uniqueness was checked with the new email
-            verify(userRepository).existsByEmail(createRequest.email());
-            
-            // Assert: password was encoded and set on the entity
-            verify(passwordEncoder).encode(createRequest.password().value());
-            assertThat(user.getPassword()).isEqualTo(fixtures.encodedPassword());
-            
-            // Assert: entity was persisted
-            verify(userRepository).save(user);
-            
-            // Assert: service returns the same (persisted) entity instance
-            assertThat(user).isSameAs(result);
-        }
-        
-        @Test
-        public void adminCreate_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
-            // Given
-            AdminCreateUserRequest createRequest = fixtures.adminCreateUserRequest();
-            User user = fixtures.userEntity();
-            
-            when(adminCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
-            when(userRepository.existsByEmail(fixtures.email())).thenReturn(true);
-            
-            // When & Then
-            assertThrows(EmailAlreadyExistsException.class, () -> underTest.adminCreate(createRequest));
-            
-            // Assert: request was mapped to entity
-            verify(adminCreateRequestMapper).mapToEntity(createRequest);
-            
-            // Assert: uniqueness check performed with the new email
-            verify(userRepository).existsByEmail(createRequest.email());
-            
-            // Assert: no password encoding
-            verifyNoInteractions(passwordEncoder);
-            
-            // Assert: entity was NOT persisted
-            verify(userRepository, never()).save(user);
-        }
     }
     
     @Nested

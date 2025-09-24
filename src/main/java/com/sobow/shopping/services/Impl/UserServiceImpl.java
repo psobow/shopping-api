@@ -2,7 +2,6 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
@@ -14,11 +13,10 @@ import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.security.UserDetailsImpl;
-import com.sobow.shopping.services.UserManagementService;
+import com.sobow.shopping.services.UserService;
 import jakarta.annotation.Nullable;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,39 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements UserManagementService {
+public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     
-    @Qualifier("adminCreateUserRequestMapper")
-    private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
-    
-    @Qualifier("selfCreateUserRequestMapper")
     private final Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
-    
-    @Override
-    public User findByEmailWithAuthorities(String email) {
-        return userRepository.findByEmailWithAuthorities(email)
-                             .orElseThrow(() -> new UsernameNotFoundException(
-                                 "User with email: " + email + " not found"));
-    }
-    
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                             .orElseThrow(() -> new UsernameNotFoundException(
-                                 "User with email: " + email + " not found"));
-    }
-    
-    @Transactional
-    @Override
-    public User adminCreate(AdminCreateUserRequest createRequest) {
-        User user = adminCreateRequestMapper.mapToEntity(createRequest);
-        assertNewEmailAvailable(createRequest.email(), null);
-        user.setPassword(passwordEncoder.encode(createRequest.password().value()));
-        return userRepository.save(user);
-    }
     
     @Transactional
     @Override
@@ -118,10 +89,6 @@ public class UserServiceImpl implements UserManagementService {
         userRepository.deleteById(user.getId());
     }
     
-    @Override
-    public boolean userExistsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
     
     private void assertNewEmailAvailable(String newEmail, @Nullable Long existingUserId) {
         boolean duplicate =
@@ -145,7 +112,9 @@ public class UserServiceImpl implements UserManagementService {
     
     private User getAuthenticatedUser(Authentication auth) {
         String email = auth.getName();
-        return findByEmail(email);
+        return userRepository.findByEmail(email)
+                             .orElseThrow(() -> new UsernameNotFoundException(
+                                 "User with email: " + email + " not found"));
     }
     
     private void updateSecurityContext(User updatedUser, Collection<? extends GrantedAuthority> authorities) {
