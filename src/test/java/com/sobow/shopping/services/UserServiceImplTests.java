@@ -73,11 +73,11 @@ class UserServiceImplTests {
     }
     
     @Nested
-    @DisplayName("selfRegister")
-    class selfRegister {
+    @DisplayName("selfCreate")
+    class selfCreate {
         
         @Test
-        public void selfRegister_should_CreateNewUser_when_ValidInput() {
+        public void selfCreate_should_CreateNewUser_when_ValidInput() {
             // Given
             SelfCreateUserRequest createRequest = fixtures.selfCreateUserRequest();
             User user = fixtures.userEntity();
@@ -106,10 +106,13 @@ class UserServiceImplTests {
             
             // Assert: service returns the same (persisted) entity instance
             assertThat(user).isSameAs(result);
+            
+            // Assert: user has USER authority assigned
+            assertThat(user.getAuthorities().stream().findFirst().get().getValue()).isEqualTo("ROLE_USER");
         }
         
         @Test
-        public void selfRegister_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
+        public void selfCreate_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
             // Given
             SelfCreateUserRequest createRequest = fixtures.selfCreateUserRequest();
             User user = fixtures.userEntity();
@@ -342,7 +345,7 @@ class UserServiceImplTests {
             // Assert: uniqueness checked for new email against other users
             verify(userRepository).existsByEmailAndIdNot(fixtures.newEmail(), fixtures.userId());
             
-            // Assert: no state changes / no side-effects
+            // Assert: no state changes
             assertThat(user.getEmail()).isEqualTo(emailBefore);
         }
         

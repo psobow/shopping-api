@@ -22,7 +22,7 @@ public class UserDetailsImpl implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return user.getAuthorities()
                    .stream()
-                   .map(UserAuthority::getAuthority)
+                   .map(UserAuthority::getValue)
                    .map(SimpleGrantedAuthority::new)
                    .collect(Collectors.toSet());
     }

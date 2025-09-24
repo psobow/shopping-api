@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record AuthorityDto(
-    @NotBlank @Size(max = 50) String authority
+    @NotBlank @Size(max = 50) String value
 ) {
     
     public AuthorityDto {
-        authority = normalizeAuthority(authority);
+        value = normalizeAuthority(value);
     }
 }

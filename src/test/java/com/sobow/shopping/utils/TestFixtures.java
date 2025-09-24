@@ -77,6 +77,7 @@ public class TestFixtures {
     
     private Long userId = 60L;
     private String userAuthority = "USER";
+    private String adminAuthority = "ADMIN";
     private String userFirstName = "first name";
     private String userLastName = "last name";
     private String userEmail = "user@email.com";
@@ -145,40 +146,44 @@ public class TestFixtures {
         return new User(userEmail, userPassword);
     }
     
-    public AuthorityDto userAuthorityRequest() {
+    public AuthorityDto userAuthorityDto() {
         return new AuthorityDto(userAuthority);
     }
     
-    public UpdateUserAddressDto updateUserAddressRequest() {
+    public AuthorityDto adminAuthorityDto() {
+        return new AuthorityDto(adminAuthority);
+    }
+    
+    public UpdateUserAddressDto updateUserAddressDto() {
         return new UpdateUserAddressDto(cityName, streetName, streetNumber, postCode);
     }
     
-    public CreateUserAddressDto createUserAddressRequest() {
+    public CreateUserAddressDto createUserAddressDto() {
         return new CreateUserAddressDto(cityName, streetName, streetNumber, postCode);
         
         
         
     }
     
-    public UpdateUserProfileDto updateUserProfileRequest() {
-        return new UpdateUserProfileDto(userFirstName, userLastName, updateUserAddressRequest());
+    public UpdateUserProfileDto updateUserProfileDto() {
+        return new UpdateUserProfileDto(userFirstName, userLastName, updateUserAddressDto());
     }
     
-    public CreateUserProfileDto createUserProfileRequest() {
-        return new CreateUserProfileDto(userFirstName, userLastName, createUserAddressRequest());
+    public CreateUserProfileDto createUserProfileDto() {
+        return new CreateUserProfileDto(userFirstName, userLastName, createUserAddressDto());
     }
     
     public SelfUpdateUserRequest selfUpdateUserRequest() {
-        return new SelfUpdateUserRequest(updateUserProfileRequest());
+        return new SelfUpdateUserRequest(updateUserProfileDto());
     }
     
     public SelfCreateUserRequest selfCreateUserRequest() {
-        return new SelfCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileRequest());
+        return new SelfCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileDto());
     }
     
     public AdminCreateUserRequest adminCreateUserRequest() {
-        return new AdminCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileRequest(),
-                                          new ListAuthorityDto(List.of(userAuthorityRequest())));
+        return new AdminCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileDto(),
+                                          new ListAuthorityDto(List.of(adminAuthorityDto())));
     }
     
     

@@ -15,6 +15,6 @@ public class UserAuthorityResponseMapper implements Mapper<UserAuthority, UserAu
     
     @Override
     public UserAuthorityResponse mapToDto(UserAuthority userAuthority) {
-        return new UserAuthorityResponse(userAuthority.getAuthority());
+        return new UserAuthorityResponse(userAuthority.getValue());
     }
 }

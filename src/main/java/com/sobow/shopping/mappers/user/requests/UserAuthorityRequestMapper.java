@@ -10,7 +10,7 @@ public class UserAuthorityRequestMapper implements Mapper<UserAuthority, Authori
     
     @Override
     public UserAuthority mapToEntity(AuthorityDto authorityDto) {
-        return new UserAuthority(authorityDto.authority());
+        return new UserAuthority(authorityDto.value());
     }
     
     @Override

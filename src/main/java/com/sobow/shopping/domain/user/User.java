@@ -69,7 +69,7 @@ public class User {
         
         removeAllAuthorities();
         patch.stream().distinct().forEach(auth -> {
-            UserAuthority newAuthority = new UserAuthority(auth.authority());
+            UserAuthority newAuthority = new UserAuthority(auth.value());
             addAuthorityAndLink(newAuthority);
         });
     }

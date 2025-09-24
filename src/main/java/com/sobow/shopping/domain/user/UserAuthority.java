@@ -24,7 +24,7 @@ import org.hibernate.proxy.HibernateProxy;
     uniqueConstraints = {
         @UniqueConstraint(
             name = "uc_auth_user_authority",
-            columnNames = {"user_id", "authority"}
+            columnNames = {"user_id", "value"}
         )
     }
 )
@@ -32,8 +32,8 @@ public class UserAuthority {
     
     // ---- Construction (builder) ----------------------------
     @Builder
-    public UserAuthority(String authority) {
-        setAuthority(authority);
+    public UserAuthority(String value) {
+        setValue(value);
     }
     
     // ---- Identifier & Basic columns ------------------------
@@ -42,7 +42,7 @@ public class UserAuthority {
     private Long id;
     
     @Column(nullable = false, updatable = false)
-    private String authority;
+    private String value;
     
     // ---- Associations --------------------------------------
     @ManyToOne(optional = false)
@@ -55,10 +55,10 @@ public class UserAuthority {
     }
     
     // ---- Setter methods ------------------------------------
-    public void setAuthority(String authority) {
-        String a = authority.trim().toUpperCase(Locale.ROOT);
+    public void setValue(String value) {
+        String a = value.trim().toUpperCase(Locale.ROOT);
         if (a.startsWith("ROLE_")) a = a.substring(5);
-        this.authority = "ROLE_" + a;
+        this.value = "ROLE_" + a;
     }
     
     // ---- Equality (proxy-safe) -----------------------------
@@ -78,11 +78,11 @@ public class UserAuthority {
         if (thisEffectiveClass != oEffectiveClass) return false;
         
         UserAuthority that = (UserAuthority) o;
-        return Objects.equals(this.authority, that.authority);
+        return Objects.equals(this.value, that.value);
     }
     
     @Override
     public final int hashCode() {
-        return Objects.hash(this.authority);
+        return Objects.hash(this.value);
     }
 }
