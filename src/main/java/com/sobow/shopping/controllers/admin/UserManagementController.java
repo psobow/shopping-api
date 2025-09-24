@@ -30,7 +30,7 @@ public class UserManagementController {
     private final UserManagementService userManagementService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> adminRegister(@RequestBody @Valid AdminCreateUserRequest createRequest) {
+    public ResponseEntity<ApiResponse> adminCreate(@RequestBody @Valid AdminCreateUserRequest createRequest) {
         User user = userManagementService.adminCreate(createRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.status(HttpStatus.CREATED)

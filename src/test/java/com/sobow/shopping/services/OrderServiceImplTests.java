@@ -2,14 +2,15 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.order.Order;
+import com.sobow.shopping.domain.order.OrderStatus;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserProfile;
@@ -19,13 +20,18 @@ import com.sobow.shopping.repositories.OrderRepository;
 import com.sobow.shopping.services.Impl.OrderServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTests {
@@ -56,9 +62,14 @@ public class OrderServiceImplTests {
             Cart cart = fixtures.cartEntity();
             CartItem cartItem = fixtures.cartItemEntity();
             
+            ReflectionTestUtils.setField(cartItem.getProduct(), "id", fixtures.productId());
             user.setProfileAndLink(userProfile);
             userProfile.setCartAndLink(cart);
             cart.addCartItemAndLink(cartItem);
+            
+            // Snapshots
+            List<Long> cartProductsIdsBefore = cart.getProductsId();
+            Set<CartItem> cartItemsBefore = new HashSet<>(cart.getCartItems());
             
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
@@ -67,8 +78,36 @@ public class OrderServiceImplTests {
             Order result = underTest.createOrder(fixtures.userId());
             
             // Then
-            assertThat(userProfile.getOrders()).contains(result).hasSize(1);
-            verify(productService, times(1)).lockForOrder(anyList());
+            // Assert: services loaded the profile and cart
+            verify(userProfileService).findByUserId(fixtures.userId());
+            verify(cartService).findByUserIdWithItems(fixtures.userId());
+            
+            // Assert: product stock was locked for EXACT products from cart
+            ArgumentCaptor<List<Long>> idsCaptor = ArgumentCaptor.forClass(List.class);
+            verify(productService, times(1)).lockForOrder(idsCaptor.capture());
+            assertThat(idsCaptor.getValue()).containsExactlyElementsOf(cartProductsIdsBefore);
+            
+            // Assert: order is NEW
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.NEW);
+            
+            // Assert: order items mirror cart items (product, brand, price, qty)
+            assertThat(result.getOrderItems()).hasSize(cartItemsBefore.size());
+            assertThat(result.getOrderItems())
+                .allSatisfy(oi -> {
+                    CartItem ci = cartItemsBefore.stream()
+                                                 .filter(c -> c.getProduct().getName().equals(oi.getProductName())
+                                                     && c.getProduct().getBrandName().equals(oi.getProductBrandName())
+                                                 ).findFirst().orElseThrow();
+                    
+                    assertThat(oi.getRequestedQty()).isEqualTo(ci.getRequestedQty());
+                    assertThat(oi.getProductPrice()).isEqualByComparingTo(ci.productPrice());
+                });
+            
+            // Assert: order is linked to the user profile and is the only order
+            assertThat(userProfile.getOrders()).containsExactly(result);
+            assertThat(result.getUserProfile()).isSameAs(userProfile);
+            
+            // Assert: cart removed from profile after successful order creation
             assertThat(userProfile.getCart()).isNull();
         }
         
@@ -78,7 +117,15 @@ public class OrderServiceImplTests {
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
+            // Assert: throws when user has no cart
             assertThrows(EntityNotFoundException.class, () -> underTest.createOrder(fixtures.userId()));
+            
+            // Assert: services were called to load profile & cart
+            verify(userProfileService).findByUserId(fixtures.userId());
+            verify(cartService).findByUserIdWithItems(fixtures.userId());
+            
+            // Assert: no stock ops / no persistence when cart missing
+            verifyNoInteractions(productService, orderRepository);
         }
         
         @Test
@@ -88,7 +135,17 @@ public class OrderServiceImplTests {
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
             // When & Then
+            // Assert: throws when user has empty cart
             assertThrows(CartEmptyException.class, () -> underTest.createOrder(fixtures.userId()));
+            
+            // Assert: services were called to load profile & cart
+            verify(userProfileService).findByUserId(fixtures.userId());
+            verify(cartService).findByUserIdWithItems(fixtures.userId());
+            
+            // Assert: no stock ops / no persistence when cart empty
+            verifyNoInteractions(productService, orderRepository);
+            
+            
         }
         
         @Test
@@ -111,6 +168,15 @@ public class OrderServiceImplTests {
             
             // When & Then
             assertThrows(InsufficientStockException.class, () -> underTest.createOrder(fixtures.userId()));
+            
+            // Assert: services loaded the profile and cart
+            verify(userProfileService).findByUserId(fixtures.userId());
+            verify(cartService).findByUserIdWithItems(fixtures.userId());
+            
+            // Assert: no persistence / linking happened after failure
+            assertThat(userProfile.getOrders()).isEmpty();
+            assertThat(userProfile.getCart()).isSameAs(cart);
+            verifyNoInteractions(orderRepository);
         }
     }
 }

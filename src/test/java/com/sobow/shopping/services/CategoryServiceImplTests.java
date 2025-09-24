@@ -35,11 +35,6 @@ public class CategoryServiceImplTests {
     
     private final TestFixtures fixtures = new TestFixtures();
     
-    @Test
-    void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
-        when(categoryRepository.findById(fixtures.nonExistingId())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> underTest.findById(fixtures.nonExistingId()));
-    }
     
     @Nested
     @DisplayName("create")
@@ -146,6 +141,17 @@ public class CategoryServiceImplTests {
             
             // Assert: entity remains unchanged
             assertThat(category.getName()).isEqualTo(nameBefore);
+        }
+    }
+    
+    @Nested
+    @DisplayName("findBy")
+    class findBy {
+        
+        @Test
+        void findById_should_ThrowNotFound_when_CategoryIdDoesNotExist() {
+            when(categoryRepository.findById(fixtures.nonExistingId())).thenReturn(Optional.empty());
+            assertThrows(EntityNotFoundException.class, () -> underTest.findById(fixtures.nonExistingId()));
         }
     }
 }

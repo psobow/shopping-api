@@ -34,26 +34,21 @@ public class UserControllerTests {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
     @Nested
-    @DisplayName("create")
-    class create {
+    @DisplayName("selfCreate")
+    class selfCreate {
         
         @Test
-        public void create_should_Return201_when_ValidRequest() {
+        public void selfCreate_should_Return201_when_ValidRequest() {
             fail("implement me");
         }
         
         @Test
-        public void create_should_Return400_when_InvalidRequestBody() {
+        public void selfCreate_should_Return400_when_InvalidRequestBody() {
             fail("implement me");
         }
         
         @Test
-        public void create_should_Return409_when_EmailAlreadyExists() {
-            fail("implement me");
-        }
-        
-        @Test
-        public void create_should_Return422_when_RoleNotAllowed() {
+        public void selfCreate_should_Return409_when_EmailAlreadyExists() {
             fail("implement me");
         }
     }

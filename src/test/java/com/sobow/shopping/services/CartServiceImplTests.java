@@ -2,6 +2,9 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.cart.Cart;
@@ -61,8 +64,18 @@ public class CartServiceImplTests {
             Cart result = underTest.createOrGetCart(fixtures.userId());
             
             // Then
+            // Assert: user profile was loaded
+            verify(userProfileService).findByUserId(fixtures.userId());
+            
+            // Assert: a new cart instance was created and returned
             assertThat(result).isNotNull();
+            
+            // Assert: new cart is linked back to the user profile
             assertThat(userProfile.getCart()).isSameAs(result);
+            assertThat(result.getUserProfile()).isSameAs(userProfile);
+            
+            // Assert: new cart has no items
+            assertThat(result.getCartItems()).isEmpty();
         }
         
         @Test
@@ -79,8 +92,15 @@ public class CartServiceImplTests {
             Cart result = underTest.createOrGetCart(fixtures.userId());
             
             // Then
+            // Assert: profile was looked up once
+            verify(userProfileService).findByUserId(fixtures.userId());
+            
+            // Assert: returns the same existing cart instance
             assertThat(result).isNotNull();
             assertThat(result).isSameAs(cart);
+            
+            // Assert: userProfile still points to that cart (no relinking/replacement)
+            assertThat(userProfile.getCart()).isSameAs(cart);
         }
     }
     
@@ -102,6 +122,7 @@ public class CartServiceImplTests {
             underTest.removeCart(fixtures.userId());
             
             // Then
+            // Assert: cart was removed
             assertThat(userProfile.getCart()).isNull();
         }
         
@@ -111,6 +132,7 @@ public class CartServiceImplTests {
             when(userProfileService.findByUserId(fixtures.userId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
+            // Assert: throw when user does not exist
             assertThrows(EntityNotFoundException.class, () -> underTest.removeCart(fixtures.userId()));
         }
     }
@@ -134,10 +156,21 @@ public class CartServiceImplTests {
             CartItem result = underTest.createCartItem(fixtures.cartId(), request);
             
             // Then
+            // Assert: cart was loaded
+            verify(cartRepository).findById(fixtures.cartId());
+            
+            // Assert: product was loaded
+            verify(productService).findById(fixtures.productId());
+            
+            // Assert: uniqueness check performed for (cartId, productId)
+            verify(cartItemRepository).existsByCartIdAndProductId(fixtures.cartId(), fixtures.productId());
+            
+            // Assert: new CartItem was created with correct links & data
             assertThat(result.getProduct()).isSameAs(product);
             assertThat(result.getRequestedQty()).isEqualTo(request.requestedQty());
-            
             assertThat(result.getCart()).isSameAs(cart);
+            
+            // Assert: cart now contains exactly this new item
             assertThat(cart.getCartItems()).hasSize(1).contains(result);
         }
         
@@ -150,8 +183,11 @@ public class CartServiceImplTests {
             when(cartRepository.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
+            // Assert: throw when cart does not exist
             assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.nonExistingId(), request));
-            assertThat(cart.getCartItems()).isEmpty();
+            
+            // Assert: no downstream calls when cart not found
+            verifyNoInteractions(productService, cartItemRepository);
         }
         
         @Test
@@ -165,7 +201,10 @@ public class CartServiceImplTests {
             when(productService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
+            // Assert: throw when product does not exist
             assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
+            
+            // Assert: cart not modified
             assertThat(cart.getCartItems()).isEmpty();
         }
         
@@ -173,6 +212,8 @@ public class CartServiceImplTests {
         public void createCartItem_should_ThrowAlreadyExists_when_CartItemAlreadyExists() {
             // Given
             Cart cart = fixtures.cartEntity();
+            CartItem item = fixtures.cartItemEntity();
+            cart.addCartItemAndLink(item);
             var itemsBefore = List.copyOf(cart.getCartItems());
             
             Product product = fixtures.productEntity();
@@ -185,6 +226,7 @@ public class CartServiceImplTests {
             
             // When & Then
             assertThrows(CartItemAlreadyExistsException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
+            // Assert: cart not modified
             assertThat(cart.getCartItems()).hasSize(itemsBefore.size());
         }
     }
@@ -209,8 +251,16 @@ public class CartServiceImplTests {
             CartItem result = underTest.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
             
             // Then
+            // Assert: item was looked up by (cartId, itemId)
+            verify(cartItemRepository).findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId());
+            
+            // Assert: the same entity instance is returned
             assertThat(result).isSameAs(item);
+            
+            // Assert: quantity was updated from the request
             assertThat(result.getRequestedQty()).isEqualTo(request.requestedQty());
+            
+            // Assert: item remains linked to the cart
             assertThat(cart.getCartItems()).contains(item);
         }
         
@@ -229,10 +279,18 @@ public class CartServiceImplTests {
             // When
             CartItem result = underTest.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
             
-            // Rhen
-            assertThat(result).isSameAs(item);
-            assertThat(result.getRequestedQty()).isZero();
+            // Then
+            // Assert: item was looked up by (cartId, itemId) and looked up again for removal
+            verify(cartItemRepository, times(2)).findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId());
             
+            // Assert: same instance is mutated and returned
+            assertThat(result).isSameAs(item);
+            
+            // Assert: qty updated to zero and item considered empty
+            assertThat(result.getRequestedQty()).isZero();
+            assertThat(result.isEmpty()).isTrue();
+            
+            // Assert: item was removed from the cart collection
             assertThat(cart.getCartItems()).doesNotContain(result);
         }
         
@@ -245,6 +303,7 @@ public class CartServiceImplTests {
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
+            // Assert: throw when item does not exist
             assertThrows(EntityNotFoundException.class,
                          () -> underTest.updateCartItemQty(fixtures.cartId(), fixtures.nonExistingId(), request));
         }
@@ -271,6 +330,10 @@ public class CartServiceImplTests {
             underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId());
             
             // Then
+            // Assert: item was looked up via (cartId, itemId)
+            verify(cartItemRepository).findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId());
+            
+            // Assert: item no longer present in the cart
             assertThat(cart.getCartItems()).doesNotContain(item);
         }
         
@@ -333,6 +396,7 @@ public class CartServiceImplTests {
             underTest.removeAllCartItems(fixtures.cartId());
             
             // Then
+            // Assert: item no longer present in the cart
             assertThat(cart.getCartItems()).doesNotContain(item);
         }
         

@@ -1,10 +1,9 @@
 package com.sobow.shopping.services;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.image.Image;
@@ -59,13 +58,25 @@ public class ImageServiceImplTests {
             List<Image> resultList = underTest.saveImages(fixtures.productId(), List.of(file));
             
             // Then
-            Image resultImage = resultList.get(0);
-            assertSame(product, resultImage.getProduct());
+            // Assert: repository looked up the product
+            verify(productService).findById(fixtures.productId());
             
-            byte[] resultBytes = resultImage.getFile().getBytes(1, (int) resultImage.getFile().length());
-            assertArrayEquals(file.getBytes(), resultBytes);
-            assertEquals(file.getOriginalFilename(), resultImage.getFileName());
-            assertEquals(file.getContentType(), resultImage.getFileType());
+            // Assert: returned Image is linked with the loaded Product
+            Image resultImage = resultList.get(0);
+            assertThat(resultImage.getProduct()).isSameAs(product);
+            
+            // Assert: bytes were copied from MultipartFile
+            byte[] fileBytes = file.getBytes();
+            int resultLength = (int) resultImage.getFile().length();
+            byte[] resultBytes = resultImage.getFile().getBytes(1, resultLength);
+            assertThat(resultLength).isEqualTo(fileBytes.length);
+            assertThat(resultBytes).isEqualTo(fileBytes);
+            
+            // Assert: filename was copied from MultipartFile
+            assertThat(resultImage.getFileName()).isEqualTo(file.getOriginalFilename());
+            
+            // Assert: content type was copied from MultipartFile
+            assertThat(resultImage.getFileType()).isEqualTo(file.getContentType());
         }
         
         @Test
@@ -79,8 +90,15 @@ public class ImageServiceImplTests {
             when(bad.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
+            // Assert: throws when MultipartFile#getBytes() fails
             assertThrows(ImageProcessingException.class,
                          () -> underTest.saveImages(fixtures.productId(), List.of(bad)));
+            
+            // Assert: repository looked up the product
+            verify(productService).findById(fixtures.productId());
+            
+            // Assert: product remains unchanged (no images linked)
+            assertThat(product.getImages()).isEmpty();
         }
     }
     
@@ -102,25 +120,47 @@ public class ImageServiceImplTests {
             Image result = underTest.updateById(fixtures.imageId(), patch);
             
             // Then
-            assertSame(image, result);
+            // Assert: repository looked up the entity
+            verify(imageRepository).findById(fixtures.imageId());
             
-            byte[] resultBytes = result.getFile().getBytes(1, (int) result.getFile().length());
-            assertArrayEquals(patch.getBytes(), resultBytes);
-            assertEquals(patch.getOriginalFilename(), result.getFileName());
-            assertEquals(patch.getContentType(), result.getFileType());
+            // Assert: service returns the same managed instance (updated in place)
+            assertThat(result).isSameAs(image);
+            
+            // Assert: bytes were replaced from MultipartFile
+            int resultLength = (int) result.getFile().length();
+            byte[] resultBytes = result.getFile().getBytes(1, resultLength);
+            assertThat(resultBytes).isEqualTo(patch.getBytes());
+            
+            // Assert: filename was copied from MultipartFile
+            assertThat(result.getFileName()).isEqualTo(patch.getOriginalFilename());
+            
+            // Assert: content type was copied from MultipartFile
+            assertThat(result.getFileType()).isEqualTo(patch.getContentType());
         }
         
         @Test
         public void updateById_should_ThrowImageProcessingException_when_GetBytesFails() throws Exception {
             // Given
             Image image = fixtures.imageEntity();
+            
+            // Snapshots
+            String nameBefore = image.getFileName();
+            String typeBefore = image.getFileType();
+            long lenBefore = image.getFile().length();
+            
             when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             MultipartFile badPatch = mock(MultipartFile.class);
             when(badPatch.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
+            // Assert: throws when MultipartFile#getBytes() fails
             assertThrows(ImageProcessingException.class, () -> underTest.updateById(fixtures.imageId(), badPatch));
+            
+            // Assert: entity remains unchanged after failure
+            assertThat(image.getFileName()).isEqualTo(nameBefore);
+            assertThat(image.getFileType()).isEqualTo(typeBefore);
+            assertThat(image.getFile().length()).isEqualTo(lenBefore);
         }
     }
     
@@ -139,11 +179,17 @@ public class ImageServiceImplTests {
             FileContent result = underTest.getImageContent(fixtures.imageId());
             
             // Then
-            byte[] resultBytes = result.bytes();
-            byte[] imageBytes = image.getFile().getBytes(1, (int) image.getFile().length());
-            assertArrayEquals(imageBytes, resultBytes);
-            assertEquals(image.getFileName(), result.fileName());
-            assertEquals(image.getFileType(), result.fileType());
+            // Assert: repository looked up the entity
+            verify(imageRepository).findById(fixtures.imageId());
+            
+            // Assert: metadata copied from Image
+            assertThat(result.fileName()).isEqualTo(image.getFileName());
+            assertThat(result.fileType()).isEqualTo(image.getFileType());
+            assertThat(result.length()).isEqualTo(image.getFile().length());
+            
+            // Assert: bytes copied from Image BLOB
+            byte[] expected = image.getFile().getBytes(1, (int) image.getFile().length());
+            assertThat(result.bytes()).isEqualTo(expected);
         }
         
         @Test
@@ -159,7 +205,8 @@ public class ImageServiceImplTests {
             
             when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
-            // When + Then
+            // When & Then
+            // Assert: throws ImageProcessingException wrapping the SQLException
             assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(fixtures.imageId()));
         }
     }

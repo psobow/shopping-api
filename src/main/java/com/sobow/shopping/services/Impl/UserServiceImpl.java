@@ -18,6 +18,7 @@ import com.sobow.shopping.services.UserManagementService;
 import jakarta.annotation.Nullable;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +35,11 @@ public class UserServiceImpl implements UserManagementService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    @Qualifier("adminCreateUserRequestMapper")
     private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    
+    @Qualifier("selfCreateUserRequestMapper")
     private final Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
     
     @Override
@@ -64,8 +69,8 @@ public class UserServiceImpl implements UserManagementService {
     @Override
     public User selfCreate(SelfCreateUserRequest createRequest) {
         User user = selfCreateRequestMapper.mapToEntity(createRequest);
-        user.addAuthorityAndLink(new UserAuthority("USER"));
         assertNewEmailAvailable(createRequest.email(), null);
+        user.addAuthorityAndLink(new UserAuthority("USER"));
         user.setPassword(passwordEncoder.encode(createRequest.password().value()));
         return userRepository.save(user);
     }

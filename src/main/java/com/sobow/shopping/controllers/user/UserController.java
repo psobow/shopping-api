@@ -33,7 +33,7 @@ public class UserController {
     private final UserManagementService userManagementService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> selfRegister(@RequestBody @Valid SelfCreateUserRequest createRequest) {
+    public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfCreateUserRequest createRequest) {
         User user = userManagementService.selfCreate(createRequest);
         UserResponse response = userResponseMapper.mapToDto(user);
         return ResponseEntity.status(HttpStatus.CREATED)
