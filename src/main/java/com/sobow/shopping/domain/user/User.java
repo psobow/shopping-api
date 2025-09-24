@@ -2,6 +2,7 @@ package com.sobow.shopping.domain.user;
 
 import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,7 +65,7 @@ public class User {
     
     public void updateFrom(List<UserAuthorityRequest> patch) {
         Objects.requireNonNull(patch, "authorities patch must not be null");
-        if (patch.isEmpty()) throw new IllegalArgumentException("authorities patch must not be empty");
+        if (patch.isEmpty()) throw new InvalidUserAuthoritiesException("authorities patch must not be empty");
         
         removeAllAuthorities();
         patch.stream().distinct().forEach(auth -> {

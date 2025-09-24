@@ -8,6 +8,7 @@ import com.sobow.shopping.exceptions.ImageProcessingException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.InvalidPriceException;
+import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
@@ -156,6 +157,18 @@ public class ExceptionController {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Email already exists");
         pd.setDetail(e.getMessage());
+        pd.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(pd.getStatus()).body(pd);
+    }
+    
+    @ExceptionHandler(InvalidUserAuthoritiesException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidUserAuthorities(
+        InvalidUserAuthoritiesException ex,
+        HttpServletRequest request
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Invalid authorities");
+        pd.setDetail(ex.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);
     }
