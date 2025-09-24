@@ -11,23 +11,25 @@ import java.lang.annotation.Target;
 /**
  * Validates that each item in a list of role requests matches an allow-list of role names.
  *
- * <p>Role values are normalized using {@code trim().toUpperCase(Locale.ROOT)}
- * before comparison. The default allow-list is {@code {"USER","ADMIN"}}.</p>
+ * <p>Each role value is normalized before comparison:
+ * <ol>
+ *   <li>{@code null} list → valid (combine with {@code @NotNull/@NotEmpty} if presence is required)</li>
+ *   <li>for each item: reject if the item or its {@code authority} is {@code null}</li>
+ *   <li>apply {@code strip()} (trim), then convert to upper case using {@link java.util.Locale#ROOT}</li>
+ *   <li>optionally remove a leading {@code "ROLE_"} prefix, if present</li>
+ *   <li>check membership in the configured allow-list</li>
+ * </ol>
+ * The default allow-list is {@code {"USER","ADMIN"}}.</p>
  *
  * <h3>Supported targets</h3>
  * <ul>
- *   <li>{@code FIELD}</li>
- *   <li>{@code PARAMETER}</li>
+ *   <li>{@link java.lang.annotation.ElementType#FIELD}</li>
  * </ul>
  *
  * <h3>Supported types</h3>
  * <ul>
  *   <li>{@code java.util.List<com.sobow.shopping.domain.user.requests.UserAuthorityRequest>}</li>
  * </ul>
- *
- * <h3>Null semantics</h3>
- * <p>The annotated value may be {@code null}. In that case the constraint is considered valid.
- * Combine with {@code @NotNull}/{@code @NotEmpty} to enforce presence.</p>
  *
  * <h3>Example</h3>
  * <pre>{@code
