@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
 import jakarta.persistence.CascadeType;
@@ -63,7 +63,7 @@ public class User {
         if (patch.userProfile() != null) profile.updateFrom(patch.userProfile());
     }
     
-    public void updateFrom(List<UserAuthorityRequest> patch) {
+    public void updateFrom(List<AuthorityDto> patch) {
         Objects.requireNonNull(patch, "authorities patch must not be null");
         if (patch.isEmpty()) throw new InvalidUserAuthoritiesException("authorities patch must not be empty");
         

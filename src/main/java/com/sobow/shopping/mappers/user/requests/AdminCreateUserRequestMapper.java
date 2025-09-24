@@ -4,8 +4,8 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
 import com.sobow.shopping.mappers.Mapper;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdminCreateUserRequestMapper implements Mapper<User, AdminCreateUserRequest> {
     
-    private final Mapper<UserAuthority, UserAuthorityRequest> userAuthorityRequestMapper;
-    private final Mapper<UserProfile, CreateUserProfileRequest> userProfileRequestMapper;
+    private final Mapper<UserAuthority, AuthorityDto> userAuthorityRequestMapper;
+    private final Mapper<UserProfile, CreateUserProfileDto> userProfileRequestMapper;
     
     @Override
     public User mapToEntity(AdminCreateUserRequest userCreateRequest) {

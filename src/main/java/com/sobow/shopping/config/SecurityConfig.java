@@ -1,11 +1,11 @@
 package com.sobow.shopping.config;
 
 import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.requests.dto.AuthoritiesDto;
-import com.sobow.shopping.domain.user.requests.dto.PasswordDto;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
+import com.sobow.shopping.domain.user.requests.admin.ListAuthorityDto;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
+import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
 import com.sobow.shopping.services.UserManagementService;
 import java.util.List;
@@ -36,13 +36,13 @@ public class SecurityConfig {
         String password = "password";
         if (!userManagementService.userExistsByEmail(adminEmail)) {
             
-            CreateUserAddressRequest address = new CreateUserAddressRequest(
+            CreateUserAddressDto address = new CreateUserAddressDto(
                 "Wroclaw", "Street", "20", "11-222");
             
-            CreateUserProfileRequest userProfile = new CreateUserProfileRequest("Patryk", "Lastname", address);
-            UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
+            CreateUserProfileDto userProfile = new CreateUserProfileDto("Patryk", "Lastname", address);
+            AuthorityDto authority = new AuthorityDto("ADMIN");
             AdminCreateUserRequest user = new AdminCreateUserRequest(adminEmail, new PasswordDto(password), userProfile,
-                                                                     new AuthoritiesDto(List.of(authority)));
+                                                                     new ListAuthorityDto(List.of(authority)));
             
             userManagementService.adminCreate(user);
         }

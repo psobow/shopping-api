@@ -3,7 +3,7 @@ package com.sobow.shopping.mappers.user.requests;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SelfCreateUserRequestMapper implements Mapper<User, SelfCreateUserRequest> {
     
-    private final Mapper<UserProfile, CreateUserProfileRequest> userProfileRequestMapper;
+    private final Mapper<UserProfile, CreateUserProfileDto> userProfileRequestMapper;
     
     @Override
     public User mapToEntity(SelfCreateUserRequest userCreateRequest) {

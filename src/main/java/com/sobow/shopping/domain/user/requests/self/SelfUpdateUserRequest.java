@@ -1,10 +1,10 @@
 package com.sobow.shopping.domain.user.requests.self;
 
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileDto;
 import jakarta.validation.Valid;
 
 public record SelfUpdateUserRequest(
-    @Valid UpdateUserProfileRequest userProfile
+    @Valid UpdateUserProfileDto userProfile
 ) {
     
 }

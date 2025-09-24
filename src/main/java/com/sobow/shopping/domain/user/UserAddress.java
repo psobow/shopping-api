@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressRequest;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,7 +56,7 @@ public class UserAddress {
         this.userProfile = userProfile;
     }
     
-    public void updateFrom(UpdateUserAddressRequest patch) {
+    public void updateFrom(UpdateUserAddressDto patch) {
         Objects.requireNonNull(patch, "User address patch must not be null");
         if (patch.cityName() != null) this.cityName = patch.cityName();
         if (patch.streetName() != null) this.streetName = patch.streetName();

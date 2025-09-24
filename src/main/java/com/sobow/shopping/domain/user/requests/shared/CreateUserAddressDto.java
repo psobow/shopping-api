@@ -7,14 +7,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record CreateUserAddressRequest(
+public record CreateUserAddressDto(
     @NotBlank @Size(max = 80) String cityName,
     @NotBlank @Size(max = 80) String streetName,
     @NotBlank @Size(max = 20) String streetNumber,
     @NotBlank @Pattern(regexp = POLAND_POST_CODE_REGEX) String postCode
 ) {
     
-    public CreateUserAddressRequest {
+    public CreateUserAddressDto {
         cityName = normalizeSingleLine(cityName);
         streetName = normalizeSingleLine(streetName);
         streetNumber = normalizeSingleLine(streetNumber);

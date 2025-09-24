@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.user.requests.dto;
+package com.sobow.shopping.domain.user.requests.shared;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;

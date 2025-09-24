@@ -25,15 +25,15 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.requests.dto.AuthoritiesDto;
-import com.sobow.shopping.domain.user.requests.dto.PasswordDto;
+import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
+import com.sobow.shopping.domain.user.requests.admin.ListAuthorityDto;
 import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileRequest;
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressRequest;
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileRequest;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
+import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
+import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressDto;
+import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileDto;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -145,27 +145,27 @@ public class TestFixtures {
         return new User(userEmail, userPassword);
     }
     
-    public UserAuthorityRequest userAuthorityRequest() {
-        return new UserAuthorityRequest(userAuthority);
+    public AuthorityDto userAuthorityRequest() {
+        return new AuthorityDto(userAuthority);
     }
     
-    public UpdateUserAddressRequest updateUserAddressRequest() {
-        return new UpdateUserAddressRequest(cityName, streetName, streetNumber, postCode);
+    public UpdateUserAddressDto updateUserAddressRequest() {
+        return new UpdateUserAddressDto(cityName, streetName, streetNumber, postCode);
     }
     
-    public CreateUserAddressRequest createUserAddressRequest() {
-        return new CreateUserAddressRequest(cityName, streetName, streetNumber, postCode);
+    public CreateUserAddressDto createUserAddressRequest() {
+        return new CreateUserAddressDto(cityName, streetName, streetNumber, postCode);
         
         
         
     }
     
-    public UpdateUserProfileRequest updateUserProfileRequest() {
-        return new UpdateUserProfileRequest(userFirstName, userLastName, updateUserAddressRequest());
+    public UpdateUserProfileDto updateUserProfileRequest() {
+        return new UpdateUserProfileDto(userFirstName, userLastName, updateUserAddressRequest());
     }
     
-    public CreateUserProfileRequest createUserProfileRequest() {
-        return new CreateUserProfileRequest(userFirstName, userLastName, createUserAddressRequest());
+    public CreateUserProfileDto createUserProfileRequest() {
+        return new CreateUserProfileDto(userFirstName, userLastName, createUserAddressRequest());
     }
     
     public SelfUpdateUserRequest selfUpdateUserRequest() {
@@ -178,7 +178,7 @@ public class TestFixtures {
     
     public AdminCreateUserRequest adminCreateUserRequest() {
         return new AdminCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileRequest(),
-                                          new AuthoritiesDto(List.of(userAuthorityRequest())));
+                                          new ListAuthorityDto(List.of(userAuthorityRequest())));
     }
     
     

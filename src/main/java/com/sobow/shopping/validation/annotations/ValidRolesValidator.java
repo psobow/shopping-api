@@ -1,6 +1,6 @@
 package com.sobow.shopping.validation.annotations;
 
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Validator for {@link ValidRoles}.
  *
- * <p>For each {@link UserAuthorityRequest} in the list:
+ * <p>For each {@link AuthorityDto} in the list:
  * <ul>
  *   <li>returns {@code true} if the list itself is {@code null};</li>
  *   <li>returns {@code false} if an item or its {@code authority} is {@code null};</li>
@@ -20,7 +20,7 @@ import java.util.Set;
  * </ul>
  * The allow-list is taken from {@link ValidRoles#allowed()} and must not be empty.</p>
  */
-public class ValidRolesValidator implements ConstraintValidator<ValidRoles, List<UserAuthorityRequest>> {
+public class ValidRolesValidator implements ConstraintValidator<ValidRoles, List<AuthorityDto>> {
     
     private Set<String> allowed;
     
@@ -33,10 +33,10 @@ public class ValidRolesValidator implements ConstraintValidator<ValidRoles, List
         }
     }
     
-    public boolean isValid(List<UserAuthorityRequest> value, ConstraintValidatorContext ctx) {
+    public boolean isValid(List<AuthorityDto> value, ConstraintValidatorContext ctx) {
         if (value == null) return true;
         
-        for (UserAuthorityRequest item : value) {
+        for (AuthorityDto item : value) {
             if (item == null || item.authority() == null) return false;
             String normalized = item.authority().strip().toUpperCase(Locale.ROOT);
             if (normalized.startsWith("ROLE_")) normalized = normalized.substring(5);
