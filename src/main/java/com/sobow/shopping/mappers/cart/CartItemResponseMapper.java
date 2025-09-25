@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.cart.dto.CartItemResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("cartItemResponseMapper")
 public class CartItemResponseMapper implements Mapper<CartItem, CartItemResponse> {
     
     @Override

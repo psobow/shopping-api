@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +31,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class CartController {
     
     private final CartService cartService;
+    @Qualifier("cartResponseMapper")
     private final Mapper<Cart, CartResponse> cartResponseMapper;
+    @Qualifier("cartItemResponseMapper")
     private final Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
     
     @PutMapping("/users/{userId}/cart")

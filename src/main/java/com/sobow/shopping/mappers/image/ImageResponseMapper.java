@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("imageResponseMapper")
 public class ImageResponseMapper implements Mapper<Image, ImageResponse> {
     
     @Override

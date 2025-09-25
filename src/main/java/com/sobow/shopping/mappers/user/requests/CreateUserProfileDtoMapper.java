@@ -6,17 +6,19 @@ import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
 import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
-@Component
-public class CreateUserProfileRequestMapper implements Mapper<UserProfile, CreateUserProfileDto> {
+@Component("createUserProfileDtoMapper")
+public class CreateUserProfileDtoMapper implements Mapper<UserProfile, CreateUserProfileDto> {
     
-    private final Mapper<UserAddress, CreateUserAddressDto> userAddressRequestMapper;
+    @Qualifier("createUserAddressDtoMapper")
+    private final Mapper<UserAddress, CreateUserAddressDto> createUserAddressDtoMapper;
     
     @Override
     public UserProfile mapToEntity(CreateUserProfileDto createUserProfileDto) {
-        UserAddress address = userAddressRequestMapper.mapToEntity(createUserProfileDto.userAddress());
+        UserAddress address = createUserAddressDtoMapper.mapToEntity(createUserProfileDto.userAddress());
         UserProfile userProfile = UserProfile.builder()
                                              .firstName(createUserProfileDto.firstName())
                                              .lastName(createUserProfileDto.lastName())

@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.order.dto.OrderItemResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("orderItemResponseMapper")
 public class OrderItemResponseMapper implements Mapper<OrderItem, OrderItemResponse> {
     
     @Override

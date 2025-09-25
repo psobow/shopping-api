@@ -6,7 +6,7 @@ import com.sobow.shopping.domain.product.dto.ProductResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("productResponseMapper")
 public class ProductResponseMapper implements Mapper<Product, ProductResponse> {
     
     @Override

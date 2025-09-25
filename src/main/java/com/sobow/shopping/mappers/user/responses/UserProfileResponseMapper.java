@@ -11,14 +11,20 @@ import com.sobow.shopping.domain.user.responses.UserProfileResponse;
 import com.sobow.shopping.mappers.Mapper;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("userProfileResponseMapper")
 public class UserProfileResponseMapper implements Mapper<UserProfile, UserProfileResponse> {
     
+    @Qualifier("userAddressResponseMapper")
     private final Mapper<UserAddress, UserAddressResponse> userAddressResponseMapper;
+    
+    @Qualifier("cartResponseMapper")
     private final Mapper<Cart, CartResponse> cartResponseMapper;
+    
+    @Qualifier("orderResponseMapper")
     private final Mapper<Order, OrderResponse> orderResponseMapper;
     
     @Override

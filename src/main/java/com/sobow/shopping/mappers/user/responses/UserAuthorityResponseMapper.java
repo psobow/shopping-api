@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.user.responses.UserAuthorityResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("userAuthorityResponseMapper")
 public class UserAuthorityResponseMapper implements Mapper<UserAuthority, UserAuthorityResponse> {
     
     @Override

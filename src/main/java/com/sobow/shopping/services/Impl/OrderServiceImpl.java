@@ -73,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
         Authentication authentication = getAuthentication();
         User user = getAuthenticatedUser(authentication);
         
-        return orderRepository.findByUserProfile_User_IdAndId(user.getId(), orderId)
+        return orderRepository.findByUserIdAndIdWithOrderItems(user.getId(), orderId)
                               .orElseThrow(
                                   () -> new EntityNotFoundException(
                                       "Order with id " + orderId + " for user " + user.getId() + " not found")
@@ -85,12 +85,12 @@ public class OrderServiceImpl implements OrderService {
         Authentication authentication = getAuthentication();
         User user = getAuthenticatedUser(authentication);
         
-        return orderRepository.findAllByUserProfile_User_IdOrderByCreatedAtDesc(user.getId());
+        return orderRepository.findAllByUserIdWithOrderItems(user.getId());
     }
     
     @Override
     public Order findByUserIdAndId(long userId, long orderId) {
-        return orderRepository.findByUserProfile_User_IdAndId(userId, orderId)
+        return orderRepository.findByUserIdAndIdWithOrderItems(userId, orderId)
                               .orElseThrow(
                                   () -> new EntityNotFoundException(
                                       "Order with id " + orderId + " for user " + userId + " not found")
@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public List<Order> findAllByUserId(long userId) {
-        return orderRepository.findAllByUserProfile_User_IdOrderByCreatedAtDesc(userId);
+        return orderRepository.findAllByUserIdWithOrderItems(userId);
     }
     
     private void assertStockAvailableAndDecrement(Set<CartItem> items) {

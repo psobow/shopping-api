@@ -6,12 +6,14 @@ import com.sobow.shopping.domain.order.dto.OrderItemResponse;
 import com.sobow.shopping.domain.order.dto.OrderResponse;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("orderResponseMapper")
 public class OrderResponseMapper implements Mapper<Order, OrderResponse> {
     
+    @Qualifier("orderItemResponseMapper")
     private final Mapper<OrderItem, OrderItemResponse> orderItemResponseMapper;
     
     @Override

@@ -10,14 +10,18 @@ import com.sobow.shopping.mappers.Mapper;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("adminCreateUserRequestMapper")
 public class AdminCreateUserRequestMapper implements Mapper<User, AdminCreateUserRequest> {
     
-    private final Mapper<UserAuthority, AuthorityDto> userAuthorityRequestMapper;
-    private final Mapper<UserProfile, CreateUserProfileDto> userProfileRequestMapper;
+    @Qualifier("userAuthorityDtoMapper")
+    private final Mapper<UserAuthority, AuthorityDto> userAuthorityDtoMapper;
+    
+    @Qualifier("createUserProfileDtoMapper")
+    private final Mapper<UserProfile, CreateUserProfileDto> createUserProfileDtoMapper;
     
     @Override
     public User mapToEntity(AdminCreateUserRequest userCreateRequest) {
@@ -26,7 +30,7 @@ public class AdminCreateUserRequestMapper implements Mapper<User, AdminCreateUse
                                                           .value()
                                                           .stream()
                                                           .distinct()
-                                                          .map(userAuthorityRequestMapper::mapToEntity)
+                                                          .map(userAuthorityDtoMapper::mapToEntity)
                                                           .collect(Collectors.toSet());
         User user = User.builder()
                         .email(userCreateRequest.email())
@@ -34,7 +38,7 @@ public class AdminCreateUserRequestMapper implements Mapper<User, AdminCreateUse
                         .build()
                         .withAuthorities(authorities);
         
-        UserProfile userProfile = userProfileRequestMapper.mapToEntity(userCreateRequest.userProfile());
+        UserProfile userProfile = createUserProfileDtoMapper.mapToEntity(userCreateRequest.userProfile());
         user.setProfileAndLink(userProfile);
         
         return user;

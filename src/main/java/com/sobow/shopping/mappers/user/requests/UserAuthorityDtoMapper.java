@@ -5,8 +5,8 @@ import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
-public class UserAuthorityRequestMapper implements Mapper<UserAuthority, AuthorityDto> {
+@Component("userAuthorityDtoMapper")
+public class UserAuthorityDtoMapper implements Mapper<UserAuthority, AuthorityDto> {
     
     @Override
     public UserAuthority mapToEntity(AuthorityDto authorityDto) {

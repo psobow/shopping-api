@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.user.responses.UserAddressResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("userAddressResponseMapper")
 public class UserAddressResponseMapper implements Mapper<UserAddress, UserAddressResponse> {
     
     @Override

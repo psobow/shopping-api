@@ -6,13 +6,15 @@ import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
 import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("selfCreateUserRequestMapper")
 public class SelfCreateUserRequestMapper implements Mapper<User, SelfCreateUserRequest> {
     
-    private final Mapper<UserProfile, CreateUserProfileDto> userProfileRequestMapper;
+    @Qualifier("createUserProfileDtoMapper")
+    private final Mapper<UserProfile, CreateUserProfileDto> createUserProfileDtoMapper;
     
     @Override
     public User mapToEntity(SelfCreateUserRequest userCreateRequest) {
@@ -21,7 +23,7 @@ public class SelfCreateUserRequestMapper implements Mapper<User, SelfCreateUserR
                         .password(userCreateRequest.password().value())
                         .build();
         
-        UserProfile userProfile = userProfileRequestMapper.mapToEntity(userCreateRequest.userProfile());
+        UserProfile userProfile = createUserProfileDtoMapper.mapToEntity(userCreateRequest.userProfile());
         user.setProfileAndLink(userProfile);
         
         return user;

@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("categoryResponseMapper")
 public class CategoryResponseMapper implements Mapper<Category, CategoryResponse> {
     
     @Override

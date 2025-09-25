@@ -5,8 +5,8 @@ import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
-public class CreateUserAddressRequestMapper implements Mapper<UserAddress, CreateUserAddressDto> {
+@Component("createUserAddressDtoMapper")
+public class CreateUserAddressDtoMapper implements Mapper<UserAddress, CreateUserAddressDto> {
     
     @Override
     public UserAddress mapToEntity(CreateUserAddressDto addressRequest) {

@@ -9,6 +9,7 @@ import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.AdminService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,10 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     
+    @Qualifier("adminCreateUserRequestMapper")
     private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    
+    @Qualifier("userResponseMapper")
     private final Mapper<User, UserResponse> userResponseMapper;
     
     @Transactional

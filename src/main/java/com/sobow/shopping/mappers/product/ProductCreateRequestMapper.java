@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
 import com.sobow.shopping.mappers.Mapper;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("productCreateRequestMapper")
 public class ProductCreateRequestMapper implements Mapper<Product, ProductCreateRequest> {
     
     public Product mapToEntity(ProductCreateRequest productCreateRequest) {

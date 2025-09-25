@@ -8,13 +8,16 @@ import com.sobow.shopping.domain.user.responses.UserProfileResponse;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@Component("userResponseMapper")
 public class UserResponseMapper implements Mapper<User, UserResponse> {
     
+    @Qualifier("userProfileResponseMapper")
     private final Mapper<UserProfile, UserProfileResponse> userProfileResponseMapper;
+    @Qualifier("userAuthorityResponseMapper")
     private final Mapper<UserAuthority, UserAuthorityResponse> userAuthorityResponseMapper;
     
     @Override

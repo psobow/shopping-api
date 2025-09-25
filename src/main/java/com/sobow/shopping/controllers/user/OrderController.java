@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class OrderController {
     
     private final OrderService orderService;
-    
+    @Qualifier("orderResponseMapper")
     private final Mapper<Order, OrderResponse> orderResponseMapper;
     
     @PostMapping("/me/orders")
