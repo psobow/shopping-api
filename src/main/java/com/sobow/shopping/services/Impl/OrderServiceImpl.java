@@ -10,10 +10,9 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
-import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.repositories.OrderRepository;
-import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.CartService;
+import com.sobow.shopping.services.CurrentUserService;
 import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.services.UserProfileService;
@@ -22,8 +21,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +32,13 @@ public class OrderServiceImpl implements OrderService {
     private final UserProfileService userProfileService;
     private final ProductService productService;
     private final CartService cartService;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     
     @Transactional
     @Override
     public Order selfCreateOrder() {
-        Authentication authentication = getAuthentication();
-        User user = getAuthenticatedUser(authentication);
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
         
         // Load UserProfile and Cart with items
         UserProfile userProfile = userProfileService.findByUserId(user.getId());
@@ -70,8 +67,8 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public Order selfFindById(long orderId) {
-        Authentication authentication = getAuthentication();
-        User user = getAuthenticatedUser(authentication);
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
         
         return orderRepository.findByUserIdAndIdWithOrderItems(user.getId(), orderId)
                               .orElseThrow(
@@ -82,8 +79,8 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public List<Order> selfFindAll() {
-        Authentication authentication = getAuthentication();
-        User user = getAuthenticatedUser(authentication);
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
         
         return orderRepository.findAllByUserIdWithOrderItems(user.getId());
     }
@@ -134,18 +131,5 @@ public class OrderServiceImpl implements OrderService {
                         .productBrandName(cartItem.getProduct().getBrandName())
                         .productPrice(cartItem.productPrice())
                         .build();
-    }
-    
-    private Authentication getAuthentication() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) throw new NoAuthenticationException();
-        return auth;
-    }
-    
-    private User getAuthenticatedUser(Authentication auth) {
-        String email = auth.getName();
-        return userRepository.findByEmail(email)
-                             .orElseThrow(() -> new UsernameNotFoundException(
-                                 "User with email: " + email + " not found"));
     }
 }

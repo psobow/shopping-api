@@ -3,14 +3,12 @@ package com.sobow.shopping.services.Impl;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
-import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.mappers.user.requests.AdminUserCreateRequestMapper;
+import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.AdminService;
-import jakarta.annotation.Nullable;
+import com.sobow.shopping.services.CurrentUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,11 +20,11 @@ public class AdminServiceImpl implements AdminService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
     
     private final AdminUserCreateRequestMapper adminUserCreateRequestMapper;
     
-    @Qualifier("userResponseMapper")
-    private final Mapper<User, UserResponse> userResponseMapper;
+    private final UserResponseMapper userResponseMapper;
     
     @Transactional
     @Override
@@ -38,7 +36,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public User adminCreate(AdminUserCreateRequest createRequest) {
         User user = adminUserCreateRequestMapper.mapToEntity(createRequest);
-        assertNewEmailAvailable(createRequest.email(), null);
+        currentUserService.assertNewEmailAvailable(createRequest.email(), null);
         user.setPassword(passwordEncoder.encode(createRequest.password().value()));
         return userRepository.save(user);
     }
@@ -62,11 +60,4 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.existsByEmail(email);
     }
     
-    private void assertNewEmailAvailable(String newEmail, @Nullable Long existingUserId) {
-        boolean duplicate =
-            (existingUserId == null && userRepository.existsByEmail(newEmail)) ||
-                (existingUserId != null && userRepository.existsByEmailAndIdNot(newEmail, existingUserId));
-        
-        if (duplicate) throw new EmailAlreadyExistsException(newEmail);
-    }
 }
