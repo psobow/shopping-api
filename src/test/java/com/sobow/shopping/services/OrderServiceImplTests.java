@@ -2,6 +2,7 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -17,17 +18,12 @@ import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.repositories.OrderRepository;
-import com.sobow.shopping.repositories.UserRepository;
-import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.Impl.OrderServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,10 +32,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,27 +46,12 @@ public class OrderServiceImplTests {
     @Mock
     private CartService cartService;
     @Mock
-    private UserRepository userRepository;
+    private CurrentUserService currentUserService;
     
     @InjectMocks
     private OrderServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
-    
-    @BeforeEach
-    void setupContext() {
-        User user = fixtures.userEntity();
-        var principal = new UserDetailsImpl(user);
-        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
-        ctx.setAuthentication(auth);
-        SecurityContextHolder.setContext(ctx);
-    }
-    
-    @AfterEach
-    void tearDownContext() {
-        SecurityContextHolder.clearContext();
-    }
     
     @Nested
     @DisplayName("createOrder")
@@ -98,7 +75,7 @@ public class OrderServiceImplTests {
             List<Long> cartProductsIdsBefore = cart.getProductsId();
             Set<CartItem> cartItemsBefore = new HashSet<>(cart.getCartItems());
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
@@ -145,7 +122,7 @@ public class OrderServiceImplTests {
             User user = fixtures.userEntity();
             ReflectionTestUtils.setField(user, "id", fixtures.userId());
             UserProfile userProfile = fixtures.userProfileEntity();
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenThrow(new EntityNotFoundException());
             
@@ -168,7 +145,8 @@ public class OrderServiceImplTests {
             ReflectionTestUtils.setField(user, "id", fixtures.userId());
             Cart cart = fixtures.cartEntity();
             UserProfile userProfile = fixtures.userProfileEntity();
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
@@ -202,7 +180,7 @@ public class OrderServiceImplTests {
             Product product = cartItem.getProduct();
             product.setAvailableQty(0);
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             

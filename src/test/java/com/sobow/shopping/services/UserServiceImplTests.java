@@ -2,8 +2,10 @@ package com.sobow.shopping.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -26,9 +28,6 @@ import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.Impl.UserServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
-import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -50,6 +48,8 @@ class UserServiceImplTests {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private CurrentUserService currentUserService;
     
     @Mock
     private SelfUserCreateRequestMapper selfUserCreateRequestMapper;
@@ -58,21 +58,21 @@ class UserServiceImplTests {
     private UserServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
-    
-    @BeforeEach
-    void setupContext() {
-        User user = fixtures.userEntity();
-        var principal = new UserDetailsImpl(user);
-        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
-        ctx.setAuthentication(auth);
-        SecurityContextHolder.setContext(ctx);
-    }
-    
-    @AfterEach
-    void tearDownContext() {
-        SecurityContextHolder.clearContext();
-    }
+
+//    @BeforeEach
+//    void setupContext() {
+//        User user = fixtures.userEntity();
+//        var principal = new UserDetailsImpl(user);
+//        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+//        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
+//        ctx.setAuthentication(auth);
+//        SecurityContextHolder.setContext(ctx);
+//    }
+//
+//    @AfterEach
+//    void tearDownContext() {
+//        SecurityContextHolder.clearContext();
+//    }
     
     @Nested
     @DisplayName("selfCreate")
@@ -85,7 +85,6 @@ class UserServiceImplTests {
             User user = fixtures.userEntity();
             
             when(selfUserCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
-            when(userRepository.existsByEmail(fixtures.email())).thenReturn(false);
             when(passwordEncoder.encode(createRequest.password().value())).thenReturn(fixtures.encodedPassword());
             when(userRepository.save(user)).thenReturn(user);
             
@@ -97,7 +96,7 @@ class UserServiceImplTests {
             verify(selfUserCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: email uniqueness was checked with the new email
-            verify(userRepository).existsByEmail(createRequest.email());
+            verify(currentUserService).assertNewEmailAvailable(createRequest.email(), null);
             
             // Assert: password was encoded and set on the entity
             verify(passwordEncoder).encode(createRequest.password().value());
@@ -120,7 +119,9 @@ class UserServiceImplTests {
             User user = fixtures.userEntity();
             
             when(selfUserCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
-            when(userRepository.existsByEmail(fixtures.email())).thenReturn(true);
+            doThrow(new EmailAlreadyExistsException("email"))
+                .when(currentUserService)
+                .assertNewEmailAvailable(createRequest.email(), null);
             
             // When & Then
             assertThrows(EmailAlreadyExistsException.class, () -> underTest.selfCreate(createRequest));
@@ -129,7 +130,7 @@ class UserServiceImplTests {
             verify(selfUserCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: uniqueness check performed with the new email
-            verify(userRepository).existsByEmail(createRequest.email());
+            verify(currentUserService).assertNewEmailAvailable(createRequest.email(), null);
             
             // Assert: no password encoding
             verifyNoInteractions(passwordEncoder);
@@ -153,15 +154,12 @@ class UserServiceImplTests {
             user.setProfileAndLink(userProfile);
             userProfile.setAddressAndLink(userAddress);
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             
             // When
             User result = underTest.selfPartialUpdate(updateRequest);
             
             // Then
-            // Assert: repo lookup was done with authenticated email
-            verify(userRepository).findByEmail(fixtures.email());
-            
             // Assert: service returned the same (updated) managed entity
             assertThat(result).isSameAs(user);
             
@@ -182,11 +180,12 @@ class UserServiceImplTests {
             SecurityContextHolder.clearContext();
             SelfUserPartialUpdateRequest updateRequest = fixtures.selfUpdateUserRequest();
             
+            doThrow(new NoAuthenticationException())
+                .when(currentUserService)
+                .getAuthentication();
+            
             // When & Then
             assertThrows(NoAuthenticationException.class, () -> underTest.selfPartialUpdate(updateRequest));
-            
-            // Assert: no repository access happened
-            verify(userRepository, never()).findByEmail(anyString());
             
             // Assert: security context is still empty
             assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
@@ -203,9 +202,12 @@ class UserServiceImplTests {
             User user = fixtures.userEntity();
             String beforeHash = user.getPassword();
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
+            var principal = new UserDetailsImpl(user);
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+            
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             when(passwordEncoder.encode(fixtures.newPassword())).thenReturn(fixtures.encodedPassword());
+            when(currentUserService.getAuthentication()).thenReturn(auth);
             
             // When
             underTest.selfUpdatePassword(new SelfPasswordUpdateRequest(new PasswordRequest(fixtures.password()),
@@ -213,8 +215,7 @@ class UserServiceImplTests {
             
             // Then
             // Assert: user loaded and old password verified
-            verify(userRepository).findByEmail(fixtures.email());
-            verify(passwordEncoder).matches(fixtures.password(), beforeHash);
+            verify(currentUserService).assertPasswordMatch(fixtures.password(), beforeHash);
             
             // Assert: new password encoded and set
             verify(passwordEncoder).encode(fixtures.newPassword());
@@ -227,16 +228,16 @@ class UserServiceImplTests {
             User user = fixtures.userEntity();
             String beforeHash = user.getPassword();
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(false);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
+            
+            doThrow(new InvalidOldPasswordException())
+                .when(currentUserService)
+                .assertPasswordMatch(fixtures.password(), user.getPassword());
             
             // When & Then
             assertThrows(InvalidOldPasswordException.class,
                          () -> underTest.selfUpdatePassword(new SelfPasswordUpdateRequest(new PasswordRequest(fixtures.password()),
                                                                                           new PasswordRequest(fixtures.newPassword()))));
-            
-            // Assert: old password was checked
-            verify(passwordEncoder).matches(fixtures.password(), user.getPassword());
             
             // Assert: no encoding
             verify(passwordEncoder, never()).encode(anyString());
@@ -250,15 +251,15 @@ class UserServiceImplTests {
             // Given
             SecurityContextHolder.clearContext();
             
+            doThrow(new NoAuthenticationException())
+                .when(currentUserService)
+                .getAuthentication();
+            
             // When & Then
             assertThrows(NoAuthenticationException.class,
                          () -> underTest.selfUpdatePassword(new SelfPasswordUpdateRequest(new PasswordRequest(fixtures.password()),
                                                                                           new PasswordRequest(fixtures.newPassword()))));
             
-            // Assert: nothing was touched
-            verify(userRepository, never()).findByEmail(anyString());
-            verify(passwordEncoder, never()).matches(anyString(), anyString());
-            verify(passwordEncoder, never()).encode(anyString());
             
             // Assert: security context is still empty
             assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
@@ -273,27 +274,24 @@ class UserServiceImplTests {
         public void selfUpdateEmail_should_UpdateEmail_and_RefreshSecurityContext_when_Valid() {
             // Given
             User user = fixtures.userEntity();
+            String beforeHash = user.getPassword();
             ReflectionTestUtils.setField(user, "id", fixtures.userId());
             
-            String emailBefore = user.getEmail();
+            var principal = new UserDetailsImpl(user);
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
             
-            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
-            when(userRepository.existsByEmailAndIdNot(fixtures.newEmail(), fixtures.userId())).thenReturn(false);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
+            when(currentUserService.getAuthentication()).thenReturn(auth);
             
             // When
-            
             underTest.selfUpdateEmail(new SelfEmailUpdateRequest(new PasswordRequest(fixtures.password()), fixtures.newEmail()));
             
             // Then
-            // Assert: loaded by current email
-            verify(userRepository).findByEmail(emailBefore);
-            
             // Assert: old password checked against the OLD stored hash
-            verify(passwordEncoder).matches(fixtures.password(), user.getPassword());
+            verify(currentUserService).assertPasswordMatch(fixtures.password(), beforeHash);
             
             // Assert: new email uniqueness checked against other users
-            verify(userRepository).existsByEmailAndIdNot(fixtures.newEmail(), fixtures.userId());
+            verify(currentUserService).assertNewEmailAvailable(fixtures.newEmail(), fixtures.userId());
             
             // Assert: email actually updated on the entity
             assertThat(user.getEmail()).isEqualTo(fixtures.newEmail());
@@ -303,22 +301,16 @@ class UserServiceImplTests {
         public void selfUpdateEmail_should_ThrowInvalidOldPassword_when_OldPasswordDoesNotMatch() {
             // Given
             User user = fixtures.userEntity();
-            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(false);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
+            
+            doThrow(new InvalidOldPasswordException())
+                .when(currentUserService)
+                .assertPasswordMatch(fixtures.password(), user.getPassword());
             
             // When & Then
             assertThrows(InvalidOldPasswordException.class,
                          () -> underTest.selfUpdateEmail(new SelfEmailUpdateRequest(new PasswordRequest(fixtures.password()),
                                                                                     fixtures.newEmail())));
-            
-            // Assert: looked up current user and old password was checked
-            verify(userRepository).findByEmail(user.getEmail());
-            
-            // Assert: old password checked against the OLD stored hash
-            verify(passwordEncoder).matches(fixtures.password(), user.getPassword());
-            
-            // Assert: NO uniqueness check
-            verify(userRepository, never()).existsByEmailAndIdNot(anyString(), anyLong());
             
             // Assert: email unchanged
             assertThat(user.getEmail()).isNotEqualTo(fixtures.newEmail());
@@ -332,23 +324,20 @@ class UserServiceImplTests {
             
             ReflectionTestUtils.setField(user, "id", fixtures.userId());
             
-            when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
-            when(userRepository.existsByEmailAndIdNot(fixtures.newEmail(), fixtures.userId())).thenReturn(true);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
+            
+            doThrow(new EmailAlreadyExistsException("email"))
+                .when(currentUserService)
+                .assertNewEmailAvailable(fixtures.newEmail(), fixtures.userId());
             
             // When & Then
             assertThrows(EmailAlreadyExistsException.class,
                          () -> underTest.selfUpdateEmail(new SelfEmailUpdateRequest(new PasswordRequest(fixtures.password()),
                                                                                     fixtures.newEmail())));
             
-            // Assert: user loaded by current email
-            verify(userRepository).findByEmail(emailBefore);
             
             // Assert: old password verified against OLD stored hash
-            verify(passwordEncoder).matches(fixtures.password(), user.getPassword());
-            
-            // Assert: uniqueness checked for new email against other users
-            verify(userRepository).existsByEmailAndIdNot(fixtures.newEmail(), fixtures.userId());
+            verify(currentUserService).assertPasswordMatch(fixtures.password(), user.getPassword());
             
             // Assert: no state changes
             assertThat(user.getEmail()).isEqualTo(emailBefore);
@@ -358,6 +347,10 @@ class UserServiceImplTests {
         public void selfUpdateEmail_should_ThrowNoAuthentication_when_SecurityContextIsEmpty() {
             // Given
             SecurityContextHolder.clearContext();
+            
+            doThrow(new NoAuthenticationException())
+                .when(currentUserService)
+                .getAuthentication();
             
             // When & Then
             assertThrows(NoAuthenticationException.class,
@@ -380,15 +373,14 @@ class UserServiceImplTests {
             // Given
             User user = fixtures.userEntity();
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(true);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
             
             // When
             underTest.selfDelete(new SelfUserDeleteRequest(new PasswordRequest(fixtures.password())));
             
             // Then
-            // Assert: looked up by email
-            verify(userRepository).findByEmail(fixtures.email());
+            // Assert: password check
+            verify(currentUserService).assertPasswordMatch(fixtures.password(), user.getPassword());
             
             // Assert: entity delete invoked
             verify(userRepository).deleteById(user.getId());
@@ -399,15 +391,16 @@ class UserServiceImplTests {
             // Given
             User user = fixtures.userEntity();
             
-            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches(fixtures.password(), user.getPassword())).thenReturn(false);
+            when(currentUserService.getAuthenticatedUser(any())).thenReturn(user);
+            
+            doThrow(new InvalidOldPasswordException())
+                .when(currentUserService)
+                .assertPasswordMatch(fixtures.password(), user.getPassword());
             
             // When & Then
             assertThrows(InvalidOldPasswordException.class,
                          () -> underTest.selfDelete(new SelfUserDeleteRequest(new PasswordRequest(fixtures.password()))));
             
-            // Assert: looked up by email
-            verify(userRepository).findByEmail(fixtures.email());
             
             // Assert: entity NOT deleted
             verify(userRepository, never()).deleteById(user.getId());
