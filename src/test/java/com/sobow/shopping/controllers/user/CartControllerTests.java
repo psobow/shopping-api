@@ -66,8 +66,8 @@ public class CartControllerTests {
             Cart cart = fixtures.cartEntity();
             CartResponse response = fixtures.cartResponse();
             
-            when(cartService.existsByUserProfile_UserId(userId)).thenReturn(true);
-            when(cartService.createOrGetCart(userId)).thenReturn(cart);
+            when(cartService.exists(userId)).thenReturn(true);
+            when(cartService.selfCreateOrGetCart(userId)).thenReturn(cart);
             when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
             
             // When & Then
@@ -85,8 +85,8 @@ public class CartControllerTests {
             Cart cart = fixtures.cartEntity();
             CartResponse response = fixtures.cartResponse();
             
-            when(cartService.existsByUserProfile_UserId(userId)).thenReturn(false);
-            when(cartService.createOrGetCart(userId)).thenReturn(cart);
+            when(cartService.exists(userId)).thenReturn(false);
+            when(cartService.selfCreateOrGetCart(userId)).thenReturn(cart);
             when(cartResponseMapper.mapToDto(cart)).thenReturn(response);
             
             // When & Then
@@ -135,7 +135,7 @@ public class CartControllerTests {
             CartItem item = fixtures.cartItemEntity();
             CartItemResponse response = fixtures.cartItemResponse();
             
-            when(cartService.createCartItem(fixtures.cartId(), request)).thenReturn(item);
+            when(cartService.selfCreateCartItem(fixtures.cartId(), request)).thenReturn(item);
             when(cartItemResponseMapper.mapToDto(item)).thenReturn(response);
             
             String json = objectMapper.writeValueAsString(request);
@@ -153,7 +153,7 @@ public class CartControllerTests {
             // Given
             CartItemCreateRequest request = fixtures.cartItemCreateRequest();
             
-            when(cartService.createCartItem(fixtures.cartId(), request))
+            when(cartService.selfCreateCartItem(fixtures.cartId(), request))
                 .thenThrow(new CartItemAlreadyExistsException(fixtures.cartId(), fixtures.productId()));
             
             String json = objectMapper.writeValueAsString(request);
@@ -203,7 +203,7 @@ public class CartControllerTests {
             CartItem item = fixtures.cartItemEntity();
             CartItemResponse response = fixtures.cartItemResponse();
             
-            when(cartService.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request)).thenReturn(item);
+            when(cartService.selfUpdateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request)).thenReturn(item);
             when(cartItemResponseMapper.mapToDto(item)).thenReturn(response);
             
             String json = objectMapper.writeValueAsString(request);

@@ -41,9 +41,6 @@ public class CartServiceImplTests {
     @Mock
     private ProductService productService;
     
-    @Mock
-    private UserProfileService userProfileService;
-    
     @InjectMocks
     private CartServiceImpl underTest;
     
@@ -61,7 +58,7 @@ public class CartServiceImplTests {
             assertThat(userProfile.getCart()).isNull();
             
             // When
-            Cart result = underTest.createOrGetCart(fixtures.userId());
+            Cart result = underTest.selfCreateOrGetCart(fixtures.userId());
             
             // Then
             // Assert: user profile was loaded
@@ -89,7 +86,7 @@ public class CartServiceImplTests {
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             
             // When
-            Cart result = underTest.createOrGetCart(fixtures.userId());
+            Cart result = underTest.selfCreateOrGetCart(fixtures.userId());
             
             // Then
             // Assert: profile was looked up once
@@ -119,7 +116,7 @@ public class CartServiceImplTests {
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             
             // When
-            underTest.removeCart(fixtures.userId());
+            underTest.selfRemoveCart(fixtures.userId());
             
             // Then
             // Assert: cart was removed
@@ -133,7 +130,7 @@ public class CartServiceImplTests {
             
             // When & Then
             // Assert: throw when user does not exist
-            assertThrows(EntityNotFoundException.class, () -> underTest.removeCart(fixtures.userId()));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfRemoveCart(fixtures.userId()));
         }
     }
     
@@ -153,7 +150,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.existsByCartIdAndProductId(fixtures.cartId(), fixtures.productId())).thenReturn(false);
             
             // When
-            CartItem result = underTest.createCartItem(fixtures.cartId(), request);
+            CartItem result = underTest.selfCreateCartItem(fixtures.cartId(), request);
             
             // Then
             // Assert: cart was loaded
@@ -184,7 +181,7 @@ public class CartServiceImplTests {
             
             // When & Then
             // Assert: throw when cart does not exist
-            assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.nonExistingId(), request));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfCreateCartItem(fixtures.nonExistingId(), request));
             
             // Assert: no downstream calls when cart not found
             verifyNoInteractions(productService, cartItemRepository);
@@ -202,7 +199,7 @@ public class CartServiceImplTests {
             
             // When & Then
             // Assert: throw when product does not exist
-            assertThrows(EntityNotFoundException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfCreateCartItem(fixtures.cartId(), request));
             
             // Assert: cart not modified
             assertThat(cart.getCartItems()).isEmpty();
@@ -225,7 +222,7 @@ public class CartServiceImplTests {
                 .thenThrow(new CartItemAlreadyExistsException(fixtures.cartId(), fixtures.productId()));
             
             // When & Then
-            assertThrows(CartItemAlreadyExistsException.class, () -> underTest.createCartItem(fixtures.cartId(), request));
+            assertThrows(CartItemAlreadyExistsException.class, () -> underTest.selfCreateCartItem(fixtures.cartId(), request));
             // Assert: cart not modified
             assertThat(cart.getCartItems()).hasSize(itemsBefore.size());
         }
@@ -248,7 +245,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId())).thenReturn(Optional.of(item));
             
             // When
-            CartItem result = underTest.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
+            CartItem result = underTest.selfUpdateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
             
             // Then
             // Assert: item was looked up by (cartId, itemId)
@@ -277,7 +274,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId())).thenReturn(Optional.of(item));
             
             // When
-            CartItem result = underTest.updateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
+            CartItem result = underTest.selfUpdateCartItemQty(fixtures.cartId(), fixtures.cartItemId(), request);
             
             // Then
             // Assert: item was looked up by (cartId, itemId) and looked up again for removal
@@ -305,7 +302,7 @@ public class CartServiceImplTests {
             // When & Then
             // Assert: throw when item does not exist
             assertThrows(EntityNotFoundException.class,
-                         () -> underTest.updateCartItemQty(fixtures.cartId(), fixtures.nonExistingId(), request));
+                         () -> underTest.selfUpdateCartItemQty(fixtures.cartId(), fixtures.nonExistingId(), request));
         }
     }
     
@@ -327,7 +324,7 @@ public class CartServiceImplTests {
             when(cartItemRepository.findByCartIdAndId(fixtures.cartId(), fixtures.cartItemId())).thenReturn(Optional.of(item));
             
             // When
-            underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId());
+            underTest.selfRemoveCartItem(fixtures.cartId(), fixtures.cartItemId());
             
             // Then
             // Assert: item was looked up via (cartId, itemId)
@@ -350,7 +347,7 @@ public class CartServiceImplTests {
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
-            assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId()));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfRemoveCartItem(fixtures.cartId(), fixtures.cartItemId()));
         }
         
         @Test
@@ -367,12 +364,12 @@ public class CartServiceImplTests {
                 .thenReturn(Optional.of(item))
                 .thenThrow(new EntityNotFoundException());
             
-            underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId());
+            underTest.selfRemoveCartItem(fixtures.cartId(), fixtures.cartItemId());
             
             assertThat(cart.getCartItems()).doesNotContain(item);
             
             // When & Then
-            assertThrows(EntityNotFoundException.class, () -> underTest.removeCartItem(fixtures.cartId(), fixtures.cartItemId()));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfRemoveCartItem(fixtures.cartId(), fixtures.cartItemId()));
         }
     }
     
@@ -393,7 +390,7 @@ public class CartServiceImplTests {
             when(cartRepository.findById(fixtures.cartId())).thenReturn(Optional.of(cart));
             
             // When
-            underTest.removeAllCartItems(fixtures.cartId());
+            underTest.selfRemoveAllCartItems(fixtures.cartId());
             
             // Then
             // Assert: item no longer present in the cart
@@ -406,7 +403,7 @@ public class CartServiceImplTests {
             when(cartRepository.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
-            assertThrows(EntityNotFoundException.class, () -> underTest.removeAllCartItems(fixtures.nonExistingId()));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfRemoveAllCartItems(fixtures.nonExistingId()));
         }
     }
 }

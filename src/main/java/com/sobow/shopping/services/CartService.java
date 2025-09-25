@@ -7,22 +7,22 @@ import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 
 public interface CartService {
     
-    Cart createOrGetCart(long userId);
+    Cart selfCreateOrGetCart();
     
-    void removeCart(long userId);
+    void selfRemoveCart();
     
-    Cart findById(long id);
+    Cart findByIdWithItems(long id);
     
     Cart findByUserIdWithItems(long id);
     
-    CartItem createCartItem(long cartId, CartItemCreateRequest createRequest);
+    CartItem selfCreateCartItem(CartItemCreateRequest createRequest);
     
-    CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest updateRequest);
+    CartItem selfUpdateCartItemQty(long itemId, CartItemUpdateRequest updateRequest);
     
-    void removeCartItem(long cartId, long itemId);
+    void selfRemoveCartItem(long itemId);
     
-    void removeAllCartItems(long cartId);
+    void selfRemoveAllCartItems();
     
-    boolean existsByUserProfile_UserId(long userId);
+    boolean exists();
     
 }

@@ -39,27 +39,27 @@ public class ImageServiceImpl implements ImageService {
     
     @Transactional
     @Override
-    public Image updateById(long id, MultipartFile patch) {
-        Image image = findById(id);
+    public Image updateByProductIdAndId(long productId, long imageId, MultipartFile patch) {
+        Image image = findByProductIdAndId(productId, imageId);
         image.updateFrom(patch);
         return image;
     }
     
     @Override
-    public Image findById(long id) {
-        return imageRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
-            "Image with id " + id + " not found"));
+    public Image findByProductIdAndId(long productId, long imageId) {
+        return imageRepository.findByProductIdAndId(productId, imageId)
+                              .orElseThrow(() -> new EntityNotFoundException("Image with id " + imageId + " not found"));
     }
     
     @Override
-    public void deleteById(long id) {
-        imageRepository.deleteById(id);
+    public void deleteByProductIdAndId(long productId, long imageId) {
+        imageRepository.findByProductIdAndId(productId, imageId).ifPresent(imageRepository::delete);
     }
     
     @Transactional(readOnly = true)
     @Override
-    public FileContent getImageContent(long id) {
-        Image img = findById(id);
+    public FileContent getImageContent(long productId, long imageId) {
+        Image img = findByProductIdAndId(productId, imageId);
         try {
             return new FileContent(
                 img.getFileName(),

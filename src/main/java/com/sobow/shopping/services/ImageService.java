@@ -9,11 +9,11 @@ public interface ImageService {
     
     List<Image> saveImages(long productId, List<MultipartFile> files);
     
-    Image updateById(long id, MultipartFile patch);
+    Image updateByProductIdAndId(long productId, long imageId, MultipartFile patch);
     
-    Image findById(long id);
+    Image findByProductIdAndId(long productId, long imageId);
     
-    void deleteById(long id);
+    void deleteByProductIdAndId(long productId, long imageId);
     
-    FileContent getImageContent(long id);
+    FileContent getImageContent(long productId, long imageId);
 }

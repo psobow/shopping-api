@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}/admin")
+@RequestMapping("${api.prefix}/admin/products/{productId}/images")
 public class ImageManagementController {
     
     private final ImageService imageService;
@@ -32,7 +32,6 @@ public class ImageManagementController {
     private final ImageResponseMapper imageResponseMapper;
     
     @PostMapping(
-        path = "/products/{productId}/images",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> saveImages(
@@ -51,21 +50,25 @@ public class ImageManagementController {
     }
     
     @PutMapping(
-        path = "/images/{id}",
+        path = "/{imageId}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateImage(
-        @RequestPart("file") @NotNull MultipartFile file,
-        @PathVariable @Positive long id
+        @PathVariable @Positive long productId,
+        @PathVariable @Positive long imageId,
+        @RequestPart("file") @NotNull MultipartFile file
     ) {
-        Image updatedImage = imageService.updateById(id, file);
+        Image updatedImage = imageService.updateByProductIdAndId(productId, imageId, file);
         ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
-    @DeleteMapping("/images/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable @Positive long id) {
-        imageService.deleteById(id);
+    @DeleteMapping("/{imageId}")
+    public ResponseEntity<Void> deleteImage(
+        @PathVariable @Positive long productId,
+        @PathVariable @Positive long imageId
+    ) {
+        imageService.deleteByProductIdAndId(productId, imageId);
         return ResponseEntity.noContent().build();
     }
 }

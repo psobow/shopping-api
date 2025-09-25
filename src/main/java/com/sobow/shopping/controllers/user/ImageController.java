@@ -16,14 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}")
+@RequestMapping("${api.prefix}/products/{productId}/images")
 public class ImageController {
     
     private final ImageService imageService;
     
-    @GetMapping("/images/{id}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable @Positive long id) {
-        FileContent fileContent = imageService.getImageContent(id);
+    @GetMapping("/{imageId}")
+    public ResponseEntity<Resource> downloadImage(
+        @PathVariable @Positive long productId,
+        @PathVariable @Positive long imageId
+    ) {
+        FileContent fileContent = imageService.getImageContent(productId, imageId);
         ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent.bytes());
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType(fileContent.fileType()))

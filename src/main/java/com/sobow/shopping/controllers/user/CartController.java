@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,60 +34,56 @@ public class CartController {
     private final CartResponseMapper cartResponseMapper;
     private final CartItemResponseMapper cartItemResponseMapper;
     
-    @PutMapping("/users/{userId}/cart")
-    public ResponseEntity<ApiResponse> createOrGetCart(@PathVariable @Positive long userId) {
-        boolean cartExists = cartService.existsByUserProfile_UserId(userId);
-        Cart cart = cartService.createOrGetCart(userId);
+    @PutMapping("/me/cart")
+    public ResponseEntity<ApiResponse> selfCreateOrGetCart() {
+        Cart cart = cartService.selfCreateOrGetCart();
         CartResponse response = cartResponseMapper.mapToDto(cart);
+        
+        URI location = URI.create("/me/cart");
+        boolean cartExists = cartService.exists();
         ApiResponse body = new ApiResponse(cartExists ? "Found" : "Created", response);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().buildAndExpand(userId).toUri();
         return cartExists ? ResponseEntity.ok().body(body)
                           : ResponseEntity.created(location).body(body);
     }
     
-    @DeleteMapping("/users/{userId}/cart")
-    public ResponseEntity<Void> deleteCart(@PathVariable @Positive long userId) {
-        cartService.removeCart(userId);
+    @DeleteMapping("/me/cart")
+    public ResponseEntity<Void> selfRemoveCart() {
+        cartService.selfRemoveCart();
         return ResponseEntity.noContent().build();
     }
     
-    @PostMapping("/carts/{cartId}/items")
-    public ResponseEntity<ApiResponse> createCartItem(
-        @PathVariable @Positive long cartId,
+    @PostMapping("/me/cart/items")
+    public ResponseEntity<ApiResponse> selfCreateCartItem(
         @RequestBody @Valid CartItemCreateRequest request
     ) {
-        CartItem cartItem = cartService.createCartItem(cartId, request);
+        CartItem cartItem = cartService.selfCreateCartItem(request);
         CartItemResponse response = cartItemResponseMapper.mapToDto(cartItem);
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("Created", response));
     }
     
-    @PutMapping("/carts/{cartId}/items/{itemId}")
-    public ResponseEntity<ApiResponse> updateCartItemQty(
-        @PathVariable @Positive long cartId,
+    @PutMapping("/me/cart/items/{itemId}")
+    public ResponseEntity<ApiResponse> selfUpdateCartItemQty(
         @PathVariable @Positive long itemId,
         @RequestBody @Valid CartItemUpdateRequest request
     ) {
-        CartItem cartItem = cartService.updateCartItemQty(cartId, itemId, request);
+        CartItem cartItem = cartService.selfUpdateCartItemQty(itemId, request);
         CartItemResponse response = cartItemResponseMapper.mapToDto(cartItem);
         
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
-    @DeleteMapping("/carts/{cartId}/items/{itemId}")
-    public ResponseEntity<Void> deleteCartItem(
-        @PathVariable @Positive long cartId,
+    @DeleteMapping("/me/cart/items/{itemId}")
+    public ResponseEntity<Void> selfRemoveCartItem(
         @PathVariable @Positive long itemId
     ) {
-        cartService.removeCartItem(cartId, itemId);
+        cartService.selfRemoveCartItem(itemId);
         return ResponseEntity.noContent().build();
     }
     
-    @DeleteMapping("/carts/{cartId}/items")
-    public ResponseEntity<Void> deleteAllCartItems(
-        @PathVariable @Positive long cartId
-    ) {
-        cartService.removeAllCartItems(cartId);
+    @DeleteMapping("/me/cart/items")
+    public ResponseEntity<Void> selfRemoveAllCartItems() {
+        cartService.selfRemoveAllCartItems();
         return ResponseEntity.noContent().build();
     }
 }

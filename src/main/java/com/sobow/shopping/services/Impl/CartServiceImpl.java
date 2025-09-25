@@ -5,15 +5,17 @@ import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
 import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
+import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.CartRepository;
 import com.sobow.shopping.services.CartService;
+import com.sobow.shopping.services.CurrentUserService;
 import com.sobow.shopping.services.ProductService;
-import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +26,16 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductService productService;
-    private final UserProfileService userProfileService;
+    private final CurrentUserService currentUserService;
     
     @Transactional
     @Override
-    public Cart createOrGetCart(long userId) {
-        UserProfile userProfile = userProfileService.findByUserId(userId);
-        if (userProfile.getCart() != null) return userProfile.getCart();
+    public Cart selfCreateOrGetCart() {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        
+        UserProfile userProfile = user.getProfile();
+        if (userProfile.getCart() != null) return findByUserIdWithItems(user.getId());
         
         Cart newCart = new Cart();
         userProfile.setCartAndLink(newCart);
@@ -39,14 +44,16 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public void removeCart(long userId) {
-        UserProfile userProfile = userProfileService.findByUserId(userId);
+    public void selfRemoveCart() {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        UserProfile userProfile = user.getProfile();
         userProfile.removeCart();
     }
     
     @Override
-    public Cart findById(long id) {
-        return cartRepository.findById(id).orElseThrow(
+    public Cart findByIdWithItems(long id) {
+        return cartRepository.findByIdWithItems(id).orElseThrow(
             () -> new EntityNotFoundException("Cart with " + id + " not found"));
     }
     
@@ -58,14 +65,18 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem createCartItem(long cartId, CartItemCreateRequest createRequest) {
-        Cart cart = findById(cartId);
+    public CartItem selfCreateCartItem(CartItemCreateRequest createRequest) {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        
+        Cart cart = findByUserIdWithItems(user.getId());
+        
         Long productId = createRequest.productId();
         Product product = productService.findById(productId);
         
         // I could update existing CartItem when already in the Cart, instead of throwing exception
-        boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cartId, productId);
-        if (itemExistsInCart) throw new CartItemAlreadyExistsException(cartId, productId);
+        boolean itemExistsInCart = cartItemRepository.existsByCartIdAndProductId(cart.getId(), productId);
+        if (itemExistsInCart) throw new CartItemAlreadyExistsException(cart.getId(), productId);
         
         CartItem newItem = new CartItem(product, createRequest.requestedQty());
         cart.addCartItemAndLink(newItem);
@@ -74,31 +85,43 @@ public class CartServiceImpl implements CartService {
     
     @Transactional
     @Override
-    public CartItem updateCartItemQty(long cartId, long itemId, CartItemUpdateRequest updateRequest) {
-        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
+    public CartItem selfUpdateCartItemQty(long itemId, CartItemUpdateRequest updateRequest) {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        Cart cart = findByUserIdWithItems(user.getId());
+        
+        CartItem item = findCartItemByCartIdAndId(cart.getId(), itemId);
         item.updateFrom(updateRequest);
-        if (item.isEmpty()) removeCartItem(cartId, itemId);
+        if (item.isEmpty()) selfRemoveCartItem(itemId);
         return item;
     }
     
     @Transactional
     @Override
-    public void removeCartItem(long cartId, long itemId) {
-        CartItem item = findCartItemByCartIdAndId(cartId, itemId);
-        Cart cart = item.getCart();
+    public void selfRemoveCartItem(long itemId) {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        Cart cart = findByUserIdWithItems(user.getId());
+        
+        CartItem item = findCartItemByCartIdAndId(cart.getId(), itemId);
         cart.removeCartItem(item);
     }
     
     @Transactional
     @Override
-    public void removeAllCartItems(long cartId) {
-        Cart cart = findById(cartId);
+    public void selfRemoveAllCartItems() {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        Cart cart = findByUserIdWithItems(user.getId());
         cart.removeAllCartItems();
     }
     
     @Override
-    public boolean existsByUserProfile_UserId(long userId) {
-        return cartRepository.existsByUserProfile_User_Id(userId);
+    public boolean exists() {
+        Authentication authentication = currentUserService.getAuthentication();
+        User user = currentUserService.getAuthenticatedUser(authentication);
+        
+        return cartRepository.existsByUserProfile_User_Id(user.getId());
     }
     
     private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {

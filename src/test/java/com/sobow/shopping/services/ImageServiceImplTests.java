@@ -117,7 +117,7 @@ public class ImageServiceImplTests {
             when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When
-            Image result = underTest.updateById(fixtures.imageId(), patch);
+            Image result = underTest.updateByProductIdAndId(fixtures.imageId(), patch);
             
             // Then
             // Assert: repository looked up the entity
@@ -155,7 +155,7 @@ public class ImageServiceImplTests {
             
             // When & Then
             // Assert: throws when MultipartFile#getBytes() fails
-            assertThrows(ImageProcessingException.class, () -> underTest.updateById(fixtures.imageId(), badPatch));
+            assertThrows(ImageProcessingException.class, () -> underTest.updateByProductIdAndId(fixtures.imageId(), badPatch));
             
             // Assert: entity remains unchanged after failure
             assertThat(image.getFileName()).isEqualTo(nameBefore);

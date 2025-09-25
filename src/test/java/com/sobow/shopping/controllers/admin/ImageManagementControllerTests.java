@@ -177,7 +177,7 @@ public class ImageManagementControllerTests {
             Image updated = fixtures.imageEntity();
             ImageResponse response = fixtures.imageResponse();
             
-            when(imageService.updateById(fixtures.imageId(), file)).thenReturn(updated);
+            when(imageService.updateByProductIdAndId(fixtures.imageId(), file)).thenReturn(updated);
             when(imageResponseMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
@@ -199,7 +199,7 @@ public class ImageManagementControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateById(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
         }
         
         @Test
@@ -213,7 +213,7 @@ public class ImageManagementControllerTests {
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateById(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
         }
         
         @Test
@@ -224,14 +224,14 @@ public class ImageManagementControllerTests {
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
             
-            verify(imageService, never()).updateById(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
         }
         
         @Test
         public void updateImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
             // Given
             MockMultipartFile file = fixtures.multipartFile();
-            when(imageService.updateById(fixtures.nonExistingId(), file))
+            when(imageService.updateByProductIdAndId(fixtures.nonExistingId(), file))
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
