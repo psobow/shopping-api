@@ -9,6 +9,7 @@ import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.domain.user.responses.UserAddressResponse;
 import com.sobow.shopping.domain.user.responses.UserProfileResponse;
 import com.sobow.shopping.mappers.Mapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,9 @@ public class UserProfileResponseMapper implements Mapper<UserProfile, UserProfil
                                   .firstName(userProfile.getFirstName())
                                   .lastName(userProfile.getLastName())
                                   .userAddress(userAddressResponseMapper.mapToDto(userProfile.getAddress()))
-                                  .cart(cartResponseMapper.mapToDto(userProfile.getCart()))
+                                  .cart(Optional.ofNullable(userProfile.getCart())
+                                                .map(cartResponseMapper::mapToDto)
+                                                .orElseGet(CartResponse::empty))
                                   .orders(userProfile.getOrders().stream().map(orderResponseMapper::mapToDto).toList())
                                   .build();
     }
