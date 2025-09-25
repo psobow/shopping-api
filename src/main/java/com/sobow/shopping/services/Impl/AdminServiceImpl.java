@@ -2,6 +2,7 @@ package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.repositories.UserRepository;
@@ -21,6 +22,13 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     
     private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    private final Mapper<User, UserResponse> userResponseMapper;
+    
+    @Transactional
+    @Override
+    public UserResponse mapToUserResponse(User user) {
+        return userResponseMapper.mapToDto(user);
+    }
     
     @Transactional
     @Override

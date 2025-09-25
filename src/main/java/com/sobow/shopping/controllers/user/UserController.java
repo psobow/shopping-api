@@ -8,7 +8,6 @@ import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
-import com.sobow.shopping.mappers.Mapper;
 import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.UserService;
 import jakarta.validation.Valid;
@@ -29,13 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "${api.prefix}/users")
 public class UserController {
     
-    private final Mapper<User, UserResponse> userResponseMapper;
     private final UserService userService;
     
     @PostMapping
     public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfCreateUserRequest createRequest) {
         User user = userService.selfCreate(createRequest);
-        UserResponse response = userResponseMapper.mapToDto(user);
+        UserResponse response = userService.mapToUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created", response));
     }
@@ -43,14 +41,14 @@ public class UserController {
     @GetMapping(path = "/me")
     public ResponseEntity<ApiResponse> selfGet(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        UserResponse response = userResponseMapper.mapToDto(user);
+        UserResponse response = userService.mapToUserResponse(user);
         return ResponseEntity.ok(new ApiResponse("Logged in user", response));
     }
     
     @PutMapping(path = "/me")
     public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUpdateUserRequest updateRequest) {
         User user = userService.selfPartialUpdate(updateRequest);
-        UserResponse response = userResponseMapper.mapToDto(user);
+        UserResponse response = userService.mapToUserResponse(user);
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     

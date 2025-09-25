@@ -6,8 +6,11 @@ import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.domain.user.responses.UserResponse;
 
 public interface UserService {
+    
+    UserResponse mapToUserResponse(User user);
     
     User selfCreate(SelfCreateUserRequest createRequest);
     

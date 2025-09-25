@@ -7,6 +7,7 @@ import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
 import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
@@ -35,6 +36,13 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     
     private final Mapper<User, SelfCreateUserRequest> selfCreateRequestMapper;
+    private final Mapper<User, UserResponse> userResponseMapper;
+    
+    @Transactional
+    @Override
+    public UserResponse mapToUserResponse(User user) {
+        return userResponseMapper.mapToDto(user);
+    }
     
     @Transactional
     @Override
