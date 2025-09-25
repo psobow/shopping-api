@@ -1,15 +1,15 @@
-package com.sobow.shopping.mappers.user.requests;
+package com.sobow.shopping.mappers.user.requests.Impl;
 
 import com.sobow.shopping.domain.user.UserAddress;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
+import com.sobow.shopping.mappers.user.requests.UserAddressCreateRequestMapper;
 import org.springframework.stereotype.Component;
 
-@Component("createUserAddressDtoMapper")
-public class CreateUserAddressDtoMapper implements Mapper<UserAddress, CreateUserAddressDto> {
+@Component
+public class UserAddressCreateRequestMapperImpl implements UserAddressCreateRequestMapper {
     
     @Override
-    public UserAddress mapToEntity(CreateUserAddressDto addressRequest) {
+    public UserAddress mapToEntity(UserAddressCreateRequest addressRequest) {
         return UserAddress.builder()
                           .cityName(addressRequest.cityName())
                           .streetName(addressRequest.streetName())
@@ -19,7 +19,7 @@ public class CreateUserAddressDtoMapper implements Mapper<UserAddress, CreateUse
     }
     
     @Override
-    public CreateUserAddressDto mapToDto(UserAddress userAddress) {
+    public UserAddressCreateRequest mapToDto(UserAddress userAddress) {
         throw new UnsupportedOperationException("mapToDto is not implemented yet");
     }
 }

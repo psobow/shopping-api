@@ -7,13 +7,13 @@ import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
 import com.sobow.shopping.domain.cart.dto.CartItemResponse;
 import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.cart.dto.CartResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.cart.CartItemResponseMapper;
+import com.sobow.shopping.mappers.cart.CartResponseMapper;
 import com.sobow.shopping.services.CartService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,10 +31,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class CartController {
     
     private final CartService cartService;
-    @Qualifier("cartResponseMapper")
-    private final Mapper<Cart, CartResponse> cartResponseMapper;
-    @Qualifier("cartItemResponseMapper")
-    private final Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
+    
+    private final CartResponseMapper cartResponseMapper;
+    private final CartItemResponseMapper cartItemResponseMapper;
     
     @PutMapping("/users/{userId}/cart")
     public ResponseEntity<ApiResponse> createOrGetCart(@PathVariable @Positive long userId) {

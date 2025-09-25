@@ -1,25 +1,25 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfEmailUpdateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfPasswordUpdateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserCreateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserDeleteRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserPartialUpdateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 
 public interface UserService {
     
     UserResponse mapToUserResponse(User user);
     
-    User selfCreate(SelfCreateUserRequest createRequest);
+    User selfCreate(SelfUserCreateRequest createRequest);
     
-    User selfPartialUpdate(SelfUpdateUserRequest updateRequest);
+    User selfPartialUpdate(SelfUserPartialUpdateRequest updateRequest);
     
-    void selfUpdatePassword(SelfUpdatePasswordRequest updateRequest);
+    void selfUpdatePassword(SelfPasswordUpdateRequest updateRequest);
     
-    void selfUpdateEmail(SelfUpdateEmailRequest updateRequest);
+    void selfUpdateEmail(SelfEmailUpdateRequest updateRequest);
     
-    void selfDelete(SelfDeleteUserRequest deleteRequest);
+    void selfDelete(SelfUserDeleteRequest deleteRequest);
     
 }

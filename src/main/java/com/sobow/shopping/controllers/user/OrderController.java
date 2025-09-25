@@ -3,13 +3,12 @@ package com.sobow.shopping.controllers.user;
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.domain.order.dto.OrderResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.order.OrderResponseMapper;
 import com.sobow.shopping.services.OrderService;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +23,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class OrderController {
     
     private final OrderService orderService;
-    @Qualifier("orderResponseMapper")
-    private final Mapper<Order, OrderResponse> orderResponseMapper;
+    
+    private final OrderResponseMapper orderResponseMapper;
     
     @PostMapping("/me/orders")
     public ResponseEntity<ApiResponse> selfCreateOrder() {

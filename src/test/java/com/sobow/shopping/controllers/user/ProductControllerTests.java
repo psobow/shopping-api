@@ -10,7 +10,7 @@ import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.product.ProductResponseMapper;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,7 +35,7 @@ public class ProductControllerTests {
     private ProductService productService;
     
     @MockitoBean
-    private Mapper<Product, ProductResponse> productResponseMapper;
+    private ProductResponseMapper productResponseMapper;
     
     private static final String PRODUCTS_PATH = "/api/products";
     private static final String PRODUCTS_BY_ID_PATH = "/api/products/{id}";

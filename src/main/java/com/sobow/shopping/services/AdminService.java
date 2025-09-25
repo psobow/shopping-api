@@ -1,7 +1,7 @@
 package com.sobow.shopping.services;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 
 public interface AdminService {
@@ -14,5 +14,5 @@ public interface AdminService {
     
     boolean userExistsByEmail(String email);
     
-    User adminCreate(AdminCreateUserRequest createRequest);
+    User adminCreate(AdminUserCreateRequest createRequest);
 }

@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.image.dto.ImageResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.image.ImageResponseMapper;
 import com.sobow.shopping.services.ImageService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +45,7 @@ public class ImageManagementControllerTests {
     private ImageService imageService;
     
     @MockitoBean
-    private Mapper<Image, ImageResponse> imageMapper;
+    private ImageResponseMapper imageResponseMapper;
     
     private final static String PRODUCT_IMAGES_BY_PRODUCT_ID_PATH = "/api/admin/products/{productId}/images";
     private final static String IMAGES_BY_ID_PATH = "/api/admin/images/{id}";
@@ -64,7 +64,7 @@ public class ImageManagementControllerTests {
             ImageResponse response = fixtures.imageResponse();
             
             when(imageService.saveImages(fixtures.productId(), List.of(file))).thenReturn(saved);
-            when(imageMapper.mapToDto(saved.get(0))).thenReturn(response);
+            when(imageResponseMapper.mapToDto(saved.get(0))).thenReturn(response);
             
             // When & Then
             mockMvc.perform(multipart(PRODUCT_IMAGES_BY_PRODUCT_ID_PATH, fixtures.productId())
@@ -178,7 +178,7 @@ public class ImageManagementControllerTests {
             ImageResponse response = fixtures.imageResponse();
             
             when(imageService.updateById(fixtures.imageId(), file)).thenReturn(updated);
-            when(imageMapper.mapToDto(updated)).thenReturn(response);
+            when(imageResponseMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
             mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.imageId())

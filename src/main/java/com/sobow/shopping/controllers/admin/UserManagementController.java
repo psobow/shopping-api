@@ -2,8 +2,8 @@ package com.sobow.shopping.controllers.admin;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.AdminUpdateUserAuthoritiesRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserAuthoritiesUpdateRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.services.AdminService;
 import jakarta.validation.Valid;
@@ -28,7 +28,7 @@ public class UserManagementController {
     private final AdminService adminService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> adminCreate(@RequestBody @Valid AdminCreateUserRequest createRequest) {
+    public ResponseEntity<ApiResponse> adminCreate(@RequestBody @Valid AdminUserCreateRequest createRequest) {
         User user = adminService.adminCreate(createRequest);
         UserResponse response = adminService.mapToUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -45,7 +45,7 @@ public class UserManagementController {
     @PutMapping(params = "email")
     public ResponseEntity<ApiResponse> adminUpdateAuthoritiesByEmail(
         @RequestParam @NotBlank @Email String email,
-        @RequestBody @Valid AdminUpdateUserAuthoritiesRequest updateRequest
+        @RequestBody @Valid AdminUserAuthoritiesUpdateRequest updateRequest
     ) {
         User user = adminService.findByEmail(email);
         user.updateFrom(updateRequest.authorities().value());

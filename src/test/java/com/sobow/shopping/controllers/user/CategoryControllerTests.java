@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.category.dto.CategoryResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.category.CategoryResponseMapper;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,7 +33,7 @@ public class CategoryControllerTests {
     private CategoryService categoryService;
     
     @MockitoBean
-    private Mapper<Category, CategoryResponse> categoryResponseMapper;
+    private CategoryResponseMapper categoryResponseMapper;
     
     private static final String CATEGORIES_PATH = "/api/categories";
     private static final String CATEGORIES_BY_ID_PATH = "/api/categories/{id}";

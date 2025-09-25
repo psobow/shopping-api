@@ -13,7 +13,7 @@ import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.category.dto.CategoryRequest;
 import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.category.CategoryResponseMapper;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,7 +39,7 @@ public class CategoryManagementControllerTests {
     private CategoryService categoryService;
     
     @MockitoBean
-    private Mapper<Category, CategoryResponse> categoryResponseMapper;
+    private CategoryResponseMapper categoryResponseMapper;
     
     private static final String CATEGORIES_PATH = "/api/admin/categories";
     private static final String CATEGORIES_BY_ID_PATH = "/api/admin/categories/{id}";

@@ -10,22 +10,22 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 
-public record ListAuthorityDto(
+public record UserAuthoritiesRequest(
     @Distinct
     @ValidRoles
     @NotEmpty
     @Size(max = 10)
     @Valid
-    List<AuthorityDto> value
+    List<UserAuthorityRequest> value
 ) {
     
     @JsonCreator(mode = Mode.DELEGATING)
-    public ListAuthorityDto(List<AuthorityDto> value) {
+    public UserAuthoritiesRequest(List<UserAuthorityRequest> value) {
         this.value = value;
     }
     
     @JsonValue
-    public List<AuthorityDto> json() {
+    public List<UserAuthorityRequest> json() {
         return value;
     }
 }

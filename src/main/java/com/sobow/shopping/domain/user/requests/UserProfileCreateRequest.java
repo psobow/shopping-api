@@ -1,4 +1,4 @@
-package com.sobow.shopping.domain.user.requests.shared;
+package com.sobow.shopping.domain.user.requests;
 
 import static com.sobow.shopping.validation.ValidationUtils.normalizeSingleLine;
 
@@ -7,13 +7,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record CreateUserProfileDto(
+public record UserProfileCreateRequest(
     @NotBlank @Size(max = 60) String firstName,
     @NotBlank @Size(max = 60) String lastName,
-    @NotNull @Valid CreateUserAddressDto userAddress
+    @NotNull @Valid UserAddressCreateRequest userAddress
 ) {
     
-    public CreateUserProfileDto {
+    public UserProfileCreateRequest {
         firstName = normalizeSingleLine(firstName);
         lastName = normalizeSingleLine(lastName);
     }

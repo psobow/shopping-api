@@ -3,9 +3,7 @@ package com.sobow.shopping.controllers.user;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.responses.UserResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.services.UserService;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 public class UserControllerTests {
     
     @MockitoBean
-    private Mapper<User, UserResponse> userResponseMapper;
+    private UserResponseMapper userResponseMapper;
+    
     @MockitoBean
     private UserService userService;
     

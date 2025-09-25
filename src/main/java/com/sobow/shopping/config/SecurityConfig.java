@@ -1,11 +1,11 @@
 package com.sobow.shopping.config;
 
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
-import com.sobow.shopping.domain.user.requests.admin.ListAuthorityDto;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
-import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
+import com.sobow.shopping.domain.user.requests.PasswordRequest;
+import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthoritiesRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
 import com.sobow.shopping.services.AdminService;
 import java.util.List;
@@ -44,13 +44,13 @@ public class SecurityConfig {
         String password = "password";
         if (!adminService.userExistsByEmail(adminEmail)) {
             
-            CreateUserAddressDto address = new CreateUserAddressDto(
+            UserAddressCreateRequest address = new UserAddressCreateRequest(
                 "Wroclaw", "Street", "20", "11-222");
             
-            CreateUserProfileDto userProfile = new CreateUserProfileDto("Patryk", "Lastname", address);
-            AuthorityDto authority = new AuthorityDto("ADMIN");
-            AdminCreateUserRequest user = new AdminCreateUserRequest(adminEmail, new PasswordDto(password), userProfile,
-                                                                     new ListAuthorityDto(List.of(authority)));
+            UserProfileCreateRequest userProfile = new UserProfileCreateRequest("Patryk", "Lastname", address);
+            UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
+            AdminUserCreateRequest user = new AdminUserCreateRequest(adminEmail, new PasswordRequest(password), userProfile,
+                                                                     new UserAuthoritiesRequest(List.of(authority)));
             
             adminService.adminCreate(user);
         }

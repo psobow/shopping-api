@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
 import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.product.ProductCreateRequestMapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
@@ -14,7 +14,6 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,8 +25,8 @@ public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
-    @Qualifier("productCreateRequestMapper")
-    private final Mapper<Product, ProductCreateRequest> productCreateRequestMapper;
+    
+    private final ProductCreateRequestMapper productCreateRequestMapper;
     
     @Transactional
     @Override

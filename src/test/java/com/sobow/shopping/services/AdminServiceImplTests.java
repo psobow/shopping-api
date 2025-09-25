@@ -8,9 +8,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.user.requests.AdminUserCreateRequestMapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.Impl.AdminServiceImpl;
@@ -38,7 +38,7 @@ public class AdminServiceImplTests {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    private AdminUserCreateRequestMapper adminUserCreateRequestMapper;
     
     @InjectMocks
     private AdminServiceImpl underTest;
@@ -67,10 +67,10 @@ public class AdminServiceImplTests {
         @Test
         public void adminCreate_should_CreateNewUser_when_ValidInput() {
             // Given
-            AdminCreateUserRequest createRequest = fixtures.adminCreateUserRequest();
+            AdminUserCreateRequest createRequest = fixtures.adminCreateUserRequest();
             User user = fixtures.userEntity();
             
-            when(adminCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
+            when(adminUserCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
             when(userRepository.existsByEmail(fixtures.email())).thenReturn(false);
             when(passwordEncoder.encode(createRequest.password().value())).thenReturn(fixtures.encodedPassword());
             when(userRepository.save(user)).thenReturn(user);
@@ -80,7 +80,7 @@ public class AdminServiceImplTests {
             
             // Then
             // Assert: request mapped to entity
-            verify(adminCreateRequestMapper).mapToEntity(createRequest);
+            verify(adminUserCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: email uniqueness was checked with the new email
             verify(userRepository).existsByEmail(createRequest.email());
@@ -99,17 +99,17 @@ public class AdminServiceImplTests {
         @Test
         public void adminCreate_should_ThrowAlreadyExists_when_EmailAlreadyUsed() {
             // Given
-            AdminCreateUserRequest createRequest = fixtures.adminCreateUserRequest();
+            AdminUserCreateRequest createRequest = fixtures.adminCreateUserRequest();
             User user = fixtures.userEntity();
             
-            when(adminCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
+            when(adminUserCreateRequestMapper.mapToEntity(createRequest)).thenReturn(user);
             when(userRepository.existsByEmail(fixtures.email())).thenReturn(true);
             
             // When & Then
             assertThrows(EmailAlreadyExistsException.class, () -> underTest.adminCreate(createRequest));
             
             // Assert: request was mapped to entity
-            verify(adminCreateRequestMapper).mapToEntity(createRequest);
+            verify(adminUserCreateRequestMapper).mapToEntity(createRequest);
             
             // Assert: uniqueness check performed with the new email
             verify(userRepository).existsByEmail(createRequest.email());

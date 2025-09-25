@@ -3,14 +3,13 @@ package com.sobow.shopping.controllers.admin;
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.image.dto.ImageResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.image.ImageResponseMapper;
 import com.sobow.shopping.services.ImageService;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageManagementController {
     
     private final ImageService imageService;
-    @Qualifier("imageResponseMapper")
-    private final Mapper<Image, ImageResponse> imageResponseMapper;
+    
+    private final ImageResponseMapper imageResponseMapper;
     
     @PostMapping(
         path = "/products/{productId}/images",

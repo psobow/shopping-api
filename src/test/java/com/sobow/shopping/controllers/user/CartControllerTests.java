@@ -16,7 +16,8 @@ import com.sobow.shopping.domain.cart.dto.CartItemResponse;
 import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.cart.dto.CartResponse;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.cart.CartItemResponseMapper;
+import com.sobow.shopping.mappers.cart.CartResponseMapper;
 import com.sobow.shopping.services.CartService;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -41,10 +42,10 @@ public class CartControllerTests {
     private CartService cartService;
     
     @MockitoBean
-    private Mapper<Cart, CartResponse> cartResponseMapper;
+    private CartResponseMapper cartResponseMapper;
     
     @MockitoBean
-    private Mapper<CartItem, CartItemResponse> cartItemResponseMapper;
+    private CartItemResponseMapper cartItemResponseMapper;
     
     private final TestFixtures fixtures = new TestFixtures();
     

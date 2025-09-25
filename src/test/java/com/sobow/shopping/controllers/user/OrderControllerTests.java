@@ -12,7 +12,7 @@ import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.domain.order.dto.OrderResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.exceptions.CartEmptyException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.order.OrderResponseMapper;
 import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.utils.TestFixtures;
@@ -41,7 +41,7 @@ class OrderControllerTests {
     private OrderService orderService;
     
     @MockitoBean
-    private Mapper<Order, OrderResponse> orderResponseMapper;
+    private OrderResponseMapper orderResponseMapper;
     
     @Autowired
     private MockMvc mockMvc;

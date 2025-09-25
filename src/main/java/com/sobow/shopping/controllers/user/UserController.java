@@ -2,11 +2,11 @@ package com.sobow.shopping.controllers.user;
 
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfDeleteUserRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdateEmailRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdatePasswordRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfEmailUpdateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfPasswordUpdateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserCreateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserDeleteRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserPartialUpdateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.UserService;
@@ -31,7 +31,7 @@ public class UserController {
     private final UserService userService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfCreateUserRequest createRequest) {
+    public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfUserCreateRequest createRequest) {
         User user = userService.selfCreate(createRequest);
         UserResponse response = userService.mapToUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -46,26 +46,26 @@ public class UserController {
     }
     
     @PutMapping(path = "/me")
-    public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUpdateUserRequest updateRequest) {
+    public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUserPartialUpdateRequest updateRequest) {
         User user = userService.selfPartialUpdate(updateRequest);
         UserResponse response = userService.mapToUserResponse(user);
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     
     @PostMapping(path = "/me/password")
-    public ResponseEntity<Void> selfUpdatePassword(@RequestBody @Valid SelfUpdatePasswordRequest updateRequest) {
+    public ResponseEntity<Void> selfUpdatePassword(@RequestBody @Valid SelfPasswordUpdateRequest updateRequest) {
         userService.selfUpdatePassword(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping(path = "/me/email")
-    public ResponseEntity<Void> selfUpdateEmail(@RequestBody @Valid SelfUpdateEmailRequest updateRequest) {
+    public ResponseEntity<Void> selfUpdateEmail(@RequestBody @Valid SelfEmailUpdateRequest updateRequest) {
         userService.selfUpdateEmail(updateRequest);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping(path = "/me")
-    public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfDeleteUserRequest deleteRequest) {
+    public ResponseEntity<Void> selfDelete(@RequestBody @Valid SelfUserDeleteRequest deleteRequest) {
         userService.selfDelete(deleteRequest);
         return ResponseEntity.noContent().build();
     }

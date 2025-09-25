@@ -2,21 +2,21 @@ package com.sobow.shopping.domain.user.requests.admin;
 
 import static com.sobow.shopping.validation.ValidationUtils.normalizeEmail;
 
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
-import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
+import com.sobow.shopping.domain.user.requests.PasswordRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AdminCreateUserRequest(
+public record AdminUserCreateRequest(
     @NotBlank @Email String email,
-    @NotBlank @Valid PasswordDto password,
-    @NotNull @Valid CreateUserProfileDto userProfile,
-    @NotNull @Valid ListAuthorityDto authorities
+    @NotBlank @Valid PasswordRequest password,
+    @NotNull @Valid UserProfileCreateRequest userProfile,
+    @NotNull @Valid UserAuthoritiesRequest authorities
 ) {
     
-    public AdminCreateUserRequest {
+    public AdminUserCreateRequest {
         email = normalizeEmail(email);
     }
 }

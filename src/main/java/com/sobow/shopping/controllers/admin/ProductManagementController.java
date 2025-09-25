@@ -5,13 +5,12 @@ import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
 import com.sobow.shopping.domain.product.dto.ProductResponse;
 import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.product.ProductResponseMapper;
 import com.sobow.shopping.services.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductManagementController {
     
     private final ProductService productService;
-    @Qualifier("productResponseMapper")
-    private final Mapper<Product, ProductResponse> productResponseMapper;
+    
+    private final ProductResponseMapper productResponseMapper;
     
     @PostMapping
     public ResponseEntity<ApiResponse> createProduct(

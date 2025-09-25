@@ -3,13 +3,12 @@ package com.sobow.shopping.controllers.user;
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.category.dto.CategoryResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.category.CategoryResponseMapper;
 import com.sobow.shopping.services.CategoryService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     
     private final CategoryService categoryService;
-    @Qualifier("categoryResponseMapper")
-    private final Mapper<Category, CategoryResponse> categoryResponseMapper;
+    
+    private final CategoryResponseMapper categoryResponseMapper;
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllCategories() {

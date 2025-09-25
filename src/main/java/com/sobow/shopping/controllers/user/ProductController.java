@@ -3,12 +3,11 @@ package com.sobow.shopping.controllers.user;
 import com.sobow.shopping.domain.ApiResponse;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductResponse;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.product.ProductResponseMapper;
 import com.sobow.shopping.services.ProductService;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     
     private final ProductService productService;
-    @Qualifier("productResponseMapper")
-    private final Mapper<Product, ProductResponse> productResponseMapper;
+    
+    private final ProductResponseMapper productResponseMapper;
     
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {

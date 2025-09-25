@@ -11,7 +11,7 @@ import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
 import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
-import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.product.ProductCreateRequestMapper;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.Impl.ProductServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
@@ -36,7 +36,7 @@ public class ProductServiceImplTests {
     private CategoryService categoryService;
     
     @Mock
-    private Mapper<Product, ProductCreateRequest> productRequestMapper;
+    private ProductCreateRequestMapper productCreateRequestMapper;
     
     @InjectMocks
     private ProductServiceImpl underTest;
@@ -55,7 +55,7 @@ public class ProductServiceImplTests {
             Category category = fixtures.categoryEntity();
             
             when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(false);
-            when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
+            when(productCreateRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(request.categoryId())).thenReturn(category);
             
             // When
@@ -66,7 +66,7 @@ public class ProductServiceImplTests {
             verify(productRepository).existsByNameAndBrandName(request.name(), request.brandName());
             
             // Assert: mapper used to create a new Product from request
-            verify(productRequestMapper).mapToEntity(request);
+            verify(productCreateRequestMapper).mapToEntity(request);
             
             // Assert: category was loaded
             verify(categoryService).findById(request.categoryId());
@@ -87,7 +87,7 @@ public class ProductServiceImplTests {
             Product mapped = fixtures.productEntity();
             
             when(productRepository.existsByNameAndBrandName(any(), any())).thenReturn(false);
-            when(productRequestMapper.mapToEntity(request)).thenReturn(mapped);
+            when(productCreateRequestMapper.mapToEntity(request)).thenReturn(mapped);
             when(categoryService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
@@ -98,7 +98,7 @@ public class ProductServiceImplTests {
             verify(productRepository).existsByNameAndBrandName(request.name(), request.brandName());
             
             // Assert: mapper was invoked
-            verify(productRequestMapper).mapToEntity(request);
+            verify(productCreateRequestMapper).mapToEntity(request);
             
             // Assert: category lookup attempted with the provided (non-existing) id
             verify(categoryService).findById(request.categoryId());

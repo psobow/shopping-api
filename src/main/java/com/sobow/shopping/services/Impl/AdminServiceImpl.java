@@ -1,10 +1,11 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.mappers.user.requests.AdminUserCreateRequestMapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.AdminService;
 import jakarta.annotation.Nullable;
@@ -22,8 +23,7 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     
-    @Qualifier("adminCreateUserRequestMapper")
-    private final Mapper<User, AdminCreateUserRequest> adminCreateRequestMapper;
+    private final AdminUserCreateRequestMapper adminUserCreateRequestMapper;
     
     @Qualifier("userResponseMapper")
     private final Mapper<User, UserResponse> userResponseMapper;
@@ -36,8 +36,8 @@ public class AdminServiceImpl implements AdminService {
     
     @Transactional
     @Override
-    public User adminCreate(AdminCreateUserRequest createRequest) {
-        User user = adminCreateRequestMapper.mapToEntity(createRequest);
+    public User adminCreate(AdminUserCreateRequest createRequest) {
+        User user = adminUserCreateRequestMapper.mapToEntity(createRequest);
         assertNewEmailAvailable(createRequest.email(), null);
         user.setPassword(passwordEncoder.encode(createRequest.password().value()));
         return userRepository.save(user);

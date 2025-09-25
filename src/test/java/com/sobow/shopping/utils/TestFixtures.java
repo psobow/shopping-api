@@ -24,16 +24,16 @@ import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.requests.admin.AdminCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.admin.AuthorityDto;
-import com.sobow.shopping.domain.user.requests.admin.ListAuthorityDto;
-import com.sobow.shopping.domain.user.requests.self.SelfCreateUserRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUpdateUserRequest;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserAddressDto;
-import com.sobow.shopping.domain.user.requests.shared.CreateUserProfileDto;
-import com.sobow.shopping.domain.user.requests.shared.PasswordDto;
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserAddressDto;
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileDto;
+import com.sobow.shopping.domain.user.requests.PasswordRequest;
+import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserAddressUpdateRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
+import com.sobow.shopping.domain.user.requests.UserProfileUpdateRequest;
+import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthoritiesRequest;
+import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserCreateRequest;
+import com.sobow.shopping.domain.user.requests.self.SelfUserPartialUpdateRequest;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -146,44 +146,44 @@ public class TestFixtures {
         return new User(userEmail, userPassword);
     }
     
-    public AuthorityDto userAuthorityDto() {
-        return new AuthorityDto(userAuthority);
+    public UserAuthorityRequest userAuthorityDto() {
+        return new UserAuthorityRequest(userAuthority);
     }
     
-    public AuthorityDto adminAuthorityDto() {
-        return new AuthorityDto(adminAuthority);
+    public UserAuthorityRequest adminAuthorityDto() {
+        return new UserAuthorityRequest(adminAuthority);
     }
     
-    public UpdateUserAddressDto updateUserAddressDto() {
-        return new UpdateUserAddressDto(cityName, streetName, streetNumber, postCode);
+    public UserAddressUpdateRequest updateUserAddressDto() {
+        return new UserAddressUpdateRequest(cityName, streetName, streetNumber, postCode);
     }
     
-    public CreateUserAddressDto createUserAddressDto() {
-        return new CreateUserAddressDto(cityName, streetName, streetNumber, postCode);
+    public UserAddressCreateRequest createUserAddressDto() {
+        return new UserAddressCreateRequest(cityName, streetName, streetNumber, postCode);
         
         
         
     }
     
-    public UpdateUserProfileDto updateUserProfileDto() {
-        return new UpdateUserProfileDto(userFirstName, userLastName, updateUserAddressDto());
+    public UserProfileUpdateRequest updateUserProfileDto() {
+        return new UserProfileUpdateRequest(userFirstName, userLastName, updateUserAddressDto());
     }
     
-    public CreateUserProfileDto createUserProfileDto() {
-        return new CreateUserProfileDto(userFirstName, userLastName, createUserAddressDto());
+    public UserProfileCreateRequest createUserProfileDto() {
+        return new UserProfileCreateRequest(userFirstName, userLastName, createUserAddressDto());
     }
     
-    public SelfUpdateUserRequest selfUpdateUserRequest() {
-        return new SelfUpdateUserRequest(updateUserProfileDto());
+    public SelfUserPartialUpdateRequest selfUpdateUserRequest() {
+        return new SelfUserPartialUpdateRequest(updateUserProfileDto());
     }
     
-    public SelfCreateUserRequest selfCreateUserRequest() {
-        return new SelfCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileDto());
+    public SelfUserCreateRequest selfCreateUserRequest() {
+        return new SelfUserCreateRequest(userEmail, new PasswordRequest(userPassword), createUserProfileDto());
     }
     
-    public AdminCreateUserRequest adminCreateUserRequest() {
-        return new AdminCreateUserRequest(userEmail, new PasswordDto(userPassword), createUserProfileDto(),
-                                          new ListAuthorityDto(List.of(adminAuthorityDto())));
+    public AdminUserCreateRequest adminCreateUserRequest() {
+        return new AdminUserCreateRequest(userEmail, new PasswordRequest(userPassword), createUserProfileDto(),
+                                          new UserAuthoritiesRequest(List.of(adminAuthorityDto())));
     }
     
     

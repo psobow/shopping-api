@@ -2,7 +2,7 @@ package com.sobow.shopping.domain.user;
 
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.order.Order;
-import com.sobow.shopping.domain.user.requests.shared.UpdateUserProfileDto;
+import com.sobow.shopping.domain.user.requests.UserProfileUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,7 +61,7 @@ public class UserProfile {
     
     // ---- Domain methods ------------------------------------
     
-    public void updateFrom(UpdateUserProfileDto patch) {
+    public void updateFrom(UserProfileUpdateRequest patch) {
         Objects.requireNonNull(patch, "User profile patch must not be null");
         if (patch.firstName() != null) this.firstName = patch.firstName();
         if (patch.lastName() != null) this.lastName = patch.lastName();
