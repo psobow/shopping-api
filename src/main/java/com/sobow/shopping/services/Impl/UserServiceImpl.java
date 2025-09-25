@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User selfPartialUpdate(SelfUpdateUserRequest updateRequest) {
-        Authentication authentication = getCurrentAuthentication();
+        Authentication authentication = getAuthentication();
         User existingUser = getAuthenticatedUser(authentication);
         existingUser.updateFrom(updateRequest);
         return existingUser;
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void selfUpdatePassword(SelfUpdatePasswordRequest updateRequest) {
-        Authentication authentication = getCurrentAuthentication();
+        Authentication authentication = getAuthentication();
         User user = getAuthenticatedUser(authentication);
         assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
         
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void selfUpdateEmail(SelfUpdateEmailRequest updateRequest) {
-        Authentication authentication = getCurrentAuthentication();
+        Authentication authentication = getAuthentication();
         User user = getAuthenticatedUser(authentication);
         assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
         
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void selfDelete(SelfDeleteUserRequest deleteRequest) {
-        Authentication authentication = getCurrentAuthentication();
+        Authentication authentication = getAuthentication();
         User user = getAuthenticatedUser(authentication);
         assertPasswordMatch(deleteRequest.oldPassword().value(), user.getPassword());
         userRepository.deleteById(user.getId());
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         }
     }
     
-    private Authentication getCurrentAuthentication() {
+    private Authentication getAuthentication() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) throw new NoAuthenticationException();
         return auth;

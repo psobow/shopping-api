@@ -5,7 +5,11 @@ import java.util.List;
 
 public interface OrderService {
     
-    Order createOrder(long userId);
+    Order selfCreateOrder();
+    
+    Order selfFindById(long orderId);
+    
+    List<Order> selfFindAll();
     
     Order findByUserIdAndId(long userId, long orderId);
     

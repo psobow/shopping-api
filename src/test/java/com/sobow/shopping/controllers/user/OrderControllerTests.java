@@ -10,18 +10,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.domain.order.dto.OrderResponse;
+import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.mappers.Mapper;
+import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -40,17 +48,32 @@ class OrderControllerTests {
     
     private final TestFixtures fixtures = new TestFixtures();
     
+    @BeforeEach
+    void setupContext() {
+        User user = fixtures.userEntity();
+        var principal = new UserDetailsImpl(user);
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
+        ctx.setAuthentication(auth);
+        SecurityContextHolder.setContext(ctx);
+    }
+    
+    @AfterEach
+    void tearDownContext() {
+        SecurityContextHolder.clearContext();
+    }
+    
     @Test
-    public void createOrder_should_Return201_when_CartNotEmpty() throws Exception {
+    public void selfCreateOrder_should_Return201_when_CartNotEmpty() throws Exception {
         // Given
         Order order = fixtures.orderEntity();
         OrderResponse orderResponse = fixtures.orderResponse();
         
-        when(orderService.createOrder(fixtures.userId())).thenReturn(order);
+        when(orderService.selfCreateOrder()).thenReturn(order);
         when(orderResponseMapper.mapToDto(order)).thenReturn(orderResponse);
         
         // When & Then
-        mockMvc.perform(post("/api/users/{userId}/orders", fixtures.userId()))
+        mockMvc.perform(post("/api/me/orders", fixtures.userId()))
                .andExpect(status().isCreated())
                .andExpect(header().exists(HttpHeaders.LOCATION))
                .andExpect(jsonPath("$.message").value("Created"))
@@ -58,14 +81,14 @@ class OrderControllerTests {
     }
     
     @Test
-    public void createOrder_should_Return422_when_CartEmpty() throws Exception {
+    public void selfCreateOrder_should_Return422_when_CartEmpty() throws Exception {
         // Given
         Order order = fixtures.orderEntity();
         
-        when(orderService.createOrder(fixtures.userId())).thenThrow(new CartEmptyException(fixtures.cartId()));
+        when(orderService.selfCreateOrder()).thenThrow(new CartEmptyException(fixtures.cartId()));
         
         // When & Then
-        mockMvc.perform(post("/api/users/{userId}/orders", fixtures.userId()))
+        mockMvc.perform(post("/api/me/orders", fixtures.userId()))
                .andExpect(status().isUnprocessableEntity());
     }
     
@@ -85,7 +108,7 @@ class OrderControllerTests {
         when(orderResponseMapper.mapToDto(order2)).thenReturn(response2);
         
         // When & Then
-        mockMvc.perform(get("/api/users/{userId}/orders", userId))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders", userId))
                .andExpect(status().isOk())
                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                .andExpect(jsonPath("$.message").value("Found"))
@@ -95,7 +118,7 @@ class OrderControllerTests {
     
     @Test
     void getAllOrders_should_Return400_when_UserIdLessThanOne() throws Exception {
-        mockMvc.perform(get("/api/users/{userId}/orders", fixtures.invalidId()))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders", fixtures.invalidId()))
                .andExpect(status().isBadRequest());
     }
     
@@ -110,7 +133,7 @@ class OrderControllerTests {
         when(orderService.findByUserIdAndId(userId, orderId)).thenReturn(order);
         when(orderResponseMapper.mapToDto(order)).thenReturn(response);
         
-        mockMvc.perform(get("/api/users/{userId}/orders/{id}", userId, orderId))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", userId, orderId))
                .andExpect(status().isOk())
                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                .andExpect(jsonPath("$.message").value("Found"))
@@ -125,18 +148,18 @@ class OrderControllerTests {
         when(orderService.findByUserIdAndId(userId, orderId))
             .thenThrow(new EntityNotFoundException());
         
-        mockMvc.perform(get("/api/users/{userId}/orders/{id}", userId, orderId))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", userId, orderId))
                .andExpect(status().isNotFound());
     }
     
     @Test
     void getOrder_should_Return400_when_IdLessThanOne() throws Exception {
         // bad userId
-        mockMvc.perform(get("/api/users/{userId}/orders/{id}", fixtures.invalidId(), 10))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", fixtures.invalidId(), 10))
                .andExpect(status().isBadRequest());
         
         // bad orderId
-        mockMvc.perform(get("/api/users/{userId}/orders/{id}", 5, fixtures.invalidId()))
+        mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", 5, fixtures.invalidId()))
                .andExpect(status().isBadRequest());
     }
 }

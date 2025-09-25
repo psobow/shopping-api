@@ -17,12 +17,17 @@ import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.repositories.OrderRepository;
+import com.sobow.shopping.repositories.UserRepository;
+import com.sobow.shopping.security.UserDetailsImpl;
 import com.sobow.shopping.services.Impl.OrderServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +36,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,11 +53,28 @@ public class OrderServiceImplTests {
     private ProductService productService;
     @Mock
     private CartService cartService;
+    @Mock
+    private UserRepository userRepository;
     
     @InjectMocks
     private OrderServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
+    
+    @BeforeEach
+    void setupContext() {
+        User user = fixtures.userEntity();
+        var principal = new UserDetailsImpl(user);
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
+        ctx.setAuthentication(auth);
+        SecurityContextHolder.setContext(ctx);
+    }
+    
+    @AfterEach
+    void tearDownContext() {
+        SecurityContextHolder.clearContext();
+    }
     
     @Nested
     @DisplayName("createOrder")
@@ -58,6 +84,7 @@ public class OrderServiceImplTests {
         public void createOrder_should_CreateOrder_and_RemoveCart_when_CartNotEmpty() {
             // Given
             User user = fixtures.userEntity();
+            ReflectionTestUtils.setField(user, "id", fixtures.userId());
             UserProfile userProfile = fixtures.userProfileEntity();
             Cart cart = fixtures.cartEntity();
             CartItem cartItem = fixtures.cartItemEntity();
@@ -71,11 +98,12 @@ public class OrderServiceImplTests {
             List<Long> cartProductsIdsBefore = cart.getProductsId();
             Set<CartItem> cartItemsBefore = new HashSet<>(cart.getCartItems());
             
+            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
             // When
-            Order result = underTest.createOrder(fixtures.userId());
+            Order result = underTest.selfCreateOrder();
             
             // Then
             // Assert: services loaded the profile and cart
@@ -114,11 +142,16 @@ public class OrderServiceImplTests {
         @Test
         public void createOrder_should_ThrowEntityNotFound_when_UserHasNoCart() {
             // Given
+            User user = fixtures.userEntity();
+            ReflectionTestUtils.setField(user, "id", fixtures.userId());
+            UserProfile userProfile = fixtures.userProfileEntity();
+            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
             // Assert: throws when user has no cart
-            assertThrows(EntityNotFoundException.class, () -> underTest.createOrder(fixtures.userId()));
+            assertThrows(EntityNotFoundException.class, () -> underTest.selfCreateOrder());
             
             // Assert: services were called to load profile & cart
             verify(userProfileService).findByUserId(fixtures.userId());
@@ -131,12 +164,17 @@ public class OrderServiceImplTests {
         @Test
         public void createOrder_should_ThrowCartEmpty_when_CartEmpty() {
             // Given
+            User user = fixtures.userEntity();
+            ReflectionTestUtils.setField(user, "id", fixtures.userId());
             Cart cart = fixtures.cartEntity();
+            UserProfile userProfile = fixtures.userProfileEntity();
+            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
+            when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
             // When & Then
             // Assert: throws when user has empty cart
-            assertThrows(CartEmptyException.class, () -> underTest.createOrder(fixtures.userId()));
+            assertThrows(CartEmptyException.class, () -> underTest.selfCreateOrder());
             
             // Assert: services were called to load profile & cart
             verify(userProfileService).findByUserId(fixtures.userId());
@@ -152,6 +190,7 @@ public class OrderServiceImplTests {
         public void createOrder_should_ThrowInsufficientStock_when_StockChanged() {
             // Given
             User user = fixtures.userEntity();
+            ReflectionTestUtils.setField(user, "id", fixtures.userId());
             UserProfile userProfile = fixtures.userProfileEntity();
             Cart cart = fixtures.cartEntity();
             CartItem cartItem = fixtures.cartItemEntity();
@@ -163,11 +202,12 @@ public class OrderServiceImplTests {
             Product product = cartItem.getProduct();
             product.setAvailableQty(0);
             
+            when(userRepository.findByEmail(fixtures.email())).thenReturn(Optional.of(user));
             when(userProfileService.findByUserId(fixtures.userId())).thenReturn(userProfile);
             when(cartService.findByUserIdWithItems(fixtures.userId())).thenReturn(cart);
             
             // When & Then
-            assertThrows(InsufficientStockException.class, () -> underTest.createOrder(fixtures.userId()));
+            assertThrows(InsufficientStockException.class, () -> underTest.selfCreateOrder());
             
             // Assert: services loaded the profile and cart
             verify(userProfileService).findByUserId(fixtures.userId());

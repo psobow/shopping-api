@@ -19,21 +19,21 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}/users/{userId}/orders")
+@RequestMapping("${api.prefix}")
 public class OrderController {
     
     private final OrderService orderService;
     
     private final Mapper<Order, OrderResponse> orderResponseMapper;
     
-    @PostMapping
-    public ResponseEntity<ApiResponse> createOrder(@PathVariable @Positive long userId) {
-        Order order = orderService.createOrder(userId);
+    @PostMapping("/me/orders")
+    public ResponseEntity<ApiResponse> selfCreateOrder() {
+        Order order = orderService.selfCreateOrder();
         OrderResponse response = orderResponseMapper.mapToDto(order);
         
         URI location = ServletUriComponentsBuilder
-            .fromCurrentRequestUri()   // /api/users/{userId}/orders
-            .path("/{id}")             // /api/users/{userId}/orders/{id}
+            .fromCurrentRequestUri()
+            .path("/{id}")
             .buildAndExpand(order.getId())
             .toUri();
         
@@ -41,22 +41,38 @@ public class OrderController {
                              .body(new ApiResponse("Created", response));
     }
     
-    @GetMapping
-    public ResponseEntity<ApiResponse> getAllOrdersByUserId(
-        @PathVariable @Positive long userId
+    @GetMapping("/me/orders/{orderId}")
+    public ResponseEntity<ApiResponse> selfGetOrderById(
+        @PathVariable @Positive long orderId
     ) {
-        List<Order> orders = orderService.findAllByUserId(userId);
+        Order order = orderService.selfFindById(orderId);
+        OrderResponse response = orderResponseMapper.mapToDto(order);
+        return ResponseEntity.ok(new ApiResponse("Found", response));
+    }
+    
+    @GetMapping("/me/orders")
+    public ResponseEntity<ApiResponse> selfGetAllOrders() {
+        List<Order> orders = orderService.selfFindAll();
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
-    @GetMapping("/{orderId}")
+    @GetMapping("/admin/users/{userId}/orders/{orderId}")
     public ResponseEntity<ApiResponse> getOrder(
         @PathVariable @Positive long userId,
         @PathVariable @Positive long orderId
     ) {
         Order order = orderService.findByUserIdAndId(userId, orderId);
         OrderResponse response = orderResponseMapper.mapToDto(order);
+        return ResponseEntity.ok(new ApiResponse("Found", response));
+    }
+    
+    @GetMapping("/admin/users/{userId}/orders")
+    public ResponseEntity<ApiResponse> getAllOrdersByUserId(
+        @PathVariable @Positive long userId
+    ) {
+        List<Order> orders = orderService.findAllByUserId(userId);
+        List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
 }
