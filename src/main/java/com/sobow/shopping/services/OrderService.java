@@ -7,11 +7,11 @@ public interface OrderService {
     
     Order selfCreateOrder();
     
-    Order selfFindById(long orderId);
+    Order selfFindByIdWithItems(long orderId);
     
-    List<Order> selfFindAll();
+    List<Order> selfFindAllWithItems();
     
-    Order findByUserIdAndId(long userId, long orderId);
+    Order findByUserIdAndIdWithItems(long userId, long orderId);
     
-    List<Order> findAllByUserId(long userId);
+    List<Order> findAllByUserIdWithItems(long userId);
 }

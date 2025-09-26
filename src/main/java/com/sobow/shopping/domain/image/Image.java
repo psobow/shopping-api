@@ -74,6 +74,6 @@ public class Image {
     
     // ---- Derived / non-persistent --------------------------
     public String getDownloadUrl() {
-        return "/api/images/" + this.id;
+        return "/api/products/%d/images/%d".formatted(product.getId(), this.id);
     }
 }

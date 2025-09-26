@@ -103,7 +103,7 @@ class OrderControllerTests {
         OrderResponse response1 = fixtures.orderResponse();
         OrderResponse response2 = fixtures.orderResponse();
         
-        when(orderService.findAllByUserId(userId)).thenReturn(List.of(order1, order2));
+        when(orderService.findAllByUserIdWithItems(userId)).thenReturn(List.of(order1, order2));
         when(orderResponseMapper.mapToDto(order1)).thenReturn(response1);
         when(orderResponseMapper.mapToDto(order2)).thenReturn(response2);
         
@@ -130,7 +130,7 @@ class OrderControllerTests {
         Order order = fixtures.orderEntity();
         OrderResponse response = fixtures.orderResponse();
         
-        when(orderService.findByUserIdAndId(userId, orderId)).thenReturn(order);
+        when(orderService.findByUserIdAndIdWithItems(userId, orderId)).thenReturn(order);
         when(orderResponseMapper.mapToDto(order)).thenReturn(response);
         
         mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", userId, orderId))
@@ -145,7 +145,7 @@ class OrderControllerTests {
         long userId = fixtures.userId();
         long orderId = fixtures.nonExistingId();
         
-        when(orderService.findByUserIdAndId(userId, orderId))
+        when(orderService.findByUserIdAndIdWithItems(userId, orderId))
             .thenThrow(new EntityNotFoundException());
         
         mockMvc.perform(get("/api/admin/users/{userId}/orders/{id}", userId, orderId))

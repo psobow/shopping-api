@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public Order selfFindById(long orderId) {
+    public Order selfFindByIdWithItems(long orderId) {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
         
@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public List<Order> selfFindAll() {
+    public List<Order> selfFindAllWithItems() {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
         
@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public Order findByUserIdAndId(long userId, long orderId) {
+    public Order findByUserIdAndIdWithItems(long userId, long orderId) {
         return orderRepository.findByUserIdAndIdWithOrderItems(userId, orderId)
                               .orElseThrow(
                                   () -> new EntityNotFoundException(
@@ -95,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public List<Order> findAllByUserId(long userId) {
+    public List<Order> findAllByUserIdWithItems(long userId) {
         return orderRepository.findAllByUserIdWithOrderItems(userId);
     }
     

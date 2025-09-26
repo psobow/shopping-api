@@ -1,5 +1,8 @@
 package com.sobow.shopping.domain.image.dto;
 
-public record ProductIdImageId(long productId, long imageId) {
-
+public interface ProductIdImageId {
+    
+    Long getProductId();
+    
+    Long getImageId();
 }

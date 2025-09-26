@@ -38,6 +38,10 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public List<ProductResponse> buildProductResponseListWithImageIds(List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            return List.of();
+        }
+        
         List<Long> productIds = products.stream().map(Product::getId).toList();
         
         Map<Long, List<Long>> imageIdsByProduct = mapProductIdToImageIdList(productIds);
@@ -51,11 +55,15 @@ public class ProductServiceImpl implements ProductService {
     }
     
     private Map<Long, List<Long>> mapProductIdToImageIdList(List<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Map.of(); // nothing to query, nothing to map
+        }
+        
         return imageRepository.findImageIdsByProductIds(productIds)
                               .stream()
                               .collect(Collectors.groupingBy(
-                                  ProductIdImageId::productId,
-                                  Collectors.mapping(ProductIdImageId::imageId, Collectors.toList())
+                                  ProductIdImageId::getProductId,
+                                  Collectors.mapping(ProductIdImageId::getImageId, Collectors.toList())
                               ));
     }
     

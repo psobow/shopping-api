@@ -1,5 +1,7 @@
 package com.sobow.shopping.domain.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;
@@ -13,7 +15,7 @@ public record ProductResponse(
     Integer availableQty,
     String description,
     Long categoryId,
-    List<Long> imagesId
+    @JsonInclude(Include.NON_NULL) List<Long> imagesId
 ) {
     
 }

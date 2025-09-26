@@ -45,14 +45,14 @@ public class OrderController {
     public ResponseEntity<ApiResponse> selfGetOrderById(
         @PathVariable @Positive long orderId
     ) {
-        Order order = orderService.selfFindById(orderId);
+        Order order = orderService.selfFindByIdWithItems(orderId);
         OrderResponse response = orderResponseMapper.mapToDto(order);
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
     @GetMapping("/me/orders")
     public ResponseEntity<ApiResponse> selfGetAllOrders() {
-        List<Order> orders = orderService.selfFindAll();
+        List<Order> orders = orderService.selfFindAllWithItems();
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
@@ -62,7 +62,7 @@ public class OrderController {
         @PathVariable @Positive long userId,
         @PathVariable @Positive long orderId
     ) {
-        Order order = orderService.findByUserIdAndId(userId, orderId);
+        Order order = orderService.findByUserIdAndIdWithItems(userId, orderId);
         OrderResponse response = orderResponseMapper.mapToDto(order);
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
@@ -71,7 +71,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse> getAllOrdersByUserId(
         @PathVariable @Positive long userId
     ) {
-        List<Order> orders = orderService.findAllByUserId(userId);
+        List<Order> orders = orderService.findAllByUserIdWithItems(userId);
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }

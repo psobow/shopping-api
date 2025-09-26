@@ -10,6 +10,19 @@ import org.springframework.stereotype.Component;
 public class ProductResponseMapperImpl implements ProductResponseMapper {
     
     @Override
+    public ProductResponse mapToDto(Product product) {
+        return ProductResponse.builder()
+                              .id(product.getId())
+                              .name(product.getName())
+                              .brandName(product.getBrandName())
+                              .price(product.getPrice())
+                              .availableQty(product.getAvailableQty())
+                              .description(product.getDescription())
+                              .categoryId(product.getCategory().getId())
+                              .build();
+    }
+    
+    @Override
     public ProductResponse mapToDto(Product product, List<Long> imageIds) {
         return ProductResponse.builder()
                               .id(product.getId())
