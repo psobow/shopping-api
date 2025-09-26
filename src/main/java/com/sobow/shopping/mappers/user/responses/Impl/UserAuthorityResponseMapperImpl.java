@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 public class UserAuthorityResponseMapperImpl implements UserAuthorityResponseMapper {
     
     @Override
-    public UserAuthority mapToEntity(UserAuthorityResponse userAuthorityResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public UserAuthorityResponse mapToDto(UserAuthority userAuthority) {
         return new UserAuthorityResponse(userAuthority.getValue());
     }

@@ -7,13 +7,11 @@ import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
 
 public interface CartService {
     
+    Cart findByUserIdWithItems(long id);
+    
     Cart selfCreateOrGetCart();
     
     void selfRemoveCart();
-    
-    Cart findByIdWithItems(long id);
-    
-    Cart findByUserIdWithItems(long id);
     
     CartItem selfCreateCartItem(CartItemCreateRequest createRequest);
     
@@ -24,5 +22,4 @@ public interface CartService {
     void selfRemoveAllCartItems();
     
     boolean exists();
-    
 }

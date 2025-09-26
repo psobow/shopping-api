@@ -1,21 +1,16 @@
 package com.sobow.shopping.mappers.product.Impl;
 
-import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductResponse;
 import com.sobow.shopping.mappers.product.ProductResponseMapper;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProductResponseMapperImpl implements ProductResponseMapper {
     
     @Override
-    public Product mapToEntity(ProductResponse productResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
-    public ProductResponse mapToDto(Product product) {
+    public ProductResponse mapToDto(Product product, List<Long> imageIds) {
         return ProductResponse.builder()
                               .id(product.getId())
                               .name(product.getName())
@@ -24,10 +19,7 @@ public class ProductResponseMapperImpl implements ProductResponseMapper {
                               .availableQty(product.getAvailableQty())
                               .description(product.getDescription())
                               .categoryId(product.getCategory().getId())
-                              .imagesId(product.getImages()
-                                               .stream()
-                                               .map(Image::getId)
-                                               .toList())
+                              .imagesId(imageIds)
                               .build();
     }
 }

@@ -13,8 +13,4 @@ public class UserAuthorityRequestMapperImpl implements UserAuthorityRequestMappe
         return new UserAuthority(userAuthorityRequest.value());
     }
     
-    @Override
-    public UserAuthorityRequest mapToDto(UserAuthority userAuthority) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

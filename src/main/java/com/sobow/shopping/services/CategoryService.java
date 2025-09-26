@@ -6,19 +6,15 @@ import java.util.List;
 
 public interface CategoryService {
     
-    Category create(CategoryRequest request);
-    
     Category findById(long id);
     
     Category findByName(String name);
     
     List<Category> findAll();
     
+    Category create(CategoryRequest request);
+    
     void deleteById(long id);
-    
-    boolean existsById(long id);
-    
-    boolean existsByName(String name);
     
     Category partialUpdateById(long id, CategoryRequest request);
 }

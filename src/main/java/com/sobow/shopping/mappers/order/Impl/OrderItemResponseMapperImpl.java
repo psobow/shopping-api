@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderItemResponseMapperImpl implements OrderItemResponseMapper {
     
-    @Override
-    public OrderItem mapToEntity(OrderItemResponse orderItemResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
     
     @Override
     public OrderItemResponse mapToDto(OrderItem orderItem) {

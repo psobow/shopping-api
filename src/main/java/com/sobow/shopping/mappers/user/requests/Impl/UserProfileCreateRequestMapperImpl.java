@@ -25,8 +25,4 @@ public class UserProfileCreateRequestMapperImpl implements UserProfileCreateRequ
         return userProfile;
     }
     
-    @Override
-    public UserProfileCreateRequest mapToDto(UserProfile userProfile) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

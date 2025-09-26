@@ -18,8 +18,4 @@ public class ProductCreateRequestMapperImpl implements ProductCreateRequestMappe
                       .build();
     }
     
-    @Override
-    public ProductCreateRequest mapToDto(Product product) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

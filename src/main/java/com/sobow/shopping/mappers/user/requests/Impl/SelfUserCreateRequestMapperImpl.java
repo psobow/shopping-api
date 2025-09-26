@@ -27,8 +27,4 @@ public class SelfUserCreateRequestMapperImpl implements SelfUserCreateRequestMap
         return user;
     }
     
-    @Override
-    public SelfUserCreateRequest mapToDto(User user) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

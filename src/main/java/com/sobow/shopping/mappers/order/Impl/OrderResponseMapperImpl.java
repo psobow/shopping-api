@@ -16,11 +16,6 @@ public class OrderResponseMapperImpl implements OrderResponseMapper {
     private final Mapper<OrderItem, OrderItemResponse> orderItemResponseMapper;
     
     @Override
-    public Order mapToEntity(OrderResponse orderResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public OrderResponse mapToDto(Order order) {
         return OrderResponse.builder()
                             .id(order.getId())

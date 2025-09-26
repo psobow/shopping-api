@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 public class UserAddressResponseMapperImpl implements UserAddressResponseMapper {
     
     @Override
-    public UserAddress mapToEntity(UserAddressResponse addressResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public UserAddressResponse mapToDto(UserAddress userAddress) {
         return UserAddressResponse.builder()
                                   .cityName(userAddress.getCityName())

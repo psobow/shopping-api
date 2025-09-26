@@ -9,11 +9,6 @@ import org.springframework.stereotype.Component;
 public class CategoryResponseMapperImpl implements CategoryResponseMapper {
     
     @Override
-    public Category mapToEntity(CategoryResponse categoryResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public CategoryResponse mapToDto(Category category) {
         return new CategoryResponse(
             category.getId(),

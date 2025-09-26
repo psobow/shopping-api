@@ -47,7 +47,7 @@ public class UserManagementController {
         @RequestParam @NotBlank @Email String email,
         @RequestBody @Valid AdminUserAuthoritiesUpdateRequest updateRequest
     ) {
-        User user = adminService.findByEmail(email);
+        User user = adminService.findByEmailWithAuthorities(email);
         user.updateFrom(updateRequest.authorities().value());
         UserResponse response = adminService.mapToUserResponse(user);
         return ResponseEntity.ok(new ApiResponse("Updated", response));

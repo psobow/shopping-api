@@ -1,18 +1,24 @@
 package com.sobow.shopping.services.Impl;
 
 import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.image.dto.ProductIdImageId;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
+import com.sobow.shopping.domain.product.dto.ProductResponse;
 import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.product.ProductCreateRequestMapper;
+import com.sobow.shopping.mappers.product.ProductResponseMapper;
+import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
 import com.sobow.shopping.services.ProductService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -24,9 +30,46 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
+    private final ImageRepository imageRepository;
     private final CategoryService categoryService;
+    private final ProductResponseMapper productResponseMapper;
     
     private final ProductCreateRequestMapper productCreateRequestMapper;
+    
+    @Override
+    public List<ProductResponse> buildProductResponseListWithImageIds(List<Product> products) {
+        List<Long> productIds = products.stream().map(Product::getId).toList();
+        
+        Map<Long, List<Long>> imageIdsByProduct = mapProductIdToImageIdList(productIds);
+        
+        List<ProductResponse> responseList =
+            products.stream()
+                    .map(p -> productResponseMapper.mapToDto(p, imageIdsByProduct.getOrDefault(p.getId(), List.of())))
+                    .toList();
+        
+        return responseList;
+    }
+    
+    private Map<Long, List<Long>> mapProductIdToImageIdList(List<Long> productIds) {
+        return imageRepository.findImageIdsByProductIds(productIds)
+                              .stream()
+                              .collect(Collectors.groupingBy(
+                                  ProductIdImageId::productId,
+                                  Collectors.mapping(ProductIdImageId::imageId, Collectors.toList())
+                              ));
+    }
+    
+    @Override
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+    
+    @Override
+    public Product findById(long id) {
+        return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+            "Product with id " + id + " not found"));
+    }
+    
     
     @Transactional
     @Override
@@ -57,11 +100,6 @@ public class ProductServiceImpl implements ProductService {
         return existingProduct;
     }
     
-    @Override
-    public List<Product> findAll() {
-        return productRepository.findAll();
-    }
-    
     @Transactional(propagation = Propagation.MANDATORY) // throw if there's no existing transaction
     @Override
     public List<Product> lockForOrder(List<Long> ids) {
@@ -74,30 +112,8 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Product findById(long id) {
-        return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
-            "Product with id " + id + " not found"));
-    }
-    
-    @Override
-    public Product findWithCategoryAndImagesById(long id) {
-        return productRepository.findByIdWithImages(id)
-                                .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
-    }
-    
-    @Override
-    public List<Product> findAllWithCategoryAndImages() {
-        return productRepository.findAllWithImages();
-    }
-    
-    @Override
     public void deleteById(long id) {
         productRepository.deleteById(id);
-    }
-    
-    @Override
-    public boolean existsById(long id) {
-        return productRepository.existsById(id);
     }
     
     @Override

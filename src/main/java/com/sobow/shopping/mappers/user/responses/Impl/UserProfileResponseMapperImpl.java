@@ -20,11 +20,6 @@ public class UserProfileResponseMapperImpl implements UserProfileResponseMapper 
     private final OrderResponseMapper orderResponseMapper;
     
     @Override
-    public UserProfile mapToEntity(UserProfileResponse userProfileResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public UserProfileResponse mapToDto(UserProfile userProfile) {
         return UserProfileResponse.builder()
                                   .firstName(userProfile.getFirstName())

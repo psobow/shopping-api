@@ -40,8 +40,4 @@ public class AdminUserCreateRequestMapperImpl implements AdminUserCreateRequestM
         return user;
     }
     
-    @Override
-    public AdminUserCreateRequest mapToDto(User user) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

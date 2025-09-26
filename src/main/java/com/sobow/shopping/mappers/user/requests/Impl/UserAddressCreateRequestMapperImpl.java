@@ -18,8 +18,4 @@ public class UserAddressCreateRequestMapperImpl implements UserAddressCreateRequ
                           .build();
     }
     
-    @Override
-    public UserAddressCreateRequest mapToDto(UserAddress userAddress) {
-        throw new UnsupportedOperationException("mapToDto is not implemented yet");
-    }
 }

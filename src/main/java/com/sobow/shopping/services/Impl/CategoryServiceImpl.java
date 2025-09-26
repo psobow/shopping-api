@@ -18,6 +18,24 @@ public class CategoryServiceImpl implements CategoryService {
     
     private final CategoryRepository categoryRepository;
     
+    @Override
+    public Category findById(long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+            "Category with " + id + " not found"));
+    }
+    
+    @Override
+    public Category findByName(String name) {
+        return categoryRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException(
+            "Category with " + name + " not found"));
+    }
+    
+    @Override
+    public List<Category> findAll() {
+        return categoryRepository.findAll();
+    }
+    
+    
     @Transactional
     @Override
     public Category create(CategoryRequest request) {
@@ -36,36 +54,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public Category findById(long id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
-            "Category with " + id + " not found"));
-    }
-    
-    @Override
-    public Category findByName(String name) {
-        return categoryRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException(
-            "Category with " + name + " not found"));
-    }
-    
-    @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
-    }
-    
-    @Override
     public void deleteById(long id) {
         categoryRepository.deleteById(id);
     }
     
-    @Override
-    public boolean existsById(long id) {
-        return categoryRepository.existsById(id);
-    }
-    
-    @Override
-    public boolean existsByName(String name) {
-        return categoryRepository.existsByName(name);
-    }
     
     private void assertCategoryUnique(String name, @Nullable Long existingCategoryId) {
         boolean duplicate =

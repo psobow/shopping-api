@@ -59,7 +59,7 @@ public class ProductControllerTests {
             
             ProductResponse response = fixtures.productResponseOf(product);
             
-            when(productService.findAllWithCategoryAndImages()).thenReturn(List.of(product));
+            when(productService.findAllWithImageIds()).thenReturn(List.of(product));
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
             // When & Then
@@ -100,7 +100,7 @@ public class ProductControllerTests {
             
             ProductResponse response = fixtures.productResponseOf(product);
             
-            when(productService.findWithCategoryAndImagesById(fixtures.productId())).thenReturn(product);
+            when(productService.findWithImagesById(fixtures.productId())).thenReturn(product);
             when(productResponseMapper.mapToDto(product)).thenReturn(response);
             
             // When & Then
@@ -127,7 +127,7 @@ public class ProductControllerTests {
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
             // Given
-            when(productService.findWithCategoryAndImagesById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
+            when(productService.findWithImagesById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.nonExistingId()))

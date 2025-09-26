@@ -28,6 +28,12 @@ public class CartServiceImpl implements CartService {
     private final ProductService productService;
     private final CurrentUserService currentUserService;
     
+    @Override
+    public Cart findByUserIdWithItems(long userId) {
+        return cartRepository.findByUserIdWithItems(userId)
+                             .orElseThrow(() -> new EntityNotFoundException("Cart of user " + userId + " not found"));
+    }
+    
     @Transactional
     @Override
     public Cart selfCreateOrGetCart() {
@@ -49,18 +55,6 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getAuthenticatedUser(authentication);
         UserProfile userProfile = user.getProfile();
         userProfile.removeCart();
-    }
-    
-    @Override
-    public Cart findByIdWithItems(long id) {
-        return cartRepository.findByIdWithItems(id).orElseThrow(
-            () -> new EntityNotFoundException("Cart with " + id + " not found"));
-    }
-    
-    @Override
-    public Cart findByUserIdWithItems(long userId) {
-        return cartRepository.findByUserIdWithItems(userId)
-                             .orElseThrow(() -> new EntityNotFoundException("Cart of user " + userId + " not found"));
     }
     
     @Transactional
@@ -90,7 +84,7 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getAuthenticatedUser(authentication);
         Cart cart = findByUserIdWithItems(user.getId());
         
-        CartItem item = findCartItemByCartIdAndId(cart.getId(), itemId);
+        CartItem item = findCartItemByCartIdAndItemId(cart.getId(), itemId);
         item.updateFrom(updateRequest);
         if (item.isEmpty()) selfRemoveCartItem(itemId);
         return item;
@@ -103,7 +97,7 @@ public class CartServiceImpl implements CartService {
         User user = currentUserService.getAuthenticatedUser(authentication);
         Cart cart = findByUserIdWithItems(user.getId());
         
-        CartItem item = findCartItemByCartIdAndId(cart.getId(), itemId);
+        CartItem item = findCartItemByCartIdAndItemId(cart.getId(), itemId);
         cart.removeCartItem(item);
     }
     
@@ -124,7 +118,7 @@ public class CartServiceImpl implements CartService {
         return cartRepository.existsByUserProfile_User_Id(user.getId());
     }
     
-    private CartItem findCartItemByCartIdAndId(long cartId, long itemId) {
+    private CartItem findCartItemByCartIdAndItemId(long cartId, long itemId) {
         return cartItemRepository.findByCartIdAndId(cartId, itemId)
                                  .orElseThrow(() -> new EntityNotFoundException(
                                      "CartItem with id " + itemId + " not found in cart with id" + cartId));

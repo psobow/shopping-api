@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ImageResponseMapperImpl implements ImageResponseMapper {
     
-    @Override
-    public Image mapToEntity(ImageResponse imageResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
     
     @Override
     public ImageResponse mapToDto(Image image) {

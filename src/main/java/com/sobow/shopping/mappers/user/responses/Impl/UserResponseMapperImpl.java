@@ -16,11 +16,6 @@ public class UserResponseMapperImpl implements UserResponseMapper {
     private final UserAuthorityResponseMapper userAuthorityResponseMapper;
     
     @Override
-    public User mapToEntity(UserResponse userResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public UserResponse mapToDto(User user) {
         return UserResponse.builder()
                            .email(user.getEmail())

@@ -1,8 +1,12 @@
 package com.sobow.shopping.mappers;
 
 public interface Mapper<Entity, DTO> {
-
-    Entity mapToEntity(DTO dto);
     
-    DTO mapToDto(Entity entity);
+    default Entity mapToEntity(DTO dto) {
+        throw new UnsupportedOperationException("mapToEntity not supported");
+    }
+    
+    default DTO mapToDto(Entity entity) {
+        throw new UnsupportedOperationException("mapToDto not supported");
+    }
 }

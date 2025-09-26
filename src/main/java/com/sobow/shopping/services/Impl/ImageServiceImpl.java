@@ -23,6 +23,13 @@ public class ImageServiceImpl implements ImageService {
     private final ProductService productService;
     private final ImageRepository imageRepository;
     
+    @Override
+    public Image findByProductIdAndId(long productId, long imageId) {
+        return imageRepository.findByProductIdAndId(productId, imageId)
+                              .orElseThrow(() -> new EntityNotFoundException("Image with id " + imageId + " not found"));
+    }
+    
+    
     @Transactional
     @Override
     public List<Image> saveImages(long productId, List<MultipartFile> files) {
@@ -43,12 +50,6 @@ public class ImageServiceImpl implements ImageService {
         Image image = findByProductIdAndId(productId, imageId);
         image.updateFrom(patch);
         return image;
-    }
-    
-    @Override
-    public Image findByProductIdAndId(long productId, long imageId) {
-        return imageRepository.findByProductIdAndId(productId, imageId)
-                              .orElseThrow(() -> new EntityNotFoundException("Image with id " + imageId + " not found"));
     }
     
     @Override

@@ -14,11 +14,6 @@ public class CartResponseMapperImpl implements CartResponseMapper {
     private final CartItemResponseMapper cartItemResponseMapper;
     
     @Override
-    public Cart mapToEntity(CartResponse cartResponse) {
-        throw new UnsupportedOperationException("mapToEntity is not implemented yet");
-    }
-    
-    @Override
     public CartResponse mapToDto(Cart cart) {
         return new CartResponse(
             cart.getId(),
