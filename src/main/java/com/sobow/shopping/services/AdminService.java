@@ -6,7 +6,7 @@ import com.sobow.shopping.domain.user.responses.UserResponse;
 
 public interface AdminService {
     
-    UserResponse mapToUserResponse(User user);
+    UserResponse mapToUserResponse(long userId);
     
     User findByEmailWithAuthorities(String email);
     

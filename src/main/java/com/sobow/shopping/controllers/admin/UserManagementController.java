@@ -30,7 +30,7 @@ public class UserManagementController {
     @PostMapping
     public ResponseEntity<ApiResponse> adminCreate(@RequestBody @Valid AdminUserCreateRequest createRequest) {
         User user = adminService.adminCreate(createRequest);
-        UserResponse response = adminService.mapToUserResponse(user);
+        UserResponse response = adminService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created by Admin", response));
     }
@@ -38,7 +38,7 @@ public class UserManagementController {
     @GetMapping(params = "email")
     public ResponseEntity<ApiResponse> adminFindByEmail(@RequestParam @NotBlank @Email String email) {
         User user = adminService.findByEmail(email);
-        UserResponse response = adminService.mapToUserResponse(user);
+        UserResponse response = adminService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
@@ -49,7 +49,7 @@ public class UserManagementController {
     ) {
         User user = adminService.findByEmailWithAuthorities(email);
         user.updateFrom(updateRequest.authorities().value());
-        UserResponse response = adminService.mapToUserResponse(user);
+        UserResponse response = adminService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
 }

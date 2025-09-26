@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     
     private Map<Long, List<Long>> mapProductIdToImageIdList(List<Long> productIds) {
         if (productIds == null || productIds.isEmpty()) {
-            return Map.of(); // nothing to query, nothing to map
+            return Map.of();
         }
         
         return imageRepository.findImageIdsByProductIds(productIds)

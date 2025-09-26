@@ -13,6 +13,7 @@ import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.CurrentUserService;
 import com.sobow.shopping.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +33,9 @@ public class UserServiceImpl implements UserService {
     
     @Transactional
     @Override
-    public UserResponse mapToUserResponse(User user) {
+    public UserResponse mapToUserResponse(long userId) {
+        User user = userRepository.findById(userId)
+                                  .orElseThrow(() -> new EntityNotFoundException("User with id" + userId + " not found"));
         return userResponseMapper.mapToDto(user);
     }
     
@@ -88,7 +91,4 @@ public class UserServiceImpl implements UserService {
         currentUserService.assertPasswordMatch(deleteRequest.oldPassword().value(), user.getPassword());
         userRepository.deleteById(user.getId());
     }
-    
-    
-    
 }

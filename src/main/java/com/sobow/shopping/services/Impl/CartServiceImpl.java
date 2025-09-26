@@ -13,6 +13,7 @@ import com.sobow.shopping.repositories.CartRepository;
 import com.sobow.shopping.services.CartService;
 import com.sobow.shopping.services.CurrentUserService;
 import com.sobow.shopping.services.ProductService;
+import com.sobow.shopping.services.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,7 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductService productService;
     private final CurrentUserService currentUserService;
+    private final UserProfileService userProfileService;
     
     @Override
     public Cart findByUserIdWithItems(long userId) {
@@ -40,7 +42,7 @@ public class CartServiceImpl implements CartService {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
         
-        UserProfile userProfile = user.getProfile();
+        UserProfile userProfile = userProfileService.findByUserId(user.getId());
         if (userProfile.getCart() != null) return findByUserIdWithItems(user.getId());
         
         Cart newCart = new Cart();
@@ -53,7 +55,7 @@ public class CartServiceImpl implements CartService {
     public void selfRemoveCart() {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
-        UserProfile userProfile = user.getProfile();
+        UserProfile userProfile = userProfileService.findByUserId(user.getId());
         userProfile.removeCart();
     }
     

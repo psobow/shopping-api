@@ -8,6 +8,7 @@ import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.repositories.UserRepository;
 import com.sobow.shopping.services.AdminService;
 import com.sobow.shopping.services.CurrentUserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,9 @@ public class AdminServiceImpl implements AdminService {
     
     @Transactional
     @Override
-    public UserResponse mapToUserResponse(User user) {
+    public UserResponse mapToUserResponse(long userId) {
+        User user = userRepository.findById(userId)
+                                  .orElseThrow(() -> new EntityNotFoundException("User with id" + userId + " not found"));
         return userResponseMapper.mapToDto(user);
     }
     

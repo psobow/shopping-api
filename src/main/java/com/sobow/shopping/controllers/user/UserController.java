@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<ApiResponse> selfCreate(@RequestBody @Valid SelfUserCreateRequest createRequest) {
         User user = userService.selfCreate(createRequest);
-        UserResponse response = userService.mapToUserResponse(user);
+        UserResponse response = userService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created", response));
     }
@@ -41,14 +41,14 @@ public class UserController {
     @GetMapping(path = "/me")
     public ResponseEntity<ApiResponse> selfGet(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        UserResponse response = userService.mapToUserResponse(user);
+        UserResponse response = userService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Logged in user", response));
     }
     
     @PutMapping(path = "/me")
     public ResponseEntity<ApiResponse> selfPartialUpdate(@RequestBody @Valid SelfUserPartialUpdateRequest updateRequest) {
         User user = userService.selfPartialUpdate(updateRequest);
-        UserResponse response = userService.mapToUserResponse(user);
+        UserResponse response = userService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     

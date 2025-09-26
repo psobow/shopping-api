@@ -10,7 +10,7 @@ import com.sobow.shopping.domain.user.responses.UserResponse;
 
 public interface UserService {
     
-    UserResponse mapToUserResponse(User user);
+    UserResponse mapToUserResponse(long userId);
     
     User selfCreate(SelfUserCreateRequest createRequest);
     
