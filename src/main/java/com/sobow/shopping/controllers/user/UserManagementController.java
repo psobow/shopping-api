@@ -27,7 +27,7 @@ public class UserManagementController {
     
     private final AdminService adminService;
     
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<ApiResponse> adminCreate(
         @RequestBody @Valid AdminUserCreateRequest createRequest
     ) {

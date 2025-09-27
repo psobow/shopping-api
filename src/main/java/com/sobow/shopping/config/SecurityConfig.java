@@ -9,8 +9,10 @@ import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
 import com.sobow.shopping.services.user.AdminService;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,12 +25,31 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     
+    @Value("${api.prefix}")
+    private String apiPrefix;
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
+                // 1) Admin-only
+                .requestMatchers(apiPrefix + "/admin/**").hasRole("ADMIN")
+                
+                // 2) Public (no auth)
+                .requestMatchers(HttpMethod.POST, apiPrefix + "/users/register").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                                 apiPrefix + "/categories",
+                                 apiPrefix + "/categories/**",
+                                 apiPrefix + "/products",
+                                 apiPrefix + "/products/**"
+                ).permitAll()
+                
+                // 3) Regular user and admin
+                .requestMatchers(apiPrefix + "/users/**").hasAnyRole("USER", "ADMIN")
+                
+                // 4) Fallback
+                .anyRequest().authenticated()
+            )
             .httpBasic(basic -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(csrf -> csrf.disable())
@@ -40,7 +61,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(AdminService adminService) {
         
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(adminService);
-        String adminEmail = "admin@email.com";
+        String adminEmail = "user@email.com";
         String password = "password";
         if (!adminService.userExistsByEmail(adminEmail)) {
             
@@ -48,7 +69,7 @@ public class SecurityConfig {
                 "Wroclaw", "Street", "20", "11-222");
             
             UserProfileCreateRequest userProfile = new UserProfileCreateRequest("Patryk", "Lastname", address);
-            UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
+            UserAuthorityRequest authority = new UserAuthorityRequest("USER");
             AdminUserCreateRequest user = new AdminUserCreateRequest(adminEmail, new PasswordRequest(password), userProfile,
                                                                      new UserAuthoritiesRequest(List.of(authority)));
             
