@@ -5,7 +5,7 @@ import com.sobow.shopping.domain.user.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
-import com.sobow.shopping.security.UserDetailsImpl;
+import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
 import jakarta.annotation.Nullable;
 import java.util.Collection;

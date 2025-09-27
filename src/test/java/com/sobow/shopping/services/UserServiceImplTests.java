@@ -25,7 +25,7 @@ import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.mappers.user.requests.SelfUserCreateRequestMapper;
-import com.sobow.shopping.security.UserDetailsImpl;
+import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.Impl.UserServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;

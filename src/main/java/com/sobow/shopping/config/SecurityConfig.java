@@ -6,7 +6,7 @@ import com.sobow.shopping.controllers.user.requests.UserProfileCreateRequest;
 import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthoritiesRequest;
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
-import com.sobow.shopping.security.UserDetailsServiceImpl;
+import com.sobow.shopping.security.Impl.UserDetailsServiceImpl;
 import com.sobow.shopping.services.user.AdminService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;

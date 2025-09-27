@@ -8,7 +8,7 @@ import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
 import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.security.UserDetailsImpl;
+import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

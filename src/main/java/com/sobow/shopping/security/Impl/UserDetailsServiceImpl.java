@@ -1,4 +1,4 @@
-package com.sobow.shopping.security;
+package com.sobow.shopping.security.Impl;
 
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.services.user.AdminService;

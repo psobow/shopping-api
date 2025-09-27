@@ -14,7 +14,7 @@ import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.mappers.order.OrderResponseMapper;
-import com.sobow.shopping.security.UserDetailsImpl;
+import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.order.OrderService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
