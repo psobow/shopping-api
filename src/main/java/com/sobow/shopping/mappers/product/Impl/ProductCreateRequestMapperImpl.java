@@ -1,7 +1,7 @@
 package com.sobow.shopping.mappers.product.Impl;
 
+import com.sobow.shopping.controllers.product.dto.ProductCreateRequest;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
 import com.sobow.shopping.mappers.product.ProductCreateRequestMapper;
 import org.springframework.stereotype.Component;
 

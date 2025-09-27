@@ -1,8 +1,8 @@
 package com.sobow.shopping.mappers.user.requests.Impl;
 
+import com.sobow.shopping.controllers.user.requests.UserProfileCreateRequest;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
 import com.sobow.shopping.mappers.user.requests.UserAddressCreateRequestMapper;
 import com.sobow.shopping.mappers.user.requests.UserProfileCreateRequestMapper;
 import lombok.AllArgsConstructor;

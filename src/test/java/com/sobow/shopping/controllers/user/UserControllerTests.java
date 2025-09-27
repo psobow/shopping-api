@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
-import com.sobow.shopping.services.UserService;
+import com.sobow.shopping.services.user.UserService;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

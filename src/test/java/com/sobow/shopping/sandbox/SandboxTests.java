@@ -1,11 +1,11 @@
 package com.sobow.shopping.sandbox;
 
 import com.sobow.shopping.domain.category.Category;
+import com.sobow.shopping.domain.category.CategoryRepository;
 import com.sobow.shopping.domain.image.Image;
+import com.sobow.shopping.domain.image.ImageRepository;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.repositories.CategoryRepository;
-import com.sobow.shopping.repositories.ImageRepository;
-import com.sobow.shopping.repositories.ProductRepository;
+import com.sobow.shopping.domain.product.ProductRepository;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;

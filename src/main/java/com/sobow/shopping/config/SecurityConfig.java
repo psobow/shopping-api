@@ -1,13 +1,13 @@
 package com.sobow.shopping.config;
 
-import com.sobow.shopping.domain.user.requests.PasswordRequest;
-import com.sobow.shopping.domain.user.requests.UserAddressCreateRequest;
-import com.sobow.shopping.domain.user.requests.UserProfileCreateRequest;
-import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
-import com.sobow.shopping.domain.user.requests.admin.UserAuthoritiesRequest;
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.controllers.user.requests.PasswordRequest;
+import com.sobow.shopping.controllers.user.requests.UserAddressCreateRequest;
+import com.sobow.shopping.controllers.user.requests.UserProfileCreateRequest;
+import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
+import com.sobow.shopping.controllers.user.requests.admin.UserAuthoritiesRequest;
+import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
 import com.sobow.shopping.security.UserDetailsServiceImpl;
-import com.sobow.shopping.services.AdminService;
+import com.sobow.shopping.services.user.AdminService;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 package com.sobow.shopping.security;
 
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.services.AdminService;
+import com.sobow.shopping.services.user.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

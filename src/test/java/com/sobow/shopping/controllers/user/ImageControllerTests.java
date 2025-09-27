@@ -9,8 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.domain.image.dto.FileContent;
-import com.sobow.shopping.services.ImageService;
+import com.sobow.shopping.controllers.image.ImageController;
+import com.sobow.shopping.services.image.ImageService;
+import com.sobow.shopping.services.image.Impl.FileContent;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;

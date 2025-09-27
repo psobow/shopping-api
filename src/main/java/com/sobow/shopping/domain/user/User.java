@@ -1,7 +1,7 @@
 package com.sobow.shopping.domain.user;
 
-import com.sobow.shopping.domain.user.requests.admin.UserAuthorityRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUserPartialUpdateRequest;
+import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
 import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

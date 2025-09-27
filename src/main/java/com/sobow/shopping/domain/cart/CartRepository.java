@@ -1,0 +1,28 @@
+package com.sobow.shopping.domain.cart;
+
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CartRepository extends JpaRepository<Cart, Long> {
+    
+    boolean existsByUserProfile_User_Id(long userId);
+    
+    @Query("""
+        SELECT DISTINCT c
+        FROM Cart c
+        LEFT JOIN FETCH c.cartItems
+        WHERE c.userProfile.user.id = :userId
+        """)
+    Optional<Cart> findByUserIdWithItems(long userId);
+    
+    @Query("""
+        SELECT DISTINCT c
+        FROM Cart c
+        LEFT JOIN FETCH c.cartItems
+        WHERE c.id = :id
+        """)
+    Optional<Cart> findByIdWithItems(long id);
+}

@@ -1,7 +1,7 @@
 package com.sobow.shopping.mappers.category.Impl;
 
+import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.mappers.category.CategoryResponseMapper;
 import org.springframework.stereotype.Component;
 

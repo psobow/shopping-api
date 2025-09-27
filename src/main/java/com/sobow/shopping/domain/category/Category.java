@@ -1,6 +1,6 @@
 package com.sobow.shopping.domain.category;
 
-import com.sobow.shopping.domain.category.dto.CategoryRequest;
+import com.sobow.shopping.controllers.category.dto.CategoryRequest;
 import com.sobow.shopping.domain.product.Product;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

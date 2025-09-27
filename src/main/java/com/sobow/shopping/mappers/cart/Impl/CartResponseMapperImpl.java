@@ -1,7 +1,7 @@
 package com.sobow.shopping.mappers.cart.Impl;
 
+import com.sobow.shopping.controllers.cart.dto.CartResponse;
 import com.sobow.shopping.domain.cart.Cart;
-import com.sobow.shopping.domain.cart.dto.CartResponse;
 import com.sobow.shopping.mappers.cart.CartItemResponseMapper;
 import com.sobow.shopping.mappers.cart.CartResponseMapper;
 import lombok.RequiredArgsConstructor;

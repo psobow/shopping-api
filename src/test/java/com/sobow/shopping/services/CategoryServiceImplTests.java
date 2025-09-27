@@ -7,11 +7,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sobow.shopping.controllers.category.dto.CategoryRequest;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.dto.CategoryRequest;
+import com.sobow.shopping.domain.category.CategoryRepository;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
-import com.sobow.shopping.repositories.CategoryRepository;
-import com.sobow.shopping.services.Impl.CategoryServiceImpl;
+import com.sobow.shopping.services.category.Impl.CategoryServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;

@@ -6,12 +6,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sobow.shopping.controllers.product.ProductController;
+import com.sobow.shopping.controllers.product.dto.ProductResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.dto.ProductResponse;
 import com.sobow.shopping.mappers.product.ProductResponseMapper;
-import com.sobow.shopping.services.ProductService;
+import com.sobow.shopping.services.product.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;

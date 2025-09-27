@@ -9,12 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sobow.shopping.controllers.category.CategoryManagementController;
+import com.sobow.shopping.controllers.category.dto.CategoryRequest;
+import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;
-import com.sobow.shopping.domain.category.dto.CategoryRequest;
-import com.sobow.shopping.domain.category.dto.CategoryResponse;
 import com.sobow.shopping.exceptions.CategoryAlreadyExistsException;
 import com.sobow.shopping.mappers.category.CategoryResponseMapper;
-import com.sobow.shopping.services.CategoryService;
+import com.sobow.shopping.services.category.CategoryService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;

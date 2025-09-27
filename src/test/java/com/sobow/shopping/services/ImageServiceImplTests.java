@@ -7,11 +7,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.dto.FileContent;
+import com.sobow.shopping.domain.image.ImageRepository;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.ImageProcessingException;
-import com.sobow.shopping.repositories.ImageRepository;
-import com.sobow.shopping.services.Impl.ImageServiceImpl;
+import com.sobow.shopping.services.image.Impl.FileContent;
+import com.sobow.shopping.services.image.Impl.ImageServiceImpl;
+import com.sobow.shopping.services.product.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
 import java.io.IOException;
 import java.sql.Blob;

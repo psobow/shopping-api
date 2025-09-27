@@ -9,13 +9,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sobow.shopping.controllers.product.ProductManagementController;
+import com.sobow.shopping.controllers.product.dto.ProductCreateRequest;
+import com.sobow.shopping.controllers.product.dto.ProductResponse;
+import com.sobow.shopping.controllers.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.domain.product.dto.ProductCreateRequest;
-import com.sobow.shopping.domain.product.dto.ProductResponse;
-import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.mappers.product.ProductResponseMapper;
-import com.sobow.shopping.services.ProductService;
+import com.sobow.shopping.services.product.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;

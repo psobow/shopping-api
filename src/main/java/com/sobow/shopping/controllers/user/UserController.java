@@ -1,15 +1,15 @@
 package com.sobow.shopping.controllers.user;
 
-import com.sobow.shopping.domain.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.user.requests.self.SelfEmailUpdateRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfPasswordUpdateRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfUserCreateRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
+import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.self.SelfEmailUpdateRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfPasswordUpdateRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUserCreateRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUserDeleteRequest;
-import com.sobow.shopping.domain.user.requests.self.SelfUserPartialUpdateRequest;
-import com.sobow.shopping.domain.user.responses.UserResponse;
 import com.sobow.shopping.security.UserDetailsImpl;
-import com.sobow.shopping.services.UserService;
+import com.sobow.shopping.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

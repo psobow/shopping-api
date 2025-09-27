@@ -1,7 +1,7 @@
 package com.sobow.shopping.domain.cart;
 
 import com.sobow.shopping.config.MoneyConfig;
-import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
+import com.sobow.shopping.controllers.cart.dto.CartItemUpdateRequest;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.OverDecrementException;

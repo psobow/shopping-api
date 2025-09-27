@@ -1,8 +1,8 @@
 package com.sobow.shopping.domain.product;
 
+import com.sobow.shopping.controllers.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

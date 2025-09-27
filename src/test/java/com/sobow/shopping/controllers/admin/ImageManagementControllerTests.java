@@ -13,10 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sobow.shopping.controllers.image.ImageManagementController;
+import com.sobow.shopping.controllers.image.dto.ImageResponse;
 import com.sobow.shopping.domain.image.Image;
-import com.sobow.shopping.domain.image.dto.ImageResponse;
 import com.sobow.shopping.mappers.image.ImageResponseMapper;
-import com.sobow.shopping.services.ImageService;
+import com.sobow.shopping.services.image.ImageService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;

@@ -8,13 +8,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sobow.shopping.controllers.order.OrderController;
+import com.sobow.shopping.controllers.order.dto.OrderResponse;
 import com.sobow.shopping.domain.order.Order;
-import com.sobow.shopping.domain.order.dto.OrderResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.exceptions.CartEmptyException;
 import com.sobow.shopping.mappers.order.OrderResponseMapper;
 import com.sobow.shopping.security.UserDetailsImpl;
-import com.sobow.shopping.services.OrderService;
+import com.sobow.shopping.services.order.OrderService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;

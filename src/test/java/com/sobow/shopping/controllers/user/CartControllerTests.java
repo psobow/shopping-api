@@ -9,16 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sobow.shopping.controllers.cart.CartController;
+import com.sobow.shopping.controllers.cart.dto.CartItemCreateRequest;
+import com.sobow.shopping.controllers.cart.dto.CartItemResponse;
+import com.sobow.shopping.controllers.cart.dto.CartItemUpdateRequest;
+import com.sobow.shopping.controllers.cart.dto.CartResponse;
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
-import com.sobow.shopping.domain.cart.dto.CartItemCreateRequest;
-import com.sobow.shopping.domain.cart.dto.CartItemResponse;
-import com.sobow.shopping.domain.cart.dto.CartItemUpdateRequest;
-import com.sobow.shopping.domain.cart.dto.CartResponse;
 import com.sobow.shopping.exceptions.CartItemAlreadyExistsException;
 import com.sobow.shopping.mappers.cart.CartItemResponseMapper;
 import com.sobow.shopping.mappers.cart.CartResponseMapper;
-import com.sobow.shopping.services.CartService;
+import com.sobow.shopping.services.cart.CartService;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

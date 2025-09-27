@@ -8,12 +8,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.requests.admin.AdminUserCreateRequest;
+import com.sobow.shopping.domain.user.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.mappers.user.requests.AdminUserCreateRequestMapper;
-import com.sobow.shopping.repositories.UserRepository;
-import com.sobow.shopping.services.Impl.AdminServiceImpl;
+import com.sobow.shopping.services.user.CurrentUserService;
+import com.sobow.shopping.services.user.Impl.AdminServiceImpl;
 import com.sobow.shopping.utils.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

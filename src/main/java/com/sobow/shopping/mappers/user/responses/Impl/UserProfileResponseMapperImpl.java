@@ -1,8 +1,8 @@
 package com.sobow.shopping.mappers.user.responses.Impl;
 
-import com.sobow.shopping.domain.cart.dto.CartResponse;
+import com.sobow.shopping.controllers.cart.dto.CartResponse;
+import com.sobow.shopping.controllers.user.responses.UserProfileResponse;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.responses.UserProfileResponse;
 import com.sobow.shopping.mappers.cart.CartResponseMapper;
 import com.sobow.shopping.mappers.order.OrderResponseMapper;
 import com.sobow.shopping.mappers.user.responses.UserAddressResponseMapper;
