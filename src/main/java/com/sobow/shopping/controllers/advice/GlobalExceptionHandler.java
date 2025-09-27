@@ -10,7 +10,6 @@ import com.sobow.shopping.exceptions.InsufficientStockException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.InvalidPriceException;
 import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
-import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -231,16 +230,6 @@ public class GlobalExceptionHandler {
                                                             HttpServletRequest request) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         pd.setTitle("User not found");
-        pd.setDetail(ex.getMessage());
-        pd.setProperty("path", request.getRequestURI());
-        return ResponseEntity.status(pd.getStatus()).body(pd);
-    }
-    
-    @ExceptionHandler(NoAuthenticationException.class)
-    public ResponseEntity<ProblemDetail> handleNoAuthentication(NoAuthenticationException ex,
-                                                                HttpServletRequest request) {
-        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        pd.setTitle("Authentication required");
         pd.setDetail(ex.getMessage());
         pd.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(pd.getStatus()).body(pd);

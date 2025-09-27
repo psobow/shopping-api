@@ -5,7 +5,6 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
-import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
@@ -41,9 +40,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     
     @Override
     public Authentication getAuthentication() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) throw new NoAuthenticationException();
-        return auth;
+        return SecurityContextHolder.getContext().getAuthentication();
     }
     
     @Override
@@ -55,10 +52,10 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
     
     @Override
-    public void updateSecurityContext(User updatedUser, Collection<? extends GrantedAuthority> authorities) {
-        UserDetails updatedPrincipal = new UserDetailsImpl(updatedUser);
+    public void updateSecurityContext(User user, Collection<? extends GrantedAuthority> authorities) {
+        UserDetails newPrincipal = new UserDetailsImpl(user);
         Authentication newAuth =
-            new UsernamePasswordAuthenticationToken(updatedPrincipal, null, authorities);
+            new UsernamePasswordAuthenticationToken(newPrincipal, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
     

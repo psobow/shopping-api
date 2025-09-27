@@ -5,4 +5,6 @@ import com.sobow.shopping.security.Impl.UserDetailsImpl;
 public interface JwtService {
     
     String generateToken(UserDetailsImpl userDetails);
+    
+    String validateAndExtractSubject(String token);
 }

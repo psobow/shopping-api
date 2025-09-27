@@ -2,11 +2,14 @@ package com.sobow.shopping.security.Impl;
 
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.security.JwtService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import java.security.Key;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +36,27 @@ public class JwtServiceImpl implements JwtService {
                    .compact();
     }
     
-    private Key getSigningKey() {
+    @Override
+    public String validateAndExtractSubject(String token) {
+        Claims payload = Jwts.parser()
+                             .verifyWith(getSigningKey())
+                             .build()
+                             .parseSignedClaims(token)
+                             .getPayload();
+        
+        String sub = payload.getSubject();
+        if (sub == null || sub.isBlank()) {
+            throw new JwtException("Missing subject");
+        }
+        Date exp = payload.getExpiration();
+        if (exp != null && exp.before(Date.from(Instant.now()))) {
+            throw new JwtException("Expired token");
+        }
+        
+        return payload.getSubject();
+    }
+    
+    private SecretKey getSigningKey() {
         byte[] keyBytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }

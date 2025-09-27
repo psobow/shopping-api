@@ -7,7 +7,10 @@ import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthoritiesRequest;
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
 import com.sobow.shopping.security.Impl.UserDetailsServiceImpl;
+import com.sobow.shopping.security.JwtService;
+import com.sobow.shopping.security.filters.JwtAuthenticationFilter;
 import com.sobow.shopping.services.user.AdminService;
+import com.sobow.shopping.services.user.CurrentUserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -32,7 +36,19 @@ public class SecurityConfig {
     private String apiPrefix;
     
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+        UserDetailsService userDetailsService,
+        JwtService jwtService,
+        CurrentUserService currentUserService
+    ) {
+        return new JwtAuthenticationFilter(userDetailsService, jwtService, currentUserService);
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(
+        HttpSecurity httpSecurity,
+        JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
         httpSecurity
             .authorizeHttpRequests(requests -> requests
                 // 1) Admin-only
@@ -63,6 +79,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.csrfTokenRepository(
                 CookieCsrfTokenRepository.withHttpOnlyFalse()
             ))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
         return httpSecurity.build();
     }
