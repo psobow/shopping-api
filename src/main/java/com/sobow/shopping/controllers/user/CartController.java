@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}")
+@RequestMapping("${api.prefix}/users/me/cart")
 public class CartController {
     
     private final CartService cartService;
@@ -34,25 +34,26 @@ public class CartController {
     private final CartResponseMapper cartResponseMapper;
     private final CartItemResponseMapper cartItemResponseMapper;
     
-    @PutMapping("/me/cart")
+    @PutMapping
     public ResponseEntity<ApiResponse> selfCreateOrGetCart() {
+        boolean cartExists = cartService.exists();
+        
         Cart cart = cartService.selfCreateOrGetCart();
         CartResponse response = cartResponseMapper.mapToDto(cart);
         
-        URI location = URI.create("/me/cart");
-        boolean cartExists = cartService.exists();
+        URI location = URI.create("/users/me/cart");
         ApiResponse body = new ApiResponse(cartExists ? "Found" : "Created", response);
         return cartExists ? ResponseEntity.ok().body(body)
                           : ResponseEntity.created(location).body(body);
     }
     
-    @DeleteMapping("/me/cart")
+    @DeleteMapping
     public ResponseEntity<Void> selfRemoveCart() {
         cartService.selfRemoveCart();
         return ResponseEntity.noContent().build();
     }
     
-    @PostMapping("/me/cart/items")
+    @PostMapping("/items")
     public ResponseEntity<ApiResponse> selfCreateCartItem(
         @RequestBody @Valid CartItemCreateRequest request
     ) {
@@ -62,7 +63,7 @@ public class CartController {
                              .body(new ApiResponse("Created", response));
     }
     
-    @PutMapping("/me/cart/items/{itemId}")
+    @PutMapping("/items/{itemId}")
     public ResponseEntity<ApiResponse> selfUpdateCartItemQty(
         @PathVariable @Positive long itemId,
         @RequestBody @Valid CartItemUpdateRequest request
@@ -73,7 +74,7 @@ public class CartController {
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
     
-    @DeleteMapping("/me/cart/items/{itemId}")
+    @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Void> selfRemoveCartItem(
         @PathVariable @Positive long itemId
     ) {
@@ -81,7 +82,7 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
     
-    @DeleteMapping("/me/cart/items")
+    @DeleteMapping("/items")
     public ResponseEntity<Void> selfRemoveAllCartItems() {
         cartService.selfRemoveAllCartItems();
         return ResponseEntity.noContent().build();

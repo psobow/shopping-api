@@ -8,14 +8,14 @@ import lombok.Builder;
 public record CartResponse(
     Long id,
     BigDecimal totalCartPrice,
-    List<CartItemResponse> itemResponseList
+    List<CartItemResponse> cartItems
 ) {
     
     public static CartResponse empty() {
         return CartResponse.builder()
                            .id(null)
                            .totalCartPrice(BigDecimal.ZERO)
-                           .itemResponseList(List.of())
+                           .cartItems(List.of())
                            .build();
     }
 }

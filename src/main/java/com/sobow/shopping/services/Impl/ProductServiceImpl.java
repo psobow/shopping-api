@@ -9,6 +9,7 @@ import com.sobow.shopping.domain.product.dto.ProductUpdateRequest;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
 import com.sobow.shopping.mappers.product.ProductCreateRequestMapper;
 import com.sobow.shopping.mappers.product.ProductResponseMapper;
+import com.sobow.shopping.repositories.CartItemRepository;
 import com.sobow.shopping.repositories.ImageRepository;
 import com.sobow.shopping.repositories.ProductRepository;
 import com.sobow.shopping.services.CategoryService;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
+    private final CartItemRepository cartItemRepository;
     private final ImageRepository imageRepository;
     private final CategoryService categoryService;
     private final ProductResponseMapper productResponseMapper;
@@ -37,14 +39,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductCreateRequestMapper productCreateRequestMapper;
     
     @Override
-    public List<ProductResponse> buildProductResponseListWithImageIds(List<Product> products) {
+    public List<ProductResponse> mapProductsToResponsesWithImageIds(List<Product> products) {
         if (products == null || products.isEmpty()) {
             return List.of();
         }
         
         List<Long> productIds = products.stream().map(Product::getId).toList();
         
-        Map<Long, List<Long>> imageIdsByProduct = mapProductIdToImageIdList(productIds);
+        Map<Long, List<Long>> imageIdsByProduct = groupImageIdsByProductId(productIds);
         
         List<ProductResponse> responseList =
             products.stream()
@@ -54,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
         return responseList;
     }
     
-    private Map<Long, List<Long>> mapProductIdToImageIdList(List<Long> productIds) {
+    private Map<Long, List<Long>> groupImageIdsByProductId(List<Long> productIds) {
         if (productIds == null || productIds.isEmpty()) {
             return Map.of();
         }
@@ -121,6 +123,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public void deleteById(long id) {
+        cartItemRepository.deleteAllByProduct_Id(id);
         productRepository.deleteById(id);
     }
     
@@ -135,9 +138,9 @@ public class ProductServiceImpl implements ProductService {
         categoryName = trimToNull(categoryName);
         
         var spec = Specification.allOf(
-            Optional.of(nameLike).map(ProductServiceImpl::nameLike).orElse(null),
-            Optional.of(brandName).map(ProductServiceImpl::brandNameEquals).orElse(null),
-            Optional.of(categoryName).map(ProductServiceImpl::categoryNameEquals).orElse(null)
+            Optional.ofNullable(nameLike).map(ProductServiceImpl::nameLike).orElse(null),
+            Optional.ofNullable(brandName).map(ProductServiceImpl::brandNameEquals).orElse(null),
+            Optional.ofNullable(categoryName).map(ProductServiceImpl::categoryNameEquals).orElse(null)
         );
         return productRepository.findAll(spec);
     }

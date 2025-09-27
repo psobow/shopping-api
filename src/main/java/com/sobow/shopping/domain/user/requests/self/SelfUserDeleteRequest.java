@@ -2,11 +2,10 @@ package com.sobow.shopping.domain.user.requests.self;
 
 import com.sobow.shopping.domain.user.requests.PasswordRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record SelfUserDeleteRequest(
-    @NotBlank @Valid PasswordRequest oldPassword
-    
+    @NotNull @Valid PasswordRequest oldPassword
 ) {
     
 }

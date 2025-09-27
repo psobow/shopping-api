@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductService {
     
-    List<ProductResponse> buildProductResponseListWithImageIds(List<Product> products);
+    List<ProductResponse> mapProductsToResponsesWithImageIds(List<Product> products);
     
     Product findById(long id);
     

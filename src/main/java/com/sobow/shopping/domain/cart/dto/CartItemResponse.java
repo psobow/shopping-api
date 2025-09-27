@@ -9,6 +9,7 @@ public record CartItemResponse(
     Long productId,
     Long cartId,
     Integer requestedQty,
+    BigDecimal productPrice,
     BigDecimal totalItemPrice
 ) {
 

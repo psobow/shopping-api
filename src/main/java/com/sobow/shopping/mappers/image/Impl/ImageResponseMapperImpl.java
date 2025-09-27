@@ -14,6 +14,7 @@ public class ImageResponseMapperImpl implements ImageResponseMapper {
         return new ImageResponse(
             image.getId(),
             image.getFileName(),
+            image.getFileType(),
             image.getDownloadUrl()
         );
     }

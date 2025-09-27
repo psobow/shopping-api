@@ -32,7 +32,7 @@ public class ProductResponseMapperImpl implements ProductResponseMapper {
                               .availableQty(product.getAvailableQty())
                               .description(product.getDescription())
                               .categoryId(product.getCategory().getId())
-                              .imagesId(imageIds)
+                              .imageIds(imageIds)
                               .build();
     }
 }

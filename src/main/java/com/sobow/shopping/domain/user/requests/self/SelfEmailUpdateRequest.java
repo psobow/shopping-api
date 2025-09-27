@@ -6,9 +6,10 @@ import com.sobow.shopping.domain.user.requests.PasswordRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record SelfEmailUpdateRequest(
-    @NotBlank @Valid PasswordRequest oldPassword,
+    @NotNull @Valid PasswordRequest oldPassword,
     @NotBlank @Email String newEmail
 ) {
     

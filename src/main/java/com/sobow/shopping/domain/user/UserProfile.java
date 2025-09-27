@@ -87,7 +87,6 @@ public class UserProfile {
     }
     
     public void removeCart() {
-        cart.removeAllCartItems();
         this.cart = null;
     }
     

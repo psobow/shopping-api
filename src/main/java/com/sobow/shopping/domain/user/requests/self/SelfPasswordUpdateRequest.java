@@ -2,11 +2,11 @@ package com.sobow.shopping.domain.user.requests.self;
 
 import com.sobow.shopping.domain.user.requests.PasswordRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record SelfPasswordUpdateRequest(
-    @NotBlank @Valid PasswordRequest oldPassword,
-    @NotBlank @Valid PasswordRequest newPassword
+    @NotNull @Valid PasswordRequest oldPassword,
+    @NotNull @Valid PasswordRequest newPassword
 ) {
     
 }

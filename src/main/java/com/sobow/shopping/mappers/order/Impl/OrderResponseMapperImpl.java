@@ -22,9 +22,9 @@ public class OrderResponseMapperImpl implements OrderResponseMapper {
                             .status(order.getStatus().toString())
                             .createdAt(order.getCreatedAt())
                             .totalOrderPrice(order.getTotalPrice())
-                            .itemResponseList(order.getOrderItems().stream()
-                                                   .map(orderItemResponseMapper::mapToDto)
-                                                   .toList())
+                            .orderItems(order.getOrderItems().stream()
+                                             .map(orderItemResponseMapper::mapToDto)
+                                             .toList())
                             .build();
     }
 }

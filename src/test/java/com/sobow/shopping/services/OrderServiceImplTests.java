@@ -105,7 +105,7 @@ public class OrderServiceImplTests {
                                                  ).findFirst().orElseThrow();
                     
                     assertThat(oi.getRequestedQty()).isEqualTo(ci.getRequestedQty());
-                    assertThat(oi.getProductPrice()).isEqualByComparingTo(ci.productPrice());
+                    assertThat(oi.getProductPrice()).isEqualByComparingTo(ci.getProductPrice());
                 });
             
             // Assert: order is linked to the user profile and is the only order

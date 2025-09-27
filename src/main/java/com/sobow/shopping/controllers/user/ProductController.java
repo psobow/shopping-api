@@ -25,14 +25,14 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {
         List<Product> products = productService.findAll();
-        List<ProductResponse> responseList = productService.buildProductResponseListWithImageIds(products);
+        List<ProductResponse> responseList = productService.mapProductsToResponsesWithImageIds(products);
         return ResponseEntity.ok(new ApiResponse("Found", responseList));
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive long id) {
         Product product = productService.findById(id);
-        List<ProductResponse> responseList = productService.buildProductResponseListWithImageIds(List.of(product));
+        List<ProductResponse> responseList = productService.mapProductsToResponsesWithImageIds(List.of(product));
         ProductResponse response = responseList.getFirst();
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
@@ -44,7 +44,7 @@ public class ProductController {
         @RequestParam(required = false) String categoryName
     ) {
         List<Product> products = productService.search(name, brandName, categoryName);
-        List<ProductResponse> responseList = productService.buildProductResponseListWithImageIds(products);
+        List<ProductResponse> responseList = productService.mapProductsToResponsesWithImageIds(products);
         
         HttpStatus status = responseList.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
         String message = responseList.isEmpty() ? "Not found" : "Found";

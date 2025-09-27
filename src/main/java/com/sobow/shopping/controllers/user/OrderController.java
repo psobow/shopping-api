@@ -26,7 +26,7 @@ public class OrderController {
     
     private final OrderResponseMapper orderResponseMapper;
     
-    @PostMapping("/me/orders")
+    @PostMapping("/users/me/orders")
     public ResponseEntity<ApiResponse> selfCreateOrder() {
         Order order = orderService.selfCreateOrder();
         OrderResponse response = orderResponseMapper.mapToDto(order);
@@ -41,7 +41,7 @@ public class OrderController {
                              .body(new ApiResponse("Created", response));
     }
     
-    @GetMapping("/me/orders/{orderId}")
+    @GetMapping("/users/me/orders/{orderId}")
     public ResponseEntity<ApiResponse> selfGetOrderById(
         @PathVariable @Positive long orderId
     ) {
@@ -50,7 +50,7 @@ public class OrderController {
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
-    @GetMapping("/me/orders")
+    @GetMapping("/users/me/orders")
     public ResponseEntity<ApiResponse> selfGetAllOrders() {
         List<Order> orders = orderService.selfFindAllWithItems();
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();

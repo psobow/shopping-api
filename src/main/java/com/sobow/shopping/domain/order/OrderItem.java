@@ -30,6 +30,7 @@ public class OrderItem {
         this.productName = productName;
         this.productBrandName = productBrandName;
         this.productPrice = productPrice;
+        this.totalPrice = productPrice.multiply(BigDecimal.valueOf(requestedQty));
     }
     
     // ---- Identifier & Basic columns ------------------------
@@ -56,7 +57,6 @@ public class OrderItem {
     @PrePersist
     public void onCreate() {
         productPrice = productPrice.setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
-        totalPrice = productPrice.multiply(BigDecimal.valueOf(requestedQty));
     }
     
     // ---- Associations --------------------------------------

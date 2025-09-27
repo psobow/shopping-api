@@ -19,8 +19,6 @@ import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.proxy.HibernateProxy;
 
 @Getter
@@ -55,7 +53,6 @@ public class CartItem {
     // ---- Associations --------------------------------------
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
     
     @ManyToOne(optional = false)
@@ -81,13 +78,13 @@ public class CartItem {
     }
     
     // ---- Derived / non-persistent --------------------------
-    public BigDecimal productPrice() {
+    public BigDecimal getProductPrice() {
         return product.getPrice()
                       .setScale(MoneyConfig.SCALE, MoneyConfig.ROUNDING);
     }
     
     public BigDecimal getTotalPrice() {
-        return productPrice().multiply(BigDecimal.valueOf(requestedQty));
+        return getProductPrice().multiply(BigDecimal.valueOf(requestedQty));
     }
     
     // ---- Setter methods ------------------------------------

@@ -73,7 +73,7 @@ public class ProductControllerTests {
                    .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
                    .andExpect(jsonPath("$.data[0].description").value(response.description()))
                    .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imagesId[0]").value(response.imagesId().get(0)));
+                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
         }
         
         @Test
@@ -114,7 +114,7 @@ public class ProductControllerTests {
                    .andExpect(jsonPath("$.data.availableQty").value(response.availableQty()))
                    .andExpect(jsonPath("$.data.description").value(response.description()))
                    .andExpect(jsonPath("$.data.categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data.imagesId[0]").value(response.imagesId().get(0)));
+                   .andExpect(jsonPath("$.data.imageIds[0]").value(response.imageIds().get(0)));
         }
         
         @Test
@@ -166,7 +166,7 @@ public class ProductControllerTests {
                    .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
                    .andExpect(jsonPath("$.data[0].description").value(response.description()))
                    .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imagesId[0]").value(response.imagesId().get(0)));
+                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
         }
         
         @Test
@@ -196,7 +196,7 @@ public class ProductControllerTests {
                    .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
                    .andExpect(jsonPath("$.data[0].description").value(response.description()))
                    .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imagesId[0]").value(response.imagesId().get(0)));
+                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
         }
         
         @Test
@@ -226,7 +226,7 @@ public class ProductControllerTests {
                    .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
                    .andExpect(jsonPath("$.data[0].description").value(response.description()))
                    .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imagesId[0]").value(response.imagesId().get(0)));
+                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
         }
         
         @Test

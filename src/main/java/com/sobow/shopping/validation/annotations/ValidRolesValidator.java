@@ -37,8 +37,8 @@ public class ValidRolesValidator implements ConstraintValidator<ValidRoles, List
         if (value == null) return true;
         
         for (UserAuthorityRequest item : value) {
-            if (item == null || item.value() == null) return false;
-            String normalized = item.value().strip().toUpperCase(Locale.ROOT);
+            if (item == null || item.role() == null) return false;
+            String normalized = item.role().strip().toUpperCase(Locale.ROOT);
             if (normalized.startsWith("ROLE_")) normalized = normalized.substring(5);
             if (!allowed.contains(normalized)) return false;
         }

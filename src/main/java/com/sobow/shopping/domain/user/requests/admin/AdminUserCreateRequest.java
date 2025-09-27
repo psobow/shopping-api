@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record AdminUserCreateRequest(
     @NotBlank @Email String email,
-    @NotBlank @Valid PasswordRequest password,
+    @NotNull @Valid PasswordRequest password,
     @NotNull @Valid UserProfileCreateRequest userProfile,
     @NotNull @Valid UserAuthoritiesRequest authorities
 ) {

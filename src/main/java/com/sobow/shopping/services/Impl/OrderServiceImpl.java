@@ -16,7 +16,9 @@ import com.sobow.shopping.services.CurrentUserService;
 import com.sobow.shopping.services.OrderService;
 import com.sobow.shopping.services.ProductService;
 import com.sobow.shopping.services.UserProfileService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
+    
+    @PersistenceContext
+    private EntityManager entityManager;
     
     private final OrderRepository orderRepository;
     private final UserProfileService userProfileService;
@@ -60,6 +65,8 @@ public class OrderServiceImpl implements OrderService {
         userProfile.addOrderAndLink(order);
         
         // Remove cart after successful order creation
+        cart.removeAllCartItems();
+        entityManager.flush();
         userProfile.removeCart();
         
         return order;
@@ -129,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
                         .requestedQty(cartItem.getRequestedQty())
                         .productName(cartItem.getProduct().getName())
                         .productBrandName(cartItem.getProduct().getBrandName())
-                        .productPrice(cartItem.productPrice())
+                        .productPrice(cartItem.getProductPrice())
                         .build();
     }
 }

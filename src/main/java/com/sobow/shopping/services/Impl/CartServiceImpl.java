@@ -123,7 +123,7 @@ public class CartServiceImpl implements CartService {
     private CartItem findCartItemByCartIdAndItemId(long cartId, long itemId) {
         return cartItemRepository.findByCartIdAndId(cartId, itemId)
                                  .orElseThrow(() -> new EntityNotFoundException(
-                                     "CartItem with id " + itemId + " not found in cart with id" + cartId));
+                                     "CartItem with id " + itemId + " not found in cart with id " + cartId));
     }
 }
 

@@ -11,7 +11,7 @@ public record OrderResponse(
     String status,
     LocalDateTime createdAt,
     BigDecimal totalOrderPrice,
-    List<OrderItemResponse> itemResponseList
+    List<OrderItemResponse> orderItems
 ) {
     
 }

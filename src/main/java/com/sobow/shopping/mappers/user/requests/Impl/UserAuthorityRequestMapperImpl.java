@@ -10,7 +10,7 @@ public class UserAuthorityRequestMapperImpl implements UserAuthorityRequestMappe
     
     @Override
     public UserAuthority mapToEntity(UserAuthorityRequest userAuthorityRequest) {
-        return new UserAuthority(userAuthorityRequest.value());
+        return new UserAuthority(userAuthorityRequest.role());
     }
     
 }

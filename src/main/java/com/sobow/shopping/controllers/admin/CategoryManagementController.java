@@ -40,8 +40,8 @@ public class CategoryManagementController {
     
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateCategory(
-        @RequestBody @Valid CategoryRequest request,
-        @PathVariable @Positive long id
+        @PathVariable @Positive long id,
+        @RequestBody @Valid CategoryRequest request
     ) {
         Category updated = categoryService.partialUpdateById(id, request);
         CategoryResponse response = categoryResponseMapper.mapToDto(updated);
