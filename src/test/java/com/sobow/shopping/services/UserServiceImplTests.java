@@ -20,7 +20,7 @@ import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRe
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAddress;
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.UserRepository;
+import com.sobow.shopping.domain.user.repo.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;

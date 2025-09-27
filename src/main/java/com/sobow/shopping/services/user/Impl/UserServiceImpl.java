@@ -7,7 +7,7 @@ import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
-import com.sobow.shopping.domain.user.UserRepository;
+import com.sobow.shopping.domain.user.repo.UserRepository;
 import com.sobow.shopping.mappers.user.requests.SelfUserCreateRequestMapper;
 import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.UserService;

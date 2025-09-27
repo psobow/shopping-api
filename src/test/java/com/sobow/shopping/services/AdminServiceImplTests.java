@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.UserRepository;
+import com.sobow.shopping.domain.user.repo.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.mappers.user.requests.AdminUserCreateRequestMapper;
 import com.sobow.shopping.services.user.CurrentUserService;

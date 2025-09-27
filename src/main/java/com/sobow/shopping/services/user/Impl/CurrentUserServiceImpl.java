@@ -2,7 +2,7 @@ package com.sobow.shopping.services.user.Impl;
 
 import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
-import com.sobow.shopping.domain.user.UserRepository;
+import com.sobow.shopping.domain.user.repo.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.mappers.user.responses.UserResponseMapper;

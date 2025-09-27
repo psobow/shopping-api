@@ -1,7 +1,7 @@
 package com.sobow.shopping.services.user.Impl;
 
 import com.sobow.shopping.domain.user.UserProfile;
-import com.sobow.shopping.domain.user.UserProfileRepository;
+import com.sobow.shopping.domain.user.repo.UserProfileRepository;
 import com.sobow.shopping.services.user.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
