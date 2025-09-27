@@ -64,9 +64,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
         currentUserService.assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
-        
         user.setPassword(passwordEncoder.encode(updateRequest.newPassword().value()));
-        
         currentUserService.updateSecurityContext(user, authentication.getAuthorities());
     }
     
@@ -76,10 +74,8 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
         currentUserService.assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
-        
         currentUserService.assertNewEmailAvailable(updateRequest.newEmail(), user.getId());
         user.setEmail(updateRequest.newEmail());
-        
         currentUserService.updateSecurityContext(user, authentication.getAuthorities());
     }
     

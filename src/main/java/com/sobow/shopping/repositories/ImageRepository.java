@@ -16,7 +16,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     @Query("""
            SELECT i.product.id AS productId, i.id AS imageId
            FROM Image i
-           WHERE i.product.id in :productIds
+           WHERE i.product.id IN :productIds
         """)
     List<ProductIdImageId> findImageIdsByProductIds(List<Long> productIds);
 }

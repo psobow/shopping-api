@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryManagementController {
     
     private final CategoryService categoryService;
-    
     private final CategoryResponseMapper categoryResponseMapper;
     
     @PostMapping

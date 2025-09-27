@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
     
     private final CartService cartService;
-    
     private final CartResponseMapper cartResponseMapper;
     private final CartItemResponseMapper cartItemResponseMapper;
     

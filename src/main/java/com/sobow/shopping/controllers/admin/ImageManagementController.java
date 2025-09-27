@@ -33,7 +33,8 @@ public class ImageManagementController {
     
     @PostMapping(
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<ApiResponse> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
         @PathVariable @Positive long productId
@@ -52,7 +53,8 @@ public class ImageManagementController {
     @PutMapping(
         path = "/{imageId}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<ApiResponse> updateImage(
         @PathVariable @Positive long productId,
         @PathVariable @Positive long imageId,

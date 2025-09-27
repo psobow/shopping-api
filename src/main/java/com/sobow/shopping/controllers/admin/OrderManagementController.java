@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderManagementController {
     
     private final OrderService orderService;
-    
     private final OrderResponseMapper orderResponseMapper;
     
     @GetMapping("/{orderId}")

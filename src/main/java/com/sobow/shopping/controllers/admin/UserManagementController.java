@@ -28,7 +28,9 @@ public class UserManagementController {
     private final AdminService adminService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> adminCreate(@RequestBody @Valid AdminUserCreateRequest createRequest) {
+    public ResponseEntity<ApiResponse> adminCreate(
+        @RequestBody @Valid AdminUserCreateRequest createRequest
+    ) {
         User user = adminService.adminCreate(createRequest);
         UserResponse response = adminService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -36,7 +38,9 @@ public class UserManagementController {
     }
     
     @GetMapping(params = "email")
-    public ResponseEntity<ApiResponse> adminFindByEmail(@RequestParam @NotBlank @Email String email) {
+    public ResponseEntity<ApiResponse> adminFindByEmail(
+        @RequestParam @NotBlank @Email String email
+    ) {
         User user = adminService.findByEmail(email);
         UserResponse response = adminService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Found", response));

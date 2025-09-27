@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductManagementController {
     
     private final ProductService productService;
-    
     private final ProductResponseMapper productResponseMapper;
     
     @PostMapping

@@ -45,12 +45,12 @@ public class ProductServiceImpl implements ProductService {
         }
         
         List<Long> productIds = products.stream().map(Product::getId).toList();
-        
         Map<Long, List<Long>> imageIdsByProduct = groupImageIdsByProductId(productIds);
-        
         List<ProductResponse> responseList =
             products.stream()
-                    .map(p -> productResponseMapper.mapToDto(p, imageIdsByProduct.getOrDefault(p.getId(), List.of())))
+                    .map(p -> productResponseMapper.mapToDto(
+                        p, imageIdsByProduct.getOrDefault(p.getId(), List.of()))
+                    )
                     .toList();
         
         return responseList;
@@ -65,8 +65,8 @@ public class ProductServiceImpl implements ProductService {
                               .stream()
                               .collect(Collectors.groupingBy(
                                   ProductIdImageId::getProductId,
-                                  Collectors.mapping(ProductIdImageId::getImageId, Collectors.toList())
-                              ));
+                                  Collectors.mapping(ProductIdImageId::getImageId, Collectors.toList()))
+                              );
     }
     
     @Override
@@ -79,7 +79,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
             "Product with id " + id + " not found"));
     }
-    
     
     @Transactional
     @Override
@@ -128,10 +127,11 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public List<Product> search(String nameLike,
-                                String brandName,
-                                String categoryName) {
-        
+    public List<Product> search(
+        String nameLike,
+        String brandName,
+        String categoryName
+    ) {
         // normalize blanks to nulls
         nameLike = trimToNull(nameLike);
         brandName = trimToNull(brandName);
