@@ -9,6 +9,7 @@ import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRe
 import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.security.Impl.UserDetailsImpl;
+import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     
     private final UserService userService;
+    private final CurrentUserService currentUserService;
     
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> selfCreate(
         @RequestBody @Valid SelfUserCreateRequest createRequest
     ) {
         User user = userService.selfCreate(createRequest);
-        UserResponse response = userService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created", response));
     }
@@ -45,7 +47,7 @@ public class UserController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         User user = userDetails.getUser();
-        UserResponse response = userService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Logged in user", response));
     }
     
@@ -54,7 +56,7 @@ public class UserController {
         @RequestBody @Valid SelfUserPartialUpdateRequest updateRequest
     ) {
         User user = userService.selfPartialUpdate(updateRequest);
-        UserResponse response = userService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("User updated", response));
     }
     

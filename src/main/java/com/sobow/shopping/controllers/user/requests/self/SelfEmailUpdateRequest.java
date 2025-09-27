@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record SelfEmailUpdateRequest(
-    @NotNull @Valid PasswordRequest oldPassword,
+    @NotNull @Valid PasswordRequest password,
     @NotBlank @Email String newEmail
 ) {
     

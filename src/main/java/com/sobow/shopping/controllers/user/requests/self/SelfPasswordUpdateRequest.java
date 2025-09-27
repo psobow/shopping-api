@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 public record SelfPasswordUpdateRequest(
-    @NotNull @Valid PasswordRequest oldPassword,
+    @NotNull @Valid PasswordRequest password,
     @NotNull @Valid PasswordRequest newPassword
 ) {
     

@@ -5,12 +5,9 @@ import com.sobow.shopping.controllers.user.requests.self.SelfPasswordUpdateReque
 import com.sobow.shopping.controllers.user.requests.self.SelfUserCreateRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
-import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
 
 public interface UserService {
-    
-    UserResponse mapToUserResponse(long userId);
     
     User selfCreate(SelfUserCreateRequest createRequest);
     

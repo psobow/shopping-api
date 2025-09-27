@@ -5,15 +5,12 @@ import com.sobow.shopping.controllers.user.requests.self.SelfPasswordUpdateReque
 import com.sobow.shopping.controllers.user.requests.self.SelfUserCreateRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
-import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserAuthority;
 import com.sobow.shopping.domain.user.UserRepository;
 import com.sobow.shopping.mappers.user.requests.SelfUserCreateRequestMapper;
-import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,15 +26,6 @@ public class UserServiceImpl implements UserService {
     private final CurrentUserService currentUserService;
     
     private final SelfUserCreateRequestMapper selfUserCreateRequestMapper;
-    private final UserResponseMapper userResponseMapper;
-    
-    @Transactional
-    @Override
-    public UserResponse mapToUserResponse(long userId) {
-        User user = userRepository.findById(userId)
-                                  .orElseThrow(() -> new EntityNotFoundException("User with id" + userId + " not found"));
-        return userResponseMapper.mapToDto(user);
-    }
     
     @Transactional
     @Override
@@ -63,7 +51,7 @@ public class UserServiceImpl implements UserService {
     public void selfUpdatePassword(SelfPasswordUpdateRequest updateRequest) {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
-        currentUserService.assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
+        currentUserService.assertPasswordMatch(updateRequest.password().value(), user.getPassword());
         user.setPassword(passwordEncoder.encode(updateRequest.newPassword().value()));
         currentUserService.updateSecurityContext(user, authentication.getAuthorities());
     }
@@ -73,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public void selfUpdateEmail(SelfEmailUpdateRequest updateRequest) {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
-        currentUserService.assertPasswordMatch(updateRequest.oldPassword().value(), user.getPassword());
+        currentUserService.assertPasswordMatch(updateRequest.password().value(), user.getPassword());
         currentUserService.assertNewEmailAvailable(updateRequest.newEmail(), user.getId());
         user.setEmail(updateRequest.newEmail());
         currentUserService.updateSecurityContext(user, authentication.getAuthorities());
@@ -84,7 +72,7 @@ public class UserServiceImpl implements UserService {
     public void selfDelete(SelfUserDeleteRequest deleteRequest) {
         Authentication authentication = currentUserService.getAuthentication();
         User user = currentUserService.getAuthenticatedUser(authentication);
-        currentUserService.assertPasswordMatch(deleteRequest.oldPassword().value(), user.getPassword());
+        currentUserService.assertPasswordMatch(deleteRequest.password().value(), user.getPassword());
         userRepository.deleteById(user.getId());
     }
 }

@@ -1,13 +1,16 @@
 package com.sobow.shopping.services.user.Impl;
 
+import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.domain.user.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
 import com.sobow.shopping.exceptions.NoAuthenticationException;
+import com.sobow.shopping.mappers.user.responses.UserResponseMapper;
 import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
@@ -25,6 +29,15 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserResponseMapper userResponseMapper;
+    
+    @Transactional
+    @Override
+    public UserResponse mapToUserResponse(long userId) {
+        User user = userRepository.findById(userId)
+                                  .orElseThrow(() -> new EntityNotFoundException("User with id" + userId + " not found"));
+        return userResponseMapper.mapToDto(user);
+    }
     
     @Override
     public Authentication getAuthentication() {

@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 public record SelfUserDeleteRequest(
-    @NotNull @Valid PasswordRequest oldPassword
+    @NotNull @Valid PasswordRequest password
 ) {
     
 }

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,7 +39,10 @@ public class SecurityConfig {
                 .requestMatchers(apiPrefix + "/admin/**").hasRole("ADMIN")
                 
                 // 2) Public (no auth)
-                .requestMatchers(HttpMethod.POST, apiPrefix + "/users/register").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                                 apiPrefix + "/users/register",
+                                 apiPrefix + "/users/login"
+                ).permitAll()
                 .requestMatchers(HttpMethod.GET,
                                  apiPrefix + "/csrf",
                                  apiPrefix + "/categories",
@@ -60,6 +65,11 @@ public class SecurityConfig {
             ))
         ;
         return httpSecurity.build();
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
     
     @Bean

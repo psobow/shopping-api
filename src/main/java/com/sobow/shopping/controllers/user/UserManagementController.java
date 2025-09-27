@@ -6,6 +6,7 @@ import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest
 import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.services.user.AdminService;
+import com.sobow.shopping.services.user.CurrentUserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -26,13 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserManagementController {
     
     private final AdminService adminService;
+    private final CurrentUserService currentUserService;
     
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> adminCreate(
         @RequestBody @Valid AdminUserCreateRequest createRequest
     ) {
         User user = adminService.adminCreate(createRequest);
-        UserResponse response = adminService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(new ApiResponse("User created by Admin", response));
     }
@@ -42,7 +44,7 @@ public class UserManagementController {
         @RequestParam @NotBlank @Email String email
     ) {
         User user = adminService.findByEmail(email);
-        UserResponse response = adminService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Found", response));
     }
     
@@ -53,7 +55,7 @@ public class UserManagementController {
     ) {
         User user = adminService.findByEmailWithAuthorities(email);
         user.updateFrom(updateRequest.authorities().value());
-        UserResponse response = adminService.mapToUserResponse(user.getId());
+        UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.ok(new ApiResponse("Updated", response));
     }
 }
