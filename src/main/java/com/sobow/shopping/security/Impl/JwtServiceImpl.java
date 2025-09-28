@@ -59,15 +59,15 @@ public class JwtServiceImpl implements JwtService {
     
     @Override
     public String validateAccessAndExtractSubject(String token) {
-        return validateToken(token, secretAccessKey, TOKEN_TYPE_ACCESS);
+        return validateTokenAndExtractSubject(token, secretAccessKey, TOKEN_TYPE_ACCESS);
     }
     
     @Override
     public String validateRefreshAndExtractSubject(String token) {
-        return validateToken(token, secretRefreshKey, TOKEN_TYPE_REFRESH);
+        return validateTokenAndExtractSubject(token, secretRefreshKey, TOKEN_TYPE_REFRESH);
     }
     
-    private String validateToken(
+    private String validateTokenAndExtractSubject(
         String token,
         String secretKey,
         String expectedTokenType

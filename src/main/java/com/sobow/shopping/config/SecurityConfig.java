@@ -26,7 +26,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -75,10 +74,10 @@ public class SecurityConfig {
             )
             .httpBasic(basic -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            //.csrf(csrf -> csrf.disable())
-            .csrf(csrf -> csrf.csrfTokenRepository(
-                CookieCsrfTokenRepository.withHttpOnlyFalse()
-            ))
+            .csrf(csrf -> csrf.disable())
+//            .csrf(csrf -> csrf.csrfTokenRepository(
+//                CookieCsrfTokenRepository.withHttpOnlyFalse()
+//            ))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
         return httpSecurity.build();
@@ -101,7 +100,7 @@ public class SecurityConfig {
                 "Wroclaw", "Street", "20", "11-222");
             
             UserProfileCreateRequest userProfile = new UserProfileCreateRequest("Patryk", "Lastname", address);
-            UserAuthorityRequest authority = new UserAuthorityRequest("USER");
+            UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
             AdminUserCreateRequest user = new AdminUserCreateRequest(adminEmail, new PasswordRequest(password), userProfile,
                                                                      new UserAuthoritiesRequest(List.of(authority)));
             
