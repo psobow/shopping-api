@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${api.prefix}/admin/products")
 @Tag(
     name = "Product Management Controller",
-    description = "API to manage products"
+    description = "API to manage products by Admin"
 )
 public class ProductManagementController {
     
