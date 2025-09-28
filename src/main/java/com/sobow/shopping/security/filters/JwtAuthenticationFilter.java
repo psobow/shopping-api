@@ -46,6 +46,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (
             JwtException ex) {
             log.warn("Invalid JWT", ex);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter()
+                    .write(
+                        """
+                                {
+                                  "type": "about:blank",
+                                  "title": "Unauthorized",
+                                  "status": 401,
+                                  "detail": "Invalid or expired JWT",
+                                  "instance": "%s"
+                                }
+                            """.formatted(request.getRequestURI()));
+            return;
         }
         
         filterChain.doFilter(request, response);

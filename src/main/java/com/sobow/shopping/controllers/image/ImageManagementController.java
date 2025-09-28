@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.image;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.image.dto.ImageResponse;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.mappers.image.ImageResponseMapper;
@@ -35,7 +35,7 @@ public class ImageManagementController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ApiResponse> saveImages(
+    public ResponseEntity<ApiResponseDto> saveImages(
         @RequestPart("file") @NotEmpty List<MultipartFile> files,
         @PathVariable @Positive long productId
     ) {
@@ -45,7 +45,7 @@ public class ImageManagementController {
                                                        .toList();
         
         return new ResponseEntity<>(
-            new ApiResponse("Upload success", responseList),
+            new ApiResponseDto("Upload success", responseList),
             HttpStatus.CREATED
         );
     }
@@ -55,14 +55,14 @@ public class ImageManagementController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ApiResponse> updateImage(
+    public ResponseEntity<ApiResponseDto> updateImage(
         @PathVariable @Positive long productId,
         @PathVariable @Positive long imageId,
         @RequestPart("file") @NotNull MultipartFile file
     ) {
         Image updatedImage = imageService.updateByProductIdAndId(productId, imageId, file);
         ImageResponse response = imageResponseMapper.mapToDto(updatedImage);
-        return ResponseEntity.ok(new ApiResponse("Updated", response));
+        return ResponseEntity.ok(new ApiResponseDto("Updated", response));
     }
     
     @DeleteMapping("/{imageId}")

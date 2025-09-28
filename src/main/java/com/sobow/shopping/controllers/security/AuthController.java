@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.security;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.security.dto.JwtAuthRequest;
 import com.sobow.shopping.controllers.security.dto.JwtAuthResponse;
 import com.sobow.shopping.controllers.security.dto.JwtRefreshTokenRequest;
@@ -26,25 +26,25 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(
+    public ResponseEntity<ApiResponseDto> login(
         @RequestBody @Valid JwtAuthRequest authRequest
     ) {
         UserDetailsImpl userDetails = authenticationService.authenticate(authRequest.email(), authRequest.password());
         String accessTokenValue = jwtService.generateAccess(userDetails);
         String refreshTokenValue = jwtService.generateRefresh(userDetails);
         JwtAuthResponse response = new JwtAuthResponse(accessTokenValue, refreshTokenValue);
-        return ResponseEntity.ok(new ApiResponse("New JWTs generated", response));
+        return ResponseEntity.ok(new ApiResponseDto("New JWTs generated", response));
     }
     
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse> refresh(
+    public ResponseEntity<ApiResponseDto> refresh(
         @RequestBody @Valid JwtRefreshTokenRequest refreshTokenRequest
     ) {
         String email = jwtService.validateRefreshAndExtractSubject(refreshTokenRequest.refresh());
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
         String newAccessToken = jwtService.generateAccess(userDetails);
         return ResponseEntity.ok(
-            new ApiResponse("New JWT access generated", new JwtAuthResponse(newAccessToken, null))
+            new ApiResponseDto("New JWT access generated", new JwtAuthResponse(newAccessToken, null))
         );
     }
 }

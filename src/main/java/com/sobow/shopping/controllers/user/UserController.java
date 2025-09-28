@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.user;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.user.requests.self.SelfEmailUpdateRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfPasswordUpdateRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserCreateRequest;
@@ -11,6 +11,7 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,37 +28,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "${api.prefix}/users")
+@Tag(name = "User Controller", description = "API for self managing user account")
 public class UserController {
     
     private final UserService userService;
     private final CurrentUserService currentUserService;
     
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> selfCreate(
+    public ResponseEntity<ApiResponseDto> selfCreate(
         @RequestBody @Valid SelfUserCreateRequest createRequest
     ) {
         User user = userService.selfCreate(createRequest);
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new ApiResponse("User created", response));
+                             .body(new ApiResponseDto("User created", response));
     }
     
     @GetMapping(path = "/me")
-    public ResponseEntity<ApiResponse> selfGet(
+    public ResponseEntity<ApiResponseDto> selfGet(
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         User user = userDetails.getUser();
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
-        return ResponseEntity.ok(new ApiResponse("Logged in user", response));
+        return ResponseEntity.ok(new ApiResponseDto("Logged in user", response));
     }
     
     @PutMapping(path = "/me")
-    public ResponseEntity<ApiResponse> selfPartialUpdate(
+    public ResponseEntity<ApiResponseDto> selfPartialUpdate(
         @RequestBody @Valid SelfUserPartialUpdateRequest updateRequest
     ) {
         User user = userService.selfPartialUpdate(updateRequest);
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
-        return ResponseEntity.ok(new ApiResponse("User updated", response));
+        return ResponseEntity.ok(new ApiResponseDto("User updated", response));
     }
     
     @PostMapping(path = "/me/password")

@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.product;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.product.dto.ProductCreateRequest;
 import com.sobow.shopping.controllers.product.dto.ProductResponse;
 import com.sobow.shopping.controllers.product.dto.ProductUpdateRequest;
@@ -29,23 +29,23 @@ public class ProductManagementController {
     private final ProductResponseMapper productResponseMapper;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> createProduct(
+    public ResponseEntity<ApiResponseDto> createProduct(
         @RequestBody @Valid ProductCreateRequest request
     ) {
         Product saved = productService.create(request);
         ProductResponse response = productResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/products/" + saved.getId()))
-                             .body(new ApiResponse("Created", response));
+                             .body(new ApiResponseDto("Created", response));
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateProduct(
+    public ResponseEntity<ApiResponseDto> updateProduct(
         @RequestBody @Valid ProductUpdateRequest request,
         @PathVariable @Positive long id
     ) {
         Product updated = productService.partialUpdateById(id, request);
         ProductResponse response = productResponseMapper.mapToDto(updated);
-        return ResponseEntity.ok(new ApiResponse("Updated", response));
+        return ResponseEntity.ok(new ApiResponseDto("Updated", response));
     }
     
     @DeleteMapping("/{id}")

@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.cart;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.cart.dto.CartItemCreateRequest;
 import com.sobow.shopping.controllers.cart.dto.CartItemResponse;
 import com.sobow.shopping.controllers.cart.dto.CartItemUpdateRequest;
@@ -34,14 +34,14 @@ public class CartController {
     private final CartItemResponseMapper cartItemResponseMapper;
     
     @PutMapping
-    public ResponseEntity<ApiResponse> selfCreateOrGetCart() {
+    public ResponseEntity<ApiResponseDto> selfCreateOrGetCart() {
         boolean cartExists = cartService.exists();
         
         Cart cart = cartService.selfCreateOrGetCart();
         CartResponse response = cartResponseMapper.mapToDto(cart);
         
         URI location = URI.create("/users/me/cart");
-        ApiResponse body = new ApiResponse(cartExists ? "Found" : "Created", response);
+        ApiResponseDto body = new ApiResponseDto(cartExists ? "Found" : "Created", response);
         return cartExists ? ResponseEntity.ok().body(body)
                           : ResponseEntity.created(location).body(body);
     }
@@ -53,24 +53,24 @@ public class CartController {
     }
     
     @PostMapping("/items")
-    public ResponseEntity<ApiResponse> selfCreateCartItem(
+    public ResponseEntity<ApiResponseDto> selfCreateCartItem(
         @RequestBody @Valid CartItemCreateRequest request
     ) {
         CartItem cartItem = cartService.selfCreateCartItem(request);
         CartItemResponse response = cartItemResponseMapper.mapToDto(cartItem);
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new ApiResponse("Created", response));
+                             .body(new ApiResponseDto("Created", response));
     }
     
     @PutMapping("/items/{itemId}")
-    public ResponseEntity<ApiResponse> selfUpdateCartItemQty(
+    public ResponseEntity<ApiResponseDto> selfUpdateCartItemQty(
         @PathVariable @Positive long itemId,
         @RequestBody @Valid CartItemUpdateRequest request
     ) {
         CartItem cartItem = cartService.selfUpdateCartItemQty(itemId, request);
         CartItemResponse response = cartItemResponseMapper.mapToDto(cartItem);
         
-        return ResponseEntity.ok(new ApiResponse("Updated", response));
+        return ResponseEntity.ok(new ApiResponseDto("Updated", response));
     }
     
     @DeleteMapping("/items/{itemId}")

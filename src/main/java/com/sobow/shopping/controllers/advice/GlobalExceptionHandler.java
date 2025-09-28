@@ -120,7 +120,6 @@ public class GlobalExceptionHandler {
             new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", "Constraint violations", violations));
     }
     
-    // this exception will only propagate from /refresh endpoint
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ProblemDetail> handleUnauthorized(JwtException ex) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);

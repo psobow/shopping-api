@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.category;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.mappers.category.CategoryResponseMapper;
@@ -26,27 +26,27 @@ public class CategoryController {
     private final CategoryResponseMapper categoryResponseMapper;
     
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllCategories() {
+    public ResponseEntity<ApiResponseDto> getAllCategories() {
         List<CategoryResponse> responseList = categoryService.findAll()
                                                              .stream()
                                                              .map(categoryResponseMapper::mapToDto)
                                                              .toList();
         
-        return ResponseEntity.ok(new ApiResponse("Found", responseList));
+        return ResponseEntity.ok(new ApiResponseDto("Found", responseList));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getCategory(@PathVariable @Positive long id) {
+    public ResponseEntity<ApiResponseDto> getCategory(@PathVariable @Positive long id) {
         Category category = categoryService.findById(id);
         CategoryResponse response = categoryResponseMapper.mapToDto(category);
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
     @GetMapping(params = "name")
-    public ResponseEntity<ApiResponse> getCategoryByName(@RequestParam @NotBlank String name) {
+    public ResponseEntity<ApiResponseDto> getCategoryByName(@RequestParam @NotBlank String name) {
         Category category = categoryService.findByName(name);
         CategoryResponse response = categoryResponseMapper.mapToDto(category);
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
 }

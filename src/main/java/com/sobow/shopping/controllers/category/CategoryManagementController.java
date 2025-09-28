@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.category;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.category.dto.CategoryRequest;
 import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;
@@ -28,24 +28,24 @@ public class CategoryManagementController {
     private final CategoryResponseMapper categoryResponseMapper;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> createCategory(
+    public ResponseEntity<ApiResponseDto> createCategory(
         @RequestBody @Valid CategoryRequest request
     ) {
         Category saved = categoryService.create(request);
         CategoryResponse response = categoryResponseMapper.mapToDto(saved);
         return ResponseEntity.created(URI.create("/api/categories/" + saved.getId()))
-                             .body(new ApiResponse("Created", response));
+                             .body(new ApiResponseDto("Created", response));
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(
+    public ResponseEntity<ApiResponseDto> updateCategory(
         @PathVariable @Positive long id,
         @RequestBody @Valid CategoryRequest request
     ) {
         Category updated = categoryService.partialUpdateById(id, request);
         CategoryResponse response = categoryResponseMapper.mapToDto(updated);
         return ResponseEntity.ok(
-            new ApiResponse("Updated", response)
+            new ApiResponseDto("Updated", response)
         );
     }
     

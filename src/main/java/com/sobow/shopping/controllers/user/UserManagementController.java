@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.user;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.user.requests.admin.AdminUserAuthoritiesUpdateRequest;
 import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.controllers.user.responses.UserResponse;
@@ -30,32 +30,32 @@ public class UserManagementController {
     private final CurrentUserService currentUserService;
     
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> adminCreate(
+    public ResponseEntity<ApiResponseDto> adminCreate(
         @RequestBody @Valid AdminUserCreateRequest createRequest
     ) {
         User user = adminService.adminCreate(createRequest);
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new ApiResponse("User created by Admin", response));
+                             .body(new ApiResponseDto("User created by Admin", response));
     }
     
     @GetMapping(params = "email")
-    public ResponseEntity<ApiResponse> adminFindByEmail(
+    public ResponseEntity<ApiResponseDto> adminFindByEmail(
         @RequestParam @NotBlank @Email String email
     ) {
         User user = adminService.findByEmail(email);
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
     @PutMapping(params = "email")
-    public ResponseEntity<ApiResponse> adminUpdateAuthoritiesByEmail(
+    public ResponseEntity<ApiResponseDto> adminUpdateAuthoritiesByEmail(
         @RequestParam @NotBlank @Email String email,
         @RequestBody @Valid AdminUserAuthoritiesUpdateRequest updateRequest
     ) {
         User user = adminService.findByEmailWithAuthorities(email);
         user.updateFrom(updateRequest.authorities().value());
         UserResponse response = currentUserService.mapToUserResponse(user.getId());
-        return ResponseEntity.ok(new ApiResponse("Updated", response));
+        return ResponseEntity.ok(new ApiResponseDto("Updated", response));
     }
 }

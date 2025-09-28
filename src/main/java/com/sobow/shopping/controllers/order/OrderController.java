@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.order;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.order.dto.OrderResponse;
 import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.mappers.order.OrderResponseMapper;
@@ -27,7 +27,7 @@ public class OrderController {
     private final OrderResponseMapper orderResponseMapper;
     
     @PostMapping
-    public ResponseEntity<ApiResponse> selfCreateOrder() {
+    public ResponseEntity<ApiResponseDto> selfCreateOrder() {
         Order order = orderService.selfCreateOrder();
         OrderResponse response = orderResponseMapper.mapToDto(order);
         
@@ -38,23 +38,23 @@ public class OrderController {
             .toUri();
         
         return ResponseEntity.created(location)
-                             .body(new ApiResponse("Created", response));
+                             .body(new ApiResponseDto("Created", response));
     }
     
     @GetMapping("{orderId}")
-    public ResponseEntity<ApiResponse> selfGetOrderById(
+    public ResponseEntity<ApiResponseDto> selfGetOrderById(
         @PathVariable @Positive long orderId
     ) {
         Order order = orderService.selfFindByIdWithItems(orderId);
         OrderResponse response = orderResponseMapper.mapToDto(order);
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
     @GetMapping
-    public ResponseEntity<ApiResponse> selfGetAllOrders() {
+    public ResponseEntity<ApiResponseDto> selfGetAllOrders() {
         List<Order> orders = orderService.selfFindAllWithItems();
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
 }

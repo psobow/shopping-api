@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.order;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.order.dto.OrderResponse;
 import com.sobow.shopping.domain.order.Order;
 import com.sobow.shopping.mappers.order.OrderResponseMapper;
@@ -23,21 +23,21 @@ public class OrderManagementController {
     private final OrderResponseMapper orderResponseMapper;
     
     @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponse> getOrder(
+    public ResponseEntity<ApiResponseDto> getOrder(
         @PathVariable @Positive long userId,
         @PathVariable @Positive long orderId
     ) {
         Order order = orderService.findByUserIdAndIdWithItems(userId, orderId);
         OrderResponse response = orderResponseMapper.mapToDto(order);
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllOrdersByUserId(
+    public ResponseEntity<ApiResponseDto> getAllOrdersByUserId(
         @PathVariable @Positive long userId
     ) {
         List<Order> orders = orderService.findAllByUserIdWithItems(userId);
         List<OrderResponse> response = orders.stream().map(orderResponseMapper::mapToDto).toList();
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
 }

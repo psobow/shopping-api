@@ -28,7 +28,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfig {
     
     @Value("${api.prefix}")
@@ -54,16 +54,26 @@ public class SecurityConfig {
                 .requestMatchers(apiPrefix + "/admin/**").hasRole("ADMIN")
                 
                 // 2) Public
-                .requestMatchers(HttpMethod.POST,
-                                 apiPrefix + "/users/register",
-                                 apiPrefix + "/users/auth/**"
+                .requestMatchers("/error").permitAll() // need this in order to get proper errors instead of empty 401
+                .requestMatchers(
+                    HttpMethod.POST,
+                    apiPrefix + "/users/register",
+                    apiPrefix + "/users/auth/**"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET,
-                                 apiPrefix + "/csrf",
-                                 apiPrefix + "/categories",
-                                 apiPrefix + "/categories/**",
-                                 apiPrefix + "/products",
-                                 apiPrefix + "/products/**"
+                .requestMatchers(
+                    HttpMethod.GET,
+                    apiPrefix + "/csrf",
+                    apiPrefix + "/categories",
+                    apiPrefix + "/categories/**",
+                    apiPrefix + "/products",
+                    apiPrefix + "/products/**"
+                ).permitAll()
+                
+                // Allow access to Swagger UI
+                .requestMatchers(
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
                 ).permitAll()
                 
                 // 3) Regular user and admin
@@ -72,9 +82,9 @@ public class SecurityConfig {
                 // 4) Fallback
                 .anyRequest().authenticated()
             )
-            .httpBasic(basic -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .csrf(csrf -> csrf.disable())
+//            .httpBasic(basic -> {})
 //            .csrf(csrf -> csrf.csrfTokenRepository(
 //                CookieCsrfTokenRepository.withHttpOnlyFalse()
 //            ))
@@ -92,14 +102,14 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(AdminService adminService) {
         
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(adminService);
-        String adminEmail = "user@email.com";
+        String adminEmail = "user@gmail.com";
         String password = "password";
         if (!adminService.userExistsByEmail(adminEmail)) {
             
             UserAddressCreateRequest address = new UserAddressCreateRequest(
-                "Wroclaw", "Street", "20", "11-222");
+                "Warsaw", "Street", "20", "11-222");
             
-            UserProfileCreateRequest userProfile = new UserProfileCreateRequest("Patryk", "Lastname", address);
+            UserProfileCreateRequest userProfile = new UserProfileCreateRequest("John", "Doe", address);
             UserAuthorityRequest authority = new UserAuthorityRequest("ADMIN");
             AdminUserCreateRequest user = new AdminUserCreateRequest(adminEmail, new PasswordRequest(password), userProfile,
                                                                      new UserAuthoritiesRequest(List.of(authority)));

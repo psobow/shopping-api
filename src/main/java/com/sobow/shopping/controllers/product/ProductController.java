@@ -1,6 +1,6 @@
 package com.sobow.shopping.controllers.product;
 
-import com.sobow.shopping.controllers.ApiResponse;
+import com.sobow.shopping.controllers.ApiResponseDto;
 import com.sobow.shopping.controllers.product.dto.ProductResponse;
 import com.sobow.shopping.domain.product.Product;
 import com.sobow.shopping.services.product.ProductService;
@@ -23,22 +23,22 @@ public class ProductController {
     private final ProductService productService;
     
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllProducts() {
+    public ResponseEntity<ApiResponseDto> getAllProducts() {
         List<Product> products = productService.findAll();
         List<ProductResponse> responseList = productService.mapProductsToResponsesWithImageIds(products);
-        return ResponseEntity.ok(new ApiResponse("Found", responseList));
+        return ResponseEntity.ok(new ApiResponseDto("Found", responseList));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getProduct(@PathVariable @Positive long id) {
+    public ResponseEntity<ApiResponseDto> getProduct(@PathVariable @Positive long id) {
         Product product = productService.findById(id);
         List<ProductResponse> responseList = productService.mapProductsToResponsesWithImageIds(List.of(product));
         ProductResponse response = responseList.getFirst();
-        return ResponseEntity.ok(new ApiResponse("Found", response));
+        return ResponseEntity.ok(new ApiResponseDto("Found", response));
     }
     
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> searchProducts(
+    public ResponseEntity<ApiResponseDto> searchProducts(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String brandName,
         @RequestParam(required = false) String categoryName
@@ -49,6 +49,6 @@ public class ProductController {
         HttpStatus status = responseList.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
         String message = responseList.isEmpty() ? "Not found" : "Found";
         
-        return new ResponseEntity<>(new ApiResponse(message, responseList), status);
+        return new ResponseEntity<>(new ApiResponseDto(message, responseList), status);
     }
 }
