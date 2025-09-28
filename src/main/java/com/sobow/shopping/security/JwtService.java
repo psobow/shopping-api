@@ -4,7 +4,11 @@ import com.sobow.shopping.security.Impl.UserDetailsImpl;
 
 public interface JwtService {
     
-    String generateToken(UserDetailsImpl userDetails);
+    String generateAccess(UserDetailsImpl userDetails);
     
-    String validateAndExtractSubject(String token);
+    String generateRefresh(UserDetailsImpl userDetails);
+    
+    String validateAccessAndExtractSubject(String token);
+    
+    String validateRefreshAndExtractSubject(String token);
 }

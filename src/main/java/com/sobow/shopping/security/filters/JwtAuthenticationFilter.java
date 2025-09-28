@@ -32,11 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         HttpServletResponse response,
         FilterChain filterChain
     ) throws ServletException, IOException {
-        // Skip if already authenticated
-        if (currentUserService.getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         // Skip if empty token
         Optional<String> tokenOptional = extractToken(request);
         if (tokenOptional.isEmpty()) {
@@ -45,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         
         try {
-            String email = jwtService.validateAndExtractSubject(tokenOptional.get());
+            String email = jwtService.validateAccessAndExtractSubject(tokenOptional.get());
             UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
             currentUserService.updateSecurityContext(userDetails.getUser(), userDetails.getAuthorities());
         } catch (

@@ -29,7 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
     
     @Value("${api.prefix}")
@@ -54,10 +54,10 @@ public class SecurityConfig {
                 // 1) Admin-only
                 .requestMatchers(apiPrefix + "/admin/**").hasRole("ADMIN")
                 
-                // 2) Public (no auth)
+                // 2) Public
                 .requestMatchers(HttpMethod.POST,
                                  apiPrefix + "/users/register",
-                                 apiPrefix + "/users/login"
+                                 apiPrefix + "/users/auth/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET,
                                  apiPrefix + "/csrf",

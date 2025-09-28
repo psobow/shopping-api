@@ -12,6 +12,7 @@ import com.sobow.shopping.exceptions.InvalidPriceException;
 import com.sobow.shopping.exceptions.InvalidUserAuthoritiesException;
 import com.sobow.shopping.exceptions.OverDecrementException;
 import com.sobow.shopping.exceptions.ProductAlreadyExistsException;
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
         return VALUE_SEGMENT.matcher(field).replaceAll("");
     }
     
-    // This exception is thrown for a single object
+    // This exception is thrown for a method with single object
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleBodyValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
         // log.error("Unhandled exception on {} {} -> {}", req.getMethod(), req.getRequestURI(), ex.getClass().getName());
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
             new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", "Constraint violations", violations));
     }
     
-    // This exception is thrown for a list of method parameters
+    // This exception is thrown for a method with list parameters
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleMethodParamValidation(
         HandlerMethodValidationException ex, HttpServletRequest req
@@ -120,12 +120,14 @@ public class GlobalExceptionHandler {
             new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request", "Constraint violations", violations));
     }
     
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ProblemDetail> handleBadCredentials(BadCredentialsException ex) {
-        var pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        pd.setTitle("Invalid credentials");
-        pd.setDetail("Email or password is incorrect.");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(pd);
+    // this exception will only propagate from /refresh endpoint
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ProblemDetail> handleUnauthorized(JwtException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        pd.setTitle("Unauthorized");
+        pd.setDetail("Authentication failed.");
+        pd.setProperty("error", "unauthorized");
+        return ResponseEntity.status(pd.getStatus()).body(pd);
     }
     
     @ExceptionHandler(ImageProcessingException.class)
