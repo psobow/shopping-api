@@ -115,14 +115,14 @@ public class ImageServiceImplTests {
             MockMultipartFile patch = fixtures.withMultipartByteArray(new byte[]{1, 2, 3})
                                               .multipartFile();
             
-            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
+            when(imageRepository.findByProductIdAndId(fixtures.productId(), fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When
-            Image result = underTest.updateByProductIdAndId(fixtures.imageId(), patch);
+            Image result = underTest.updateByProductIdAndId(fixtures.productId(), fixtures.imageId(), patch);
             
             // Then
             // Assert: repository looked up the entity
-            verify(imageRepository).findById(fixtures.imageId());
+            verify(imageRepository).findByProductIdAndId(fixtures.productId(), fixtures.imageId());
             
             // Assert: service returns the same managed instance (updated in place)
             assertThat(result).isSameAs(image);
@@ -149,14 +149,15 @@ public class ImageServiceImplTests {
             String typeBefore = image.getFileType();
             long lenBefore = image.getFile().length();
             
-            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
+            when(imageRepository.findByProductIdAndId(fixtures.productId(), fixtures.imageId())).thenReturn(Optional.of(image));
             
             MultipartFile badPatch = mock(MultipartFile.class);
             when(badPatch.getBytes()).thenThrow(new IOException("Boom!"));
             
             // When & Then
             // Assert: throws when MultipartFile#getBytes() fails
-            assertThrows(ImageProcessingException.class, () -> underTest.updateByProductIdAndId(fixtures.imageId(), badPatch));
+            assertThrows(ImageProcessingException.class,
+                         () -> underTest.updateByProductIdAndId(fixtures.productId(), fixtures.imageId(), badPatch));
             
             // Assert: entity remains unchanged after failure
             assertThat(image.getFileName()).isEqualTo(nameBefore);
@@ -174,14 +175,14 @@ public class ImageServiceImplTests {
             // Given
             Image image = fixtures.imageEntity();
             
-            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
+            when(imageRepository.findByProductIdAndId(fixtures.productId(), fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When
-            FileContent result = underTest.getImageContent(fixtures.imageId());
+            FileContent result = underTest.getImageContent(fixtures.productId(), fixtures.imageId());
             
             // Then
             // Assert: repository looked up the entity
-            verify(imageRepository).findById(fixtures.imageId());
+            verify(imageRepository).findByProductIdAndId(fixtures.productId(), fixtures.imageId());
             
             // Assert: metadata copied from Image
             assertThat(result.fileName()).isEqualTo(image.getFileName());
@@ -204,11 +205,11 @@ public class ImageServiceImplTests {
             Image image = fixtures.withImageFile(bad)
                                   .imageEntity();
             
-            when(imageRepository.findById(fixtures.imageId())).thenReturn(Optional.of(image));
+            when(imageRepository.findByProductIdAndId(fixtures.productId(), fixtures.imageId())).thenReturn(Optional.of(image));
             
             // When & Then
             // Assert: throws ImageProcessingException wrapping the SQLException
-            assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(fixtures.imageId()));
+            assertThrows(ImageProcessingException.class, () -> underTest.getImageContent(fixtures.productId(), fixtures.imageId()));
         }
     }
 }

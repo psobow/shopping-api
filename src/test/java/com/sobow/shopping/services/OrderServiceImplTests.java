@@ -24,6 +24,7 @@ import com.sobow.shopping.services.product.ProductService;
 import com.sobow.shopping.services.user.CurrentUserService;
 import com.sobow.shopping.services.user.UserProfileService;
 import com.sobow.shopping.utils.TestFixtures;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.List;
@@ -51,7 +52,8 @@ public class OrderServiceImplTests {
     private CartService cartService;
     @Mock
     private CurrentUserService currentUserService;
-    
+    @Mock
+    private EntityManager entityManager;
     @InjectMocks
     private OrderServiceImpl underTest;
     

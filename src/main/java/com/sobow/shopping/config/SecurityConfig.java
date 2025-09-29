@@ -102,7 +102,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(AdminService adminService) {
         
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(adminService);
-        String adminEmail = "user@gmail.com";
+        String adminEmail = "adminuser@gmail.com";
         String password = "password";
         if (!adminService.userExistsByEmail(adminEmail)) {
             

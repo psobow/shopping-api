@@ -59,6 +59,7 @@ public class ImageManagementController {
         @ApiResponse(responseCode = "400", description = "Validation error"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "403", description = "Forbidden"),
+        @ApiResponse(responseCode = "413", description = "Payload too large"),
         @ApiResponse(responseCode = "415", description = "Unsupported media type")
     })
     @PostMapping(

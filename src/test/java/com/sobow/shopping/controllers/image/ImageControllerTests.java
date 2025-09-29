@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.user;
+package com.sobow.shopping.controllers.image;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.controllers.image.ImageController;
 import com.sobow.shopping.services.image.ImageService;
 import com.sobow.shopping.services.image.Impl.FileContent;
 import com.sobow.shopping.utils.TestFixtures;
@@ -33,7 +32,7 @@ public class ImageControllerTests {
     @MockitoBean
     private ImageService imageService;
     
-    private final static String IMAGES_BY_ID_PATH = "/api/images/{id}";
+    private final static String IMAGE_PATH = "/api/products/{productId}/images/{imageId}";
     
     private final TestFixtures fixtures = new TestFixtures();
     
@@ -46,10 +45,10 @@ public class ImageControllerTests {
             // Given
             FileContent fileContent = fixtures.fileContent();
             
-            when(imageService.getImageContent(fixtures.imageId())).thenReturn(fileContent);
+            when(imageService.getImageContent(fixtures.productId(), fixtures.imageId())).thenReturn(fileContent);
             
             // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.imageId()))
+            mockMvc.perform(get(IMAGE_PATH, fixtures.productId(), fixtures.imageId()))
                    .andExpect(status().isOk())
                    .andExpect(header().string("Content-Type", fileContent.fileType()))
                    .andExpect(header().string("Content-Length", String.valueOf(fileContent.length())))
@@ -59,21 +58,34 @@ public class ImageControllerTests {
         }
         
         @Test
-        public void downloadImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
+        public void downloadImage_should_Return400_when_IdLessThanOne() throws Exception {
             // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.invalidId()))
+            mockMvc.perform(get(IMAGE_PATH, fixtures.productId(), fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).getImageContent(anyLong());
+            mockMvc.perform(get(IMAGE_PATH, fixtures.invalidId(), fixtures.imageId()))
+                   .andExpect(status().isBadRequest());
+            
+            verify(imageService, never()).getImageContent(anyLong(), anyLong());
         }
         
         @Test
         public void downloadImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
             // Given
-            when(imageService.getImageContent(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
+            when(imageService.getImageContent(fixtures.productId(), fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
-            mockMvc.perform(get(IMAGES_BY_ID_PATH, fixtures.nonExistingId()))
+            mockMvc.perform(get(IMAGE_PATH, fixtures.productId(), fixtures.nonExistingId()))
+                   .andExpect(status().isNotFound());
+        }
+        
+        @Test
+        public void downloadImage_should_Return404_when_ProductIdDoesNotExist() throws Exception {
+            // Given
+            when(imageService.getImageContent(fixtures.nonExistingId(), fixtures.imageId())).thenThrow(new EntityNotFoundException());
+            
+            // When & Then
+            mockMvc.perform(get(IMAGE_PATH, fixtures.nonExistingId(), fixtures.imageId()))
                    .andExpect(status().isNotFound());
         }
     }

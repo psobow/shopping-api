@@ -112,7 +112,7 @@ public class TestFixtures {
                             .status(OrderStatus.NEW.toString())
                             .createdAt(LocalDateTime.now())
                             .totalOrderPrice(totalCartPrice)
-                            .itemResponseList(List.of(orderItemResponse()))
+                            .orderItems(List.of(orderItemResponse()))
                             .build();
     }
     
@@ -212,7 +212,7 @@ public class TestFixtures {
     }
     
     public CartItemResponse cartItemResponse() {
-        return new CartItemResponse(cartItemId, productId, cartId, requestedQty, totalItemPrice);
+        return new CartItemResponse(cartItemId, productId, cartId, requestedQty, productPrice, totalItemPrice);
     }
     
     public CartItemCreateRequest cartItemCreateRequest() {
@@ -236,7 +236,7 @@ public class TestFixtures {
         return new ProductUpdateRequest(productName, brandName, productPrice, availableQty, description, categoryId);
     }
     
-    public ProductResponse productResponseOf(Product p) {
+    public ProductResponse productResponse() {
         return new ProductResponse(productId, productName, brandName, productPrice, availableQty, description,
                                    categoryId, List.of(imageId));
     }
@@ -260,7 +260,7 @@ public class TestFixtures {
     }
     
     public ImageResponse imageResponse() {
-        return new ImageResponse(imageId, fileName, downloadUrl);
+        return new ImageResponse(imageId, fileName, fileType, downloadUrl);
     }
     
     public MockMultipartFile multipartFile() {

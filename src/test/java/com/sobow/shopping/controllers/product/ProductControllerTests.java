@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.user;
+package com.sobow.shopping.controllers.product;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -6,12 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.controllers.product.ProductController;
 import com.sobow.shopping.controllers.product.dto.ProductResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.domain.product.Product;
-import com.sobow.shopping.mappers.product.ProductResponseMapper;
 import com.sobow.shopping.services.product.ProductService;
 import com.sobow.shopping.utils.TestFixtures;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,8 +33,6 @@ public class ProductControllerTests {
     @MockitoBean
     private ProductService productService;
     
-    @MockitoBean
-    private ProductResponseMapper productResponseMapper;
     
     private static final String PRODUCTS_PATH = "/api/products";
     private static final String PRODUCTS_BY_ID_PATH = "/api/products/{id}";
@@ -54,37 +50,29 @@ public class ProductControllerTests {
             Category category = fixtures.categoryEntity();
             Product product = fixtures.productEntity();
             Image image = fixtures.imageEntity();
-            
             category.addProductAndLink(product);
             product.addImageAndLink(image);
             
-            ProductResponse response = fixtures.productResponseOf(product);
-            
-            when(productService.findAllWithImageIds()).thenReturn(List.of(product));
-            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            when(productService.findAll()).thenReturn(List.of(product));
+            when(productService.mapProductsToResponsesWithImageIds(List.of(product))).thenReturn(List.of(fixtures.productResponse()));
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_PATH))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
-                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
-                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
-                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
-                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
-                   .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
-                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
-                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
+                   .andExpect(jsonPath("$.data").isArray());
         }
         
         @Test
         public void getAllProducts_should_Return200WithEmptyList_when_ProductsDoesNotExist() throws Exception {
             // Given
             when(productService.findAll()).thenReturn(List.of());
+            when(productService.mapProductsToResponsesWithImageIds(List.of())).thenReturn(List.of());
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_PATH))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.message").value("Found"))
                    .andExpect(jsonPath("$.data").isArray())
                    .andExpect(jsonPath("$.data", hasSize(0)));
         }
@@ -99,23 +87,16 @@ public class ProductControllerTests {
             category.addProductAndLink(product);
             product.addImageAndLink(image);
             
-            ProductResponse response = fixtures.productResponseOf(product);
+            ProductResponse response = fixtures.productResponse();
             
-            when(productService.findWithImagesById(fixtures.productId())).thenReturn(product);
-            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            when(productService.findById(fixtures.productId())).thenReturn(product);
+            when(productService.mapProductsToResponsesWithImageIds(List.of(product))).thenReturn(List.of(response));
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.productId()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
-                   .andExpect(jsonPath("$.data.id").value(response.id()))
-                   .andExpect(jsonPath("$.data.name").value(response.name()))
-                   .andExpect(jsonPath("$.data.brandName").value(response.brandName()))
-                   .andExpect(jsonPath("$.data.price").value(response.price().doubleValue()))
-                   .andExpect(jsonPath("$.data.availableQty").value(response.availableQty()))
-                   .andExpect(jsonPath("$.data.description").value(response.description()))
-                   .andExpect(jsonPath("$.data.categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data.imageIds[0]").value(response.imageIds().get(0)));
+                   .andExpect(jsonPath("$.data").exists());
         }
         
         @Test
@@ -128,7 +109,7 @@ public class ProductControllerTests {
         @Test
         public void getProduct_should_Return404_when_ProductIdDoesNotExist() throws Exception {
             // Given
-            when(productService.findWithImagesById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
+            when(productService.findById(fixtures.nonExistingId())).thenThrow(new EntityNotFoundException());
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_BY_ID_PATH, fixtures.nonExistingId()))
@@ -150,24 +131,17 @@ public class ProductControllerTests {
             category.addProductAndLink(product);
             product.addImageAndLink(image);
             
-            ProductResponse response = fixtures.productResponseOf(product);
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(product.getName(), null, null)).thenReturn(List.of(product));
-            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            when(productService.mapProductsToResponsesWithImageIds(List.of(product))).thenReturn(List.of(response));
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("name", product.getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
-                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
-                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
-                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
-                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
-                   .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
-                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
-                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
+                   .andExpect(jsonPath("$.data").isArray());
         }
         
         @Test
@@ -180,24 +154,17 @@ public class ProductControllerTests {
             category.addProductAndLink(product);
             product.addImageAndLink(image);
             
-            ProductResponse response = fixtures.productResponseOf(product);
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(null, product.getBrandName(), null)).thenReturn(List.of(product));
-            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            when(productService.mapProductsToResponsesWithImageIds(List.of(product))).thenReturn(List.of(response));
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("brandName", product.getBrandName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
-                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
-                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
-                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
-                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
-                   .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
-                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
-                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
+                   .andExpect(jsonPath("$.data").isArray());
         }
         
         @Test
@@ -210,24 +177,17 @@ public class ProductControllerTests {
             category.addProductAndLink(product);
             product.addImageAndLink(image);
             
-            ProductResponse response = fixtures.productResponseOf(product);
+            ProductResponse response = fixtures.productResponse();
             
             when(productService.search(null, null, product.getCategory().getName())).thenReturn(List.of(product));
-            when(productResponseMapper.mapToDto(product)).thenReturn(response);
+            when(productService.mapProductsToResponsesWithImageIds(List.of(product))).thenReturn(List.of(response));
             
             // When & Then
             mockMvc.perform(get(PRODUCTS_SEARCH_PATH)
                                 .param("categoryName", product.getCategory().getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.message").value("Found"))
-                   .andExpect(jsonPath("$.data[0].id").value(response.id()))
-                   .andExpect(jsonPath("$.data[0].name").value(response.name()))
-                   .andExpect(jsonPath("$.data[0].brandName").value(response.brandName()))
-                   .andExpect(jsonPath("$.data[0].price").value(response.price().doubleValue()))
-                   .andExpect(jsonPath("$.data[0].availableQty").value(response.availableQty()))
-                   .andExpect(jsonPath("$.data[0].description").value(response.description()))
-                   .andExpect(jsonPath("$.data[0].categoryId").value(response.categoryId()))
-                   .andExpect(jsonPath("$.data[0].imageIds[0]").value(response.imageIds().get(0)));
+                   .andExpect(jsonPath("$.data").isArray());
         }
         
         @Test

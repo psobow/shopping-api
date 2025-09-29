@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.admin;
+package com.sobow.shopping.controllers.category;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.controllers.category.CategoryManagementController;
 import com.sobow.shopping.controllers.category.dto.CategoryRequest;
 import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;

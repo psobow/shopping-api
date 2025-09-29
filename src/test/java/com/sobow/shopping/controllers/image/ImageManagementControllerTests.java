@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.admin;
+package com.sobow.shopping.controllers.image;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.controllers.image.ImageManagementController;
 import com.sobow.shopping.controllers.image.dto.ImageResponse;
 import com.sobow.shopping.domain.image.Image;
 import com.sobow.shopping.mappers.image.ImageResponseMapper;
@@ -49,7 +48,7 @@ public class ImageManagementControllerTests {
     private ImageResponseMapper imageResponseMapper;
     
     private final static String PRODUCT_IMAGES_BY_PRODUCT_ID_PATH = "/api/admin/products/{productId}/images";
-    private final static String IMAGES_BY_ID_PATH = "/api/admin/images/{id}";
+    private final static String PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH = PRODUCT_IMAGES_BY_PRODUCT_ID_PATH + "/{imageId}";
     
     private final TestFixtures fixtures = new TestFixtures();
     
@@ -178,11 +177,12 @@ public class ImageManagementControllerTests {
             Image updated = fixtures.imageEntity();
             ImageResponse response = fixtures.imageResponse();
             
-            when(imageService.updateByProductIdAndId(fixtures.imageId(), file)).thenReturn(updated);
+            when(imageService.updateByProductIdAndId(fixtures.productId(), fixtures.imageId(), file)).thenReturn(updated);
             when(imageResponseMapper.mapToDto(updated)).thenReturn(response);
             
             // When & Then
-            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.imageId())
+            mockMvc.perform(multipart(HttpMethod.PUT, PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(),
+                                      fixtures.imageId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isOk())
@@ -196,11 +196,12 @@ public class ImageManagementControllerTests {
         @Test
         public void updateImage_should_Return400_when_FilePartMissing() throws Exception {
             // When & Then
-            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.imageId())
+            mockMvc.perform(multipart(HttpMethod.PUT, PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(),
+                                      fixtures.imageId())
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), anyLong(), any());
         }
         
         @Test
@@ -209,34 +210,36 @@ public class ImageManagementControllerTests {
             MockMultipartFile file = fixtures.multipartFile();
             
             // When & Then
-            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.invalidId())
+            mockMvc.perform(multipart(HttpMethod.PUT, PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(),
+                                      fixtures.invalidId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isBadRequest());
             
-            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), anyLong(), any());
         }
         
         @Test
         public void updateImage_should_Return415_when_ContentTypeUnsupported() throws Exception {
             // When & Then
-            mockMvc.perform(put(IMAGES_BY_ID_PATH, fixtures.imageId())
+            mockMvc.perform(put(PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(), fixtures.imageId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content("{}"))
                    .andExpect(status().isUnsupportedMediaType());
             
-            verify(imageService, never()).updateByProductIdAndId(anyLong(), any());
+            verify(imageService, never()).updateByProductIdAndId(anyLong(), anyLong(), any());
         }
         
         @Test
         public void updateImage_should_Return404_when_ImageIdDoesNotExist() throws Exception {
             // Given
             MockMultipartFile file = fixtures.multipartFile();
-            when(imageService.updateByProductIdAndId(fixtures.nonExistingId(), file))
+            when(imageService.updateByProductIdAndId(fixtures.productId(), fixtures.nonExistingId(), file))
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
-            mockMvc.perform(multipart(HttpMethod.PUT, IMAGES_BY_ID_PATH, fixtures.nonExistingId())
+            mockMvc.perform(multipart(HttpMethod.PUT, PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH,
+                                      fixtures.productId(), fixtures.nonExistingId())
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA))
                    .andExpect(status().isNotFound());
@@ -250,17 +253,17 @@ public class ImageManagementControllerTests {
         @Test
         public void deleteImage_should_Return204_when_Deleted() throws Exception {
             // When & Then
-            mockMvc.perform(delete(IMAGES_BY_ID_PATH, fixtures.imageId()))
+            mockMvc.perform(delete(PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(), fixtures.imageId()))
                    .andExpect(status().isNoContent());
-            verify(imageService).deleteById(fixtures.imageId());
+            verify(imageService).deleteByProductIdAndId(fixtures.productId(), fixtures.imageId());
         }
         
         @Test
         public void deleteImage_should_Return400_when_ImageIdLessThanOne() throws Exception {
             // When & Then
-            mockMvc.perform(delete(IMAGES_BY_ID_PATH, fixtures.invalidId()))
+            mockMvc.perform(delete(PRODUCT_IMAGES_BY_PRODUCT_AND_IMAGE_ID_PATH, fixtures.productId(), fixtures.invalidId()))
                    .andExpect(status().isBadRequest());
-            verify(imageService, never()).deleteById(fixtures.invalidId());
+            verify(imageService, never()).deleteByProductIdAndId(fixtures.productId(), fixtures.invalidId());
         }
     }
 }

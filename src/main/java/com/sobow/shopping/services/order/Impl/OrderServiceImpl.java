@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderServiceImpl implements OrderService {
     
     @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
     
     private final OrderRepository orderRepository;
     private final UserProfileService userProfileService;
@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
     private void assertStockAvailableAndDecrement(Set<CartItem> items) {
         for (CartItem item : items) {
             // Assert products still available
-            Product product = productService.findById(item.getProduct().getId());
+            Product product = item.getProduct();
             int availableQty = product.getAvailableQty();
             int requestedQty = item.getRequestedQty();
             if (requestedQty > availableQty) {

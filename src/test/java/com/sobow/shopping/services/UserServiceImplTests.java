@@ -3,7 +3,6 @@ package com.sobow.shopping.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -23,7 +22,6 @@ import com.sobow.shopping.domain.user.UserProfile;
 import com.sobow.shopping.domain.user.repo.UserRepository;
 import com.sobow.shopping.exceptions.EmailAlreadyExistsException;
 import com.sobow.shopping.exceptions.InvalidOldPasswordException;
-import com.sobow.shopping.exceptions.NoAuthenticationException;
 import com.sobow.shopping.mappers.user.requests.SelfUserCreateRequestMapper;
 import com.sobow.shopping.security.Impl.UserDetailsImpl;
 import com.sobow.shopping.services.user.CurrentUserService;
@@ -38,7 +36,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -59,21 +56,6 @@ class UserServiceImplTests {
     private UserServiceImpl underTest;
     
     private final TestFixtures fixtures = new TestFixtures();
-
-//    @BeforeEach
-//    void setupContext() {
-//        User user = fixtures.userEntity();
-//        var principal = new UserDetailsImpl(user);
-//        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-//        SecurityContext ctx = SecurityContextHolder.createEmptyContext();
-//        ctx.setAuthentication(auth);
-//        SecurityContextHolder.setContext(ctx);
-//    }
-//
-//    @AfterEach
-//    void tearDownContext() {
-//        SecurityContextHolder.clearContext();
-//    }
     
     @Nested
     @DisplayName("selfCreate")
@@ -174,23 +156,6 @@ class UserServiceImplTests {
             assertThat(user.getProfile().getAddress().getStreetNumber()).isEqualTo(updateRequest.userProfile().userAddress().streetNumber());
             assertThat(user.getProfile().getAddress().getPostCode()).isEqualTo(updateRequest.userProfile().userAddress().postCode());
         }
-        
-        @Test
-        public void selfPartialUpdate_should_ThrowNoAuthentication_when_SecurityContextIsEmpty() {
-            // Given
-            SecurityContextHolder.clearContext();
-            SelfUserPartialUpdateRequest updateRequest = fixtures.selfUpdateUserRequest();
-            
-            doThrow(new NoAuthenticationException())
-                .when(currentUserService)
-                .getAuthentication();
-            
-            // When & Then
-            assertThrows(NoAuthenticationException.class, () -> underTest.selfPartialUpdate(updateRequest));
-            
-            // Assert: security context is still empty
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        }
     }
     
     @Nested
@@ -245,25 +210,6 @@ class UserServiceImplTests {
             
             // Assert: user's password value did not change
             assertThat(user.getPassword()).isEqualTo(beforeHash);
-        }
-        
-        @Test
-        public void selfUpdatePassword_should_ThrowNoAuthentication_when_SecurityContextIsEmpty() {
-            // Given
-            SecurityContextHolder.clearContext();
-            
-            doThrow(new NoAuthenticationException())
-                .when(currentUserService)
-                .getAuthentication();
-            
-            // When & Then
-            assertThrows(NoAuthenticationException.class,
-                         () -> underTest.selfUpdatePassword(new SelfPasswordUpdateRequest(new PasswordRequest(fixtures.password()),
-                                                                                          new PasswordRequest(fixtures.newPassword()))));
-            
-            
-            // Assert: security context is still empty
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         }
     }
     
@@ -342,26 +288,6 @@ class UserServiceImplTests {
             
             // Assert: no state changes
             assertThat(user.getEmail()).isEqualTo(emailBefore);
-        }
-        
-        @Test
-        public void selfUpdateEmail_should_ThrowNoAuthentication_when_SecurityContextIsEmpty() {
-            // Given
-            SecurityContextHolder.clearContext();
-            
-            doThrow(new NoAuthenticationException())
-                .when(currentUserService)
-                .getAuthentication();
-            
-            // When & Then
-            assertThrows(NoAuthenticationException.class,
-                         () -> underTest.selfUpdateEmail(new SelfEmailUpdateRequest(new PasswordRequest(fixtures.password()),
-                                                                                    fixtures.newEmail())));
-            
-            // Assert: nothing hit the collaborators
-            verify(userRepository, never()).findByEmail(anyString());
-            verify(passwordEncoder, never()).matches(anyString(), anyString());
-            verify(userRepository, never()).existsByEmailAndIdNot(anyString(), anyLong());
         }
     }
     

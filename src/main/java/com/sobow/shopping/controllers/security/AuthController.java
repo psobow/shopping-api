@@ -40,7 +40,7 @@ public class AuthController {
                 mediaType = "application/json",
                 examples = @ExampleObject(value = """
                             {
-                                "email": "user@gmail.com",
+                                "email": "adminuser@gmail.com",
                                 "password": "password"
                             }
                     """

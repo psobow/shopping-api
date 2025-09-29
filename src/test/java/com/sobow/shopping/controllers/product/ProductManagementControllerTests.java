@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.admin;
+package com.sobow.shopping.controllers.product;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sobow.shopping.controllers.product.ProductManagementController;
 import com.sobow.shopping.controllers.product.dto.ProductCreateRequest;
 import com.sobow.shopping.controllers.product.dto.ProductResponse;
 import com.sobow.shopping.controllers.product.dto.ProductUpdateRequest;
@@ -61,7 +60,7 @@ public class ProductManagementControllerTests {
             ProductCreateRequest request = fixtures.productCreateRequest();
             Category category = fixtures.categoryEntity();
             Product saved = fixtures.productEntity();
-            ProductResponse response = fixtures.productResponseOf(saved);
+            ProductResponse response = fixtures.productResponse();
             
             category.addProductAndLink(saved);
             String json = objectMapper.writeValueAsString(request);
@@ -116,7 +115,7 @@ public class ProductManagementControllerTests {
             Product updated = fixtures.productEntity();
             category.addProductAndLink(updated);
             
-            ProductResponse response = fixtures.productResponseOf(updated);
+            ProductResponse response = fixtures.productResponse();
             
             String json = objectMapper.writeValueAsString(request);
             

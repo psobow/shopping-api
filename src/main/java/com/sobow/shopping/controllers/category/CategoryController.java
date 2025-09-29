@@ -78,7 +78,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "400", description = "Validation error"),
         @ApiResponse(responseCode = "404", description = "Not found")
     })
-    @GetMapping("/{name}")
+    @GetMapping("/by-name/{name}")
     public ResponseEntity<ApiResponseDto> getCategoryByName(@PathVariable @NotBlank String name) {
         Category category = categoryService.findByName(name);
         CategoryResponse response = categoryResponseMapper.mapToDto(category);

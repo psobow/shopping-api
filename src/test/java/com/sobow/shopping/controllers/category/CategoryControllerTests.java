@@ -1,4 +1,4 @@
-package com.sobow.shopping.controllers.user;
+package com.sobow.shopping.controllers.category;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.sobow.shopping.controllers.category.CategoryController;
 import com.sobow.shopping.controllers.category.dto.CategoryResponse;
 import com.sobow.shopping.domain.category.Category;
 import com.sobow.shopping.mappers.category.CategoryResponseMapper;
@@ -38,6 +37,7 @@ public class CategoryControllerTests {
     
     private static final String CATEGORIES_PATH = "/api/categories";
     private static final String CATEGORIES_BY_ID_PATH = "/api/categories/{id}";
+    private static final String CATEGORIES_BY_NAME_PATH = "/api/categories/by-name/{name}";
     
     private final TestFixtures fixtures = new TestFixtures();
     
@@ -120,8 +120,7 @@ public class CategoryControllerTests {
             when(categoryResponseMapper.mapToDto(category)).thenReturn(response);
             
             // When & Then
-            mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", category.getName()))
+            mockMvc.perform(get(CATEGORIES_BY_NAME_PATH, category.getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.data.id").value(response.id()))
                    .andExpect(jsonPath("$.data.name").value(response.name()));
@@ -130,20 +129,19 @@ public class CategoryControllerTests {
         @Test
         public void getCategoryByName_should_Return404_when_CategoryWithNameDoesNotExist() throws Exception {
             // Given
-            when(categoryService.findByName("non existing category name"))
+            String categoryName = "non existing category name";
+            when(categoryService.findByName(categoryName))
                 .thenThrow(new EntityNotFoundException());
             
             // When & Then
-            mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", "non existing category name"))
+            mockMvc.perform(get(CATEGORIES_BY_NAME_PATH, categoryName))
                    .andExpect(status().isNotFound());
         }
         
         @Test
-        public void getCategoryByName_should_Return400_when_RequestParamBlank() throws Exception {
+        public void getCategoryByName_should_Return400_when_PathParamBlank() throws Exception {
             // When & Then
-            mockMvc.perform(get(CATEGORIES_PATH)
-                                .param("name", "  "))
+            mockMvc.perform(get(CATEGORIES_BY_NAME_PATH, "  "))
                    .andExpect(status().isBadRequest());
         }
     }
