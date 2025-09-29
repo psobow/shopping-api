@@ -21,8 +21,15 @@ import com.sobow.shopping.controllers.user.requests.UserProfileUpdateRequest;
 import com.sobow.shopping.controllers.user.requests.admin.AdminUserCreateRequest;
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthoritiesRequest;
 import com.sobow.shopping.controllers.user.requests.admin.UserAuthorityRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfEmailUpdateRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfPasswordUpdateRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserCreateRequest;
+import com.sobow.shopping.controllers.user.requests.self.SelfUserDeleteRequest;
 import com.sobow.shopping.controllers.user.requests.self.SelfUserPartialUpdateRequest;
+import com.sobow.shopping.controllers.user.responses.UserAddressResponse;
+import com.sobow.shopping.controllers.user.responses.UserAuthorityResponse;
+import com.sobow.shopping.controllers.user.responses.UserProfileResponse;
+import com.sobow.shopping.controllers.user.responses.UserResponse;
 import com.sobow.shopping.domain.cart.Cart;
 import com.sobow.shopping.domain.cart.CartItem;
 import com.sobow.shopping.domain.category.Category;
@@ -186,7 +193,34 @@ public class TestFixtures {
                                           new UserAuthoritiesRequest(List.of(adminAuthorityDto())));
     }
     
+    public SelfUserDeleteRequest deleteRequest() {
+        return new SelfUserDeleteRequest(new PasswordRequest(userPassword));
+    }
     
+    public SelfEmailUpdateRequest emailUpdateRequest() {
+        return new SelfEmailUpdateRequest(new PasswordRequest(userPassword), userEmail);
+    }
+    
+    public SelfPasswordUpdateRequest passwordUpdateRequest() {
+        return new SelfPasswordUpdateRequest(new PasswordRequest(userPassword), new PasswordRequest(newPassword));
+    }
+    
+    public UserAuthorityResponse userAuthorityResponse() {
+        return new UserAuthorityResponse("USER");
+    }
+    
+    public UserAddressResponse userAddressResponse() {
+        return new UserAddressResponse(cityName, streetName, streetNumber, postCode);
+    }
+    
+    public UserProfileResponse userProfileResponse() {
+        return new UserProfileResponse(userFirstName, userLastName, userAddressResponse(), cartResponse(),
+                                       List.of(orderResponse()));
+    }
+    
+    public UserResponse userResponse() {
+        return new UserResponse(userEmail, userProfileResponse(), List.of(userAuthorityResponse()));
+    }
     
     public Cart cartEntity() {
         Cart cart = new Cart();
