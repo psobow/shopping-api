@@ -8,6 +8,8 @@ import com.sobow.shopping.domain.user.User;
 import com.sobow.shopping.services.user.AdminService;
 import com.sobow.shopping.services.user.CurrentUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -36,14 +38,37 @@ public class UserManagementController {
     private final CurrentUserService currentUserService;
     
     @Operation(
-        summary = "Create a new user (admin)",
-        security = {@SecurityRequirement(name = "bearerAuth")}
+        summary = "Create a new user",
+        security = {@SecurityRequirement(name = "bearerAuth")},
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    {
+                        "email": "newuser@gmail.com",
+                        "password": "password",
+                        "userProfile": {
+                            "firstName": "new user first name",
+                            "lastName": "new user last name",
+                            "userAddress": {
+                                "cityName": "Wroclaw",
+                                "streetName": "some street",
+                                "streetNumber": "30",
+                                "postCode": "10-200"
+                            }
+                        },
+                        "authorities": ["ADMIN"]
+                    }
+                    """)
+            )
+        )
     )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "User created"),
         @ApiResponse(responseCode = "400", description = "Validation error"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Forbidden (requires admin role)"),
+        @ApiResponse(responseCode = "403", description = "Forbidden"),
         @ApiResponse(responseCode = "409", description = "Email already exists")
     })
     @PostMapping("/register")
@@ -57,14 +82,14 @@ public class UserManagementController {
     }
     
     @Operation(
-        summary = "Find user by email (admin)",
+        summary = "Find user by email",
         security = {@SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Found"),
         @ApiResponse(responseCode = "400", description = "Validation error"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Forbidden (requires admin role)"),
+        @ApiResponse(responseCode = "403", description = "Forbidden"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping(params = "email")
@@ -77,14 +102,25 @@ public class UserManagementController {
     }
     
     @Operation(
-        summary = "Update user authorities by email (admin)",
-        security = {@SecurityRequirement(name = "bearerAuth")}
+        summary = "Update user authorities by email",
+        security = {@SecurityRequirement(name = "bearerAuth")},
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    {
+                        "authorities": ["ADMIN"]
+                    }
+                    """)
+            )
+        )
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Updated"),
         @ApiResponse(responseCode = "400", description = "Validation error"),
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Forbidden (requires admin role)"),
+        @ApiResponse(responseCode = "403", description = "Forbidden"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PutMapping(params = "email")

@@ -34,7 +34,7 @@ public class OrderManagementController {
     private final OrderResponseMapper orderResponseMapper;
     
     @Operation(
-        summary = "Get user's order",
+        summary = "Get user's order by id",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @Parameters({
@@ -59,7 +59,7 @@ public class OrderManagementController {
     }
     
     @Operation(
-        summary = "List user's orders",
+        summary = "Get all user's orders",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @Parameters({

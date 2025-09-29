@@ -28,7 +28,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("${api.prefix}/users/me/orders")
 @Tag(
     name = "Order Controller",
-    description = "API to manage orders by authenticated user"
+    description = "API to manage order by authenticated user"
 )
 public class OrderController {
     

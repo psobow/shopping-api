@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${api.prefix}/categories")
 @Tag(
     name = "Category Controller",
-    description = "API to get categories by id or name"
+    description = "API to get category by id or name"
 )
 public class CategoryController {
     
