@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("${api.prefix}/admin/products/{productId}/images")
 @Tag(
     name = "Image Management Controller",
-    description = "API to manage Images by Admin"
+    description = "API to manage images by Admin"
 )
 public class ImageManagementController {
     
