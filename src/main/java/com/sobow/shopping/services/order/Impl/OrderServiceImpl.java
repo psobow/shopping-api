@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
     private void assertStockAvailableAndDecrement(Set<CartItem> items) {
         for (CartItem item : items) {
             // Assert products still available
-            Product product = item.getProduct();
+            Product product = productService.findById(item.getProduct().getId());
             int availableQty = product.getAvailableQty();
             int requestedQty = item.getRequestedQty();
             if (requestedQty > availableQty) {
