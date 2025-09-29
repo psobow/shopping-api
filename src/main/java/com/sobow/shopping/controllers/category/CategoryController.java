@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     
     private final CategoryService categoryService;
-    
     private final CategoryResponseMapper categoryResponseMapper;
     
     @Operation(
